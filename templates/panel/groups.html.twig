@@ -1,0 +1,102 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Группы студентов{% endblock %}
+
+{% block body %}
+
+<div class="back-button centered">
+    <a href="{{ path('app_panel') }}" class="btn btn-secondary">Вернуться в панель</a>
+</div>
+
+<h1 class="page-title centered">Добавить группу</h1>
+
+<!-- Форма для добавления группы -->
+<div class="add-group-container">
+    <form method="post" action="{{ path('add_group') }}" class="add-group-form">
+        <div class="form-row">
+            <label for="name" class="centered">Название группы:</label>
+            <input type="text" id="name" name="name" class="form-control" required>
+            <label for="code">Код группы:</label>
+            <input type="text" id="code" name="code" class="form-control" required>
+            <label for="description">Описание:</label>
+            <textarea id="description" name="description" class="form-control" required></textarea>
+            <button type="submit" class="btn btn-primary">Добавить группу</button>
+        </div>
+    </form>
+</div>
+
+<h1 class="page-title centered">Текущие группы</h1>
+
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Название</th>
+                <th>Код</th>
+                <th>Описание</th>
+                <th>Статус</th>
+                <th>Студенты</th>
+                <th>Расписание</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for group in groups %}
+            <tr>
+                <td>{{ group.name }}</td>
+                <td>{{ group.code }}</td>
+                <td>{{ group.description }}</td>
+                <td>{{ group.group_status == 1 ? 'Активна' : 'Неактивна' }}</td>
+                <td>
+                    <button class="toggle-students" data-group-id="{{ group.id }}">
+                        Показать студентов
+                    </button>
+                </td>
+                <td>
+                    <form action="{{ path('edit_schedule', { 'id': group.id }) }}" method="POST">
+                        <input type="hidden" name="group_id" value="{{ group.id }}">
+                        <button type="submit" class="toggle-students">
+                            Редактировать расписание
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            <tr class="students-list" id="students-group-{{ group.id }}" style="display: none;">
+                <td colspan="6">
+                    <ul>
+                        {% if group.students is not empty %}
+                            {% for student in group.students %}
+                            <li>{{ student.first_name }} {{ student.last_name }}</li>
+                            {% endfor %}
+                        {% else %}
+                            <li>Студенты отсутствуют.</li>
+                        {% endif %}
+                    </ul>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const toggleButtons = document.querySelectorAll('.toggle-students');
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const groupId = this.dataset.groupId;
+                const studentRow = document.getElementById('students-group-' + groupId);
+                if (studentRow.style.display === 'none') {
+                    studentRow.style.display = 'table-row';
+                    this.textContent = 'Скрыть студентов';
+                } else {
+                    studentRow.style.display = 'none';
+                    this.textContent = 'Показать студентов';
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

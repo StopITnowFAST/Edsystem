@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Предметы{% endblock %}
+
+{% block body %}
+
+<div class="back-button centered">
+    <a href="{{ path('app_panel') }}" class="btn btn-secondary">Вернуться в панель</a>
+</div>
+
+<div class="subject-container">
+    <h1 class="centered">Добавление учебных предметов</h1>
+
+    <form action="{{ path('add_subject') }}" method="post" class="subject-form">
+        <div class="form-group">
+            <label for="subject_name">Название предмета</label>
+            <input type="text" id="subject_name" name="subject_name" required class="form-control">
+            <button type="submit" class="btn" >Добавить предмет</button>
+        </div>
+    </form>
+
+    <h2 class="centered">Список учебных предметов</h2>
+    <ul class="subject-list">
+        {% for subject in subjects %}
+            <li class="subject-item">{{ subject.name }}</li>
+        {% else %}
+            <li class="subject-item">Нет добавленных предметов</li>
+        {% endfor %}
+    </ul>
+</div>
+
+
+    
+
+{% endblock %}

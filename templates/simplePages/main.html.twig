@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Добро пожаловать{% endblock %}
+
+{% block body %}
+        <h1 class="centered">Добро пожаловать на наш сайт!</h1>
+
+        <p class="centered">Удивительный сайт для диплома.</p>
+
+        <div class="centered get-away">
+            <a href="{{ path('app_register') }}" class="btn btn-primary centered">Регистрация</a>
+            <a href="{{ path('app_login') }}" class="btn btn-secondary centered">Войти в аккаунт</a>
+        </div>
+{% endblock %}

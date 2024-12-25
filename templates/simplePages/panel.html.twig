@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Админ Панель{% endblock %}
+
+{% block body %}
+    <div class="admin-panel">
+        <h1 class="centered">Добро пожаловать в Админ Панель</h1>
+
+        <div class="admin-sections">
+            <div class="section">
+                <a href="{{ path('panel_groups') }}" class="btn-section">Управление группами студентов</a>
+            </div>
+
+            <div class="section">
+                <a href="{{ path('panel_students') }}" class="btn-section">Управление студентами</a>
+            </div>
+
+            <div class="section">
+                <a href="{{ path('panel_grades') }}" class="btn-section">Управление оценками</a>
+            </div>
+
+            <div class="section">
+                <a href="{{ path('panel_subjects') }}" class="btn-section">Управление предметами</a>
+            </div>
+
+            <div class="section">
+                <a href="{{ path('panel_accounts') }}" class="btn-section">Подвязка аккаунтов</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,42 @@
+<div class="student-grades">
+    {% if user is not null %}
+        <h1 class="student-name centered">Оценки студента: {{ user.lastName }} {{ user.firstName }}</h1>
+    {% else %}
+        <p class="no-info">Информация о студенте не доступна.</p>
+    {% endif %}
+
+    {% if lessons is null or lessons|length == 0 %}
+        <p class="no-info">Расписание для данного студента не выбрано.</p>
+    {% else %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Предмет</th>
+                    <th>Оценки</th>
+                    <th>Средний балл</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lesson in lessons %}
+                    <tr>
+                        <td>{{ lesson }}</td>
+                        <td>
+                            {% if grades[lesson] is defined and grades[lesson]|length > 0 %}
+                                {{ grades[lesson]|join(', ') }}
+                            {% else %}
+                                Не выставлена
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if averages[lesson] is defined and averages[lesson] is not null and averages[lesson] != 0 %}
+                                {{ averages[lesson] }}
+                            {% else %}
+                                Не выставлен
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</div>

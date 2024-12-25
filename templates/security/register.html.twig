@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Register{% endblock %}
+
+{% block body %}
+
+    <!-- Отображение ошибок формы -->
+    {% if form_errors(registrationForm) %}
+        <div class="form-errors">
+            {{ form_errors(registrationForm) }}
+        </div>
+    {% endif %}
+
+    <!-- Форма регистрации -->
+    <div class="form-container">
+        {{ form_start(registrationForm, {'attr': {'class': 'registration-form'}}) }}
+            <h1 class="page-title centered">Регистрация</h1>
+            <div class="add-group-container">
+                <div class="field-registration">
+                    {{ form_row(registrationForm.email, {
+                        'attr': {'class': 'form-control-slice', 'placeholder': 'Ваш email'},
+                        'label_attr': {'class': 'reg-label'}
+                    }) }}
+                    {{ form_row(registrationForm.plainPassword, {
+                        'attr': {'class': 'form-control-slice', 'placeholder': 'Пароль'},
+                        'label': 'Пароль',
+                        'label_attr': {'class': 'reg-label'}
+                    }) }}
+                    <button type="submit" class="btn btn-primary">Зарегистрироваться</button>  
+                </div>
+            </div>
+
+
+            <div class="form-actions">
+            </div>
+        {{ form_end(registrationForm) }}
+    </div>
+
+    <div class="centered get-away">
+        <a href="{{ path('app_register') }}" class="btn btn-secondary">Регистрация</a>
+        <a href="{{ path('app_login') }}" class="btn btn-secondary">Войти в аккаунт</a>
+    </div>
+{% endblock %}

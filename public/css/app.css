@@ -1,0 +1,788 @@
+/* Основные цвета */
+:root {
+    --primary-color: #7289da; /* Основной синий */
+    --secondary-color: #424549; /* Тёмно-серый */
+    --background-color: #282b30; /* Темный фон */
+    --light-gray: #36393e; /* Легкий серый */
+    --darker-bg: #1e2124; /* Еще более темный фон */
+    --accent-color: #ffffff; /* Белый для текста */
+}
+
+/* Общие стили для тела страницы */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: var(--background-color);
+    color: var(--accent-color);
+    margin: 0;
+    padding: 0;
+}
+
+/* Глобальные стили для всех таблиц в проекте */
+table {
+    width: 100%;
+    border-collapse: collapse; /* Убираем промежутки между ячейками */
+    background-color: var(--background-color); /* Темный фон таблицы, похожий на фон Discord */
+    border-radius: 10px; /* Скругление углов */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Тень для таблицы */
+    margin: 20px 0; /* Отступы вокруг таблицы */
+}
+
+/* Стиль для заголовков таблиц */
+th {
+    background-color: var(--secondary-color); /* Темный фон для заголовков */
+    color: var(--accent-color); /* Белый цвет текста для заголовков */
+    padding: 12px;
+    text-align: left;
+    border-bottom: 2px solid var(--accent-color); /* Более толстая линия разделяющая заголовки */
+}
+
+/* Стиль для ячеек таблицы */
+td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--secondary-color); /* Легкая линия разделяющая строки с темным цветом */
+    color: var(--accent-color); /* Светлый текст для ячеек */
+}
+
+/* Альтернативный фон для четных строк */
+tr:nth-child(even) {
+    background-color: var(--background-color); /* Темный фон для четных строк */
+}
+
+/* Эффект при наведении на строку */
+tr:hover {
+    background-color: var(--light-gray); /* Цвет при наведении на строку */
+    border-radius: 200px;
+}
+
+/* Стиль для кнопок внутри таблиц */
+button {
+    background-color: var(--primary-color);
+    color: var(--accent-color);
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 200px;
+    transition: var(--background-color) 0.3s ease;
+}
+
+button:hover {
+    background-color: var(--secondary-color); /* Цвет кнопки при наведении */
+}
+
+button:focus {
+    outline: none;
+}
+
+/* Общие стили для таблиц внутри контейнеров */
+.table-container {
+    display: flex;
+    justify-content: center; /* Выравнивание таблиц по горизонтали */
+    padding: 40px;
+    background-color: var(--darker-bg); /* Темный фон контейнера */
+    border-radius: 10px; /* Скругление углов */
+    margin: 20px auto; /* Центрируем таблицу по горизонтали */
+    max-width: 1200px; /* Максимальная ширина контейнера */
+}
+
+
+/* СТИЛИ ДЛЯ ВСЕХ ФОРМ */
+
+/* Контейнер формы добавления группы */
+.add-group-container {
+    display: flex;
+    justify-content: center; /* Выравнивание формы по центру */
+    padding: 40px;
+    background-color: var(--darker-bg); /* Темный фон контейнера */
+    border-radius: 10px; /* Скругление углов */
+    max-width: 1200px; /* Максимальная ширина, как у таблицы */
+    margin: 20px auto; /* Центрирование формы */
+}
+
+/* Стили для формы */
+.add-group-form {
+    width: 100%;
+    background-color: var(--background-color); /* Темный фон для формы */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); /* Легкая тень */
+}
+
+/* Стиль для всех полей ввода */
+.form-control {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--background-color); /* Темный фон для полей ввода */
+    border: 1px solid var(--secondary-color); /* Темная граница */
+    color: var(--accent-color); /* Светлый текст */
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color); /* Синий цвет границы при фокусе */
+    background-color: var(--secondary-color); /* Немного светлее фон при фокусе */
+}
+
+/* Стили для меток */
+label {
+    color: var(--accent-color); /* Светлый текст для меток */
+    margin-bottom: 8px;
+    display: block;
+    font-size: 14px;
+}
+
+/* Стиль для текста внутри textarea */
+textarea {
+    resize: none;
+}
+
+/* Кнопка отправки формы */
+button {
+    background-color: var(--primary-color);
+    color: var(--accent-color);
+    border: none;
+    padding: 12px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    font-size: 16px;
+    width: 100%; /* Кнопка по ширине всего контейнера */
+}
+
+button:hover {
+    background-color: var(--secondary-color); /* Цвет кнопки при наведении */
+}
+
+/* Общие стили для строки с полями ввода */
+.form-row {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap; /* Разрешаем перенос строк, если нужно */
+}
+
+/* Для поля описания, чтобы оно занимало всю ширину */
+.form-group-full {
+    width: 100% !important; /* Поле описания будет растягиваться на всю ширину */
+}
+
+@media (max-width: 768px) {
+    /* На мобильных устройствах поля формы занимают всю ширину */
+    .form-group {
+        width: 100%;
+    }
+
+    .form-group-full {
+        width: 100%;
+    }
+}
+
+/* Админ панель */
+.centered {
+    text-align: center;
+}
+
+.get-away {    
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+
+.admin-panel {
+    background-color: var(--darker-bg);
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.admin-panel h1 {
+    color: var(--primary-color);
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.admin-sections {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* или space-around, если хотите немного больше отступов между секциями */
+    gap: 20px; /* отступ между секциями */
+    padding: 50px;
+}
+
+.section {
+    flex: 1; /* Каждая секция будет занимать одинаковую долю пространства */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 300px; /* фиксированная высота для всех секций */
+    background-color: var(--light-gray); /* пример фона, чтобы секции были видимы */
+    border-radius: 50px; /* радиус скругления углов, если нужно */
+}
+
+.section a {
+    display: block;
+    text-align: center;
+    padding: 20px;
+    color: var(--accent-color);
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.section a:hover {
+    background-color: var(--primary-color);
+    border-radius: 50px;
+}
+
+.btn-section {
+    width: 100%;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .section {
+        flex: 1 1 100%;
+    }
+}
+
+/* Стили для шапки */
+.header {
+    background-color: var(--background-color);
+    padding: 15px 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.logo a {
+    text-decoration: none;
+}
+
+#site-logo {
+    width: 120px; /* Размер логотипа */
+}
+
+.panel {
+    margin-right: 20px;    
+}
+
+.panel-link {
+    font-size: 1rem;
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.panel-link:hover {
+    color: var(--secondary-color);
+}
+
+.button-container {
+    display: flex; /* расположить кнопки в ряд */
+    gap: 10px; /* отступ между кнопками */
+}
+
+.user-menu {
+    position: relative;
+}
+
+.menu-toggle {
+    background-color: var(--primary-color);
+    color: var(--accent-color);
+    padding: 8px 15px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.menu-toggle:hover {
+    background-color: var(--secondary-color);
+}
+
+.dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: var(--darker-bg);
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    list-style: none;
+    padding: 10px 0;
+    margin: 0;
+    width: 200px;
+}
+
+.user-menu:hover .dropdown {
+    display: block;
+}
+
+.dropdown-link {
+    display: block;
+    color: var(--accent-color);
+    padding: 10px 20px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.dropdown-link:hover {
+    background-color: var(--secondary-color);
+}
+
+/* Адаптивность для маленьких экранов */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .logo {
+        margin-bottom: 20px;
+    }
+
+    .user-menu {
+        width: 100%;
+    }
+
+    .dropdown {
+        width: 100%;
+    }
+
+    .panel {
+        display: none;
+    }
+
+    .menu-toggle {
+        width: 100%;
+        text-align: left;
+        padding: 10px 20px;
+    }
+}
+
+/* Стили футера */
+.footer {
+    background-color: var(--darker-bg);
+    padding: 20px 0;
+    text-align: center;
+    color: var(--accent-color);
+}
+
+.footer .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.social-links {
+    margin-bottom: 10px;
+}
+
+.social-link {
+    font-size: 1rem;
+    color: var(--primary-color);
+    margin: 0 15px;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.social-link:hover {
+    color: var(--secondary-color);
+}
+
+.copyright {
+    font-size: 0.9rem;
+    color: var(--light-gray);
+    margin-top: 10px;
+}
+
+/* Адаптивность для маленьких экранов */
+@media (max-width: 768px) {
+    .social-link {
+        display: block;
+        margin: 10px 0;
+    }
+}
+
+/* .btn {
+    color: var(--primary-color);
+}
+
+.btn:hover {
+    color: var(--secondary-color);
+} */
+
+.btn {
+    background-color: var(--primary-color); /* Основной синий */
+    color: var(--accent-color); /* Белый цвет для текста */
+    border: none;
+    padding: 12px 20px;
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    text-decoration: none; /* Убирает подчеркивание */
+}
+
+.btn:hover {
+    background-color: var(--secondary-color); /* Тёмно-серый при наведении */
+}
+
+.btn:focus {
+    outline: none;
+}
+
+
+.back-button {
+    text-align: center; /* Центрируем кнопку по горизонтали */
+    margin-top: 40px; /* Отступ сверху от соседних элементов */
+    margin-bottom: 40px; /* Отступ сверху от соседних элементов */
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color); /* Тёмно-серый цвет фона */
+    color: var(--accent-color); /* Белый текст */
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none; /* Убираем подчеркивание у ссылки */
+    text-align: center;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background-color: var(--primary-color); /* При наведении меняем на основной синий цвет */
+}
+
+.no-info {
+    color: var(--accent-color); /* Используем светлый серый цвет для текста */
+    text-align: center; /* Центрируем текст */
+    font-size: 16px; /* Устанавливаем размер шрифта */
+    margin-top: 20px; /* Отступ сверху */
+    font-style: italic; /* Курсивное начертание текста */
+}
+
+
+
+
+
+
+
+
+
+
+/* Стили для меток (labels) */
+label {
+    color: var(--accent-color);
+    font-size: 14px;
+    margin-bottom: 5px;
+    display: block;
+    text-align: center;
+}
+
+/* Общие стили для всех полей ввода и селектов */
+input[type="number"], select {
+    width: 300px; /* Устанавливаем одинаковую ширину */
+    height: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    background-color: var(--secondary-color);
+    color: var(--accent-color);
+    border: 1px solid var(--primary-color);
+    border-radius: 5px;
+    font-size: 14px;
+    outline: none;
+    text-align: center; /* Текст в полях по центру */
+}
+
+input[type="number"]:focus, select:focus {
+    border-color: var(--primary-color);
+    background-color: var(--light-gray);
+}
+
+
+
+.subject-container {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #36393e;
+    border-radius: 10px;
+}
+
+
+
+/* Заголовки */
+.title, .subject-list-title {
+    color: #7289da;
+    text-align: center;
+}
+
+/* Стили для формы */
+.subject-form {
+    max-width: 400px;
+    margin: 0 auto;
+    background-color: #36393e;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-label {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 5px;
+    color: #ffffff;
+}
+
+.form-input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #424549;
+    background-color: #1e2124;
+    color: #ffffff;
+    font-size: 16px;
+}
+
+.form-input:focus {
+    border-color: #7289da;
+    outline: none;
+}
+
+/* Стили для списка предметов */
+.subject-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.subject-item {
+    padding: 10px;
+    background-color: #424549;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.subject-item:hover {
+    background-color: #7289da;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    color: var(--accent-color); /* Белый текст */
+}
+
+/* Метки для элементов формы */
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 16px;
+    color: var(--accent-color); /* Белый цвет для текста меток */
+}
+
+/* Ввод для текста */
+.form-group input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--secondary-color); /* Тёмно-серый бордер */
+    background-color: var(--darker-bg); /* Еще более темный фон для поля ввода */
+    color: var(--accent-color); /* Белый текст */
+    font-size: 16px;
+    border-radius: 5px;
+    box-sizing: border-box; /* Чтобы учитывать padding в ширине */
+}
+
+.form-group input[type="text"]:focus {
+    border-color: var(--primary-color); /* Синий цвет при фокусе */
+    outline: none;
+}
+
+/* Кнопка добавления предмета */
+.submit-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--primary-color); /* Синий цвет кнопки */
+    color: var(--accent-color); /* Белый текст */
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    box-sizing: border-box; /* Чтобы учитывать padding в ширине */
+}
+
+.submit-btn:hover {
+    background-color: #5e73a4; /* Темный синий при наведении */
+}
+
+/* Общие стили для всех блоков */
+.profile, .schedule, .grades {
+    background-color: var(--light-gray); /* Легкий серый фон для блоков */
+    padding: 20px; /* Отступы внутри блоков */
+    margin-bottom: 20px; /* Отступы между блоками */
+    border-radius: 8px; /* Скругленные углы */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Тень для блока */
+}
+
+/* Стили для блока профиля */
+.profile {
+    background-color: var(--light-gray); /* Темный фон для профиля */
+    color: var(--accent-color); /* Белый цвет текста */
+    display: flex;
+    flex-direction: column; /* Выравнивание по вертикали */
+    margin-left: auto; /* Автоматический отступ слева */
+    margin-right: auto; /* Автоматический отступ справа */
+    width: 50%; /* Ширина блока */
+}
+
+/* Стили для блока расписания, выравнивание по центру */
+.schedule {
+    background-color: var(--light-gray); /* Темно-серый фон для расписания */
+    color: var(--accent-color); /* Белый текст */
+    display: flex;
+    flex-direction: column; /* Вертикальное выравнивание */
+    align-items: center; /* Центрируем все содержимое */
+    margin-top: 20px;
+    margin-left: auto; /* Автоматический отступ слева */
+    margin-right: auto; /* Автоматический отступ справа */
+    width: 50%; /* Ширина блока */
+}
+
+/* Стили для блока оценок (занимает всю ширину) */
+.grades {
+    background-color: var(--light-gray); /* Легкий серый фон для оценок */
+    color: var(--accent-color); /* Белый цвет текста */
+    display: flex;
+    flex-direction: column; /* Вертикальное выравнивание */
+    align-items: center; /* Выравнивание элементов слева */
+    width: 50%; /* Блок занимает всю ширину */
+    margin-left: auto; /* Автоматический отступ слева */
+    margin-right: auto; /* Автоматический отступ справа */
+}
+
+/* Стили для таблицы в блоке grades */
+.grades table {
+    width: 100%; /* Таблица занимает всю ширину блока */
+    border-collapse: collapse; /* Убираем двойные границы */
+    table-layout: fixed;
+    margin-top: 20px; /* Отступ сверху */
+    border: 1px solid var(--primary-color); /* Граница таблицы в основном синем цвете */
+}
+
+.grades th, .grades td {
+    padding: 12px; /* Отступы в ячейках таблицы */
+    text-align: left; /* Выравнивание текста по левому краю */
+    border-bottom: 1px solid var(--darker-bg); /* Нижняя граница ячеек */
+}
+
+/* Стили для таблиц в блоке schedule */
+.schedule table {
+    table-layout: fixed;
+    word-wrap: break-word;
+    width: 100%; /* Ширина таблицы */
+    margin: 10px 0; /* Отступы сверху и снизу */
+    border: 1px solid var(--primary-color); /* Граница таблицы в основном синем цвете */
+}
+
+.schedule th, .schedule td {
+    padding: 12px; /* Отступы в ячейках таблицы */
+    text-align: left; /* Выравнивание текста по левому краю */
+    border-bottom: 1px solid var(--darker-bg); /* Нижняя граница ячеек */
+}
+
+/* Стили для заголовков внутри блоков */
+.profile h2, .schedule h2, .grades h2 {
+    color: var(--primary-color); /* Основной синий для заголовков */
+    margin-bottom: 10px; /* Отступ снизу */
+}
+
+/* Стили для элементов внутри блоков, например, списков */
+.profile ul, .schedule ul, .grades ul {
+    list-style-type: none; /* Убираем маркеры списка */
+    padding-left: 0; /* Убираем отступ слева */
+}
+
+.profile li, .schedule li, .grades li {
+    margin-bottom: 10px; /* Отступы между элементами списка */
+}
+
+/* Для картинок или иконок в блоках */
+.profile img, .schedule img, .grades img {
+    max-width: 100%; /* Ограничиваем максимальную ширину */
+    height: auto; /* Автоматическая высота */
+    margin-bottom: 10px; /* Отступ снизу */
+}
+
+.field-registration {
+    display: block; /* Каждый элемент будет занимать всю ширину */
+    width: 104%; /* Чтобы поля формы растягивались на всю ширину контейнера */
+    margin-bottom: 15px; /* Отступ между полями */
+    padding: 10px; /* Добавим отступы внутри полей */
+    border-radius: 5px; /* Скругленные углы */
+    font-size: 1rem; /* Размер шрифта для текста */
+}
+
+.form-control-slice {
+    width: 98%;
+    padding: 10px;
+    background-color: var(--background-color); /* Темный фон для полей ввода */
+    border: 1px solid var(--secondary-color); /* Темная граница */
+    color: var(--accent-color); /* Светлый текст */
+    border-radius: 5px;   
+}
+
+.reg-label {
+    text-align: left; /* Размещение текста по правому краю */
+    margin-bottom: 15px; /* Отступ снизу */
+    margin-top: 15px;
+}
+
+.schedule-container {
+    display: flex;    
+    justify-content: center; /* Выравнивание формы по центру */
+    padding: 40px;
+    background-color: var(--darker-bg); /* Темный фон контейнера */
+    border-radius: 10px; /* Скругление углов */
+    margin: 20px auto; /* Центрирование формы */
+    width: 80%; /* Ширина блока */  
+    flex-direction: column; /* Вертикальное выравнивание */
+    align-items: center; /* Выравнивание элементов слева */
+    margin-left: auto; /* Автоматический отступ слева */
+    margin-right: auto; /* Автоматический отступ справа */
+}
+
+.schedule-container table {    
+    width: 100%; /* Таблица занимает всю ширину блока */
+    border-collapse: collapse; /* Убираем двойные границы */
+    table-layout: fixed;
+    margin-top: 20px; /* Отступ сверху */
+}
+
+.form-input, .select-like {
+    width: 100%; /* Заполнить всю доступную ширину */
+    padding: 8px; /* Выровнять внутренние отступы */
+    box-sizing: border-box; /* Учитывать отступы и границы в ширине */
+    margin: 0px;
+}
+
+/* Специфический стиль для select */
+.select-like {
+    appearance: none; /* Убираем стандартный стиль select (внешний вид зависит от браузера) */
+    -webkit-appearance: none; /* Для Safari */
+    -moz-appearance: none; /* Для Firefox */
+    background-color: #1e2124;
+    border: 1px solid var(--secondary-color); /* Граница */
+    border-radius: 4px; /* Закругленные углы */
+}
