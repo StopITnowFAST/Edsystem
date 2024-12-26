@@ -29,7 +29,6 @@ class StudentsController extends AbstractController {
         $this->em = $em;     
     }
 
-    // Учительская страница редактирования ученика
     #[Route(path: '/panel/students', name: 'panel_students')] 
     function panelStudent(Request $request, SluggerInterface $slugger) {
         $studentsFromDB = $this->em->getRepository(Student::class)->findAll();
@@ -92,7 +91,6 @@ class StudentsController extends AbstractController {
             $entityManager->flush();
         } 
 
-        // Перенаправляем на страницу списка студентов
         return $this->redirectToRoute('panel_students');
     }
 }
