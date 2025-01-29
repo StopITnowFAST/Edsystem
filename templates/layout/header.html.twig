@@ -1,24 +1,24 @@
-<header class="header">
-    <div class="container">
-        <div class="logo">
+<header>
+    <div>
+        <div>
             <a href="{{ path('app_main') }}">
                 <img src="/images/logo.png" alt="Логотип" id="site-logo">
             </a>
         </div>
 
-        <div class="button-container">
+        <div >
             {% if is_granted('ROLE_TEACHER') %}
-                <a href="{{ path('app_panel') }}" class="btn">Панель учителя</a>
+                <a href="{{ path('app_panel') }}">Панель учителя</a>
             {% endif %}
-            <div class="user-menu">            
-                <button class="btn menu-toggle">Меню</button>
-                <ul class="dropdown">
+            <div>            
+                <button>Меню</button>
+                <ul>
                     {% if app.user %}
-                        <li><a href="{{ path('app_account') }}" class="dropdown-link">Аккаунт</a></li>
-                        <li><a href="{{ path('app_logout') }}" class="dropdown-link">Выйти</a></li>
+                        <li><a href="{{ path('app_account') }}">Аккаунт</a></li>
+                        <li><a href="{{ path('app_logout') }}">Выйти</a></li>
                     {% else %}
-                        <li><a href="{{ path('app_register') }}" class="dropdown-link">Регистрация</a></li>
-                        <li><a href="{{ path('app_login') }}" class="dropdown-link">Войти</a></li>
+                        <li><a href="{{ path('app_register') }}">Регистрация</a></li>
+                        <li><a href="{{ path('app_login') }}">Войти</a></li>
                     {% endif %}
                 </ul>
             </div>

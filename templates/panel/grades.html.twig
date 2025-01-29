@@ -4,18 +4,18 @@
 
 {% block body %}
 
-    <div class="back-button centered">
-        <a href="{{ path('app_panel') }}" class="btn btn-secondary">Вернуться в панель</a>
+    <div>
+        <a href="{{ path('app_panel') }}" >Вернуться в панель</a>
     </div>
 
-    <h1 class="centered">Выставление оценок</h1>
+    <h1>Выставление оценок</h1>
 
     {# Шаг 1: Выбор группы #}
-    <div class="add-group-container">
+    <div>
 
-        <form method="get" action="{{ path('panel_grades') }}">
+        <form method="get" action="{{ path('panel_gradeas') }}">
             <label for="group">Выберите группу:</label>
-            <select name="groupId" id="group" onchange="this.form.submit()" class="centered">
+            <select name="groupId" id="group" onchange="this.form.submit()">
                 <option value="">Выберите группу</option>
                 {% for group in groups %}
                     <option value="{{ group.id }}" {% if group.id == groupId %}selected{% endif %}>{{ group.name }}</option>
@@ -24,7 +24,7 @@
         </form>
     
     </div>
-    <div class="add-group-container">
+    <div>
 
     {% if groupId %}
         {# Шаг 2: Выбор студента #}
@@ -41,12 +41,12 @@
     
     </div>
 
-    <div class="add-group-container">
+    <div>
         {% if studentId %}
             {# Шаг 3: Выбор предмета #}
             <form method="post" action="{{ path('panel_grades') }}">
                 <label for="lesson">Выберите предмет</label>
-                <div class="centered">
+                <div>
                     <select name="lessonName" id="lesson">
                         <option value="">Выберите предмет</option>
                         {% for lesson in lessons %}
@@ -55,9 +55,10 @@
                     </select>
 
                     <label for="grade">Оценка:</label>
+                    
                     <input type="number" name="grade" id="grade" min="1" max="5" required>
 
-                    <button type="submit" class="btn">Добавить оценку</button>
+                    <button type="submit">Добавить оценку</button>
 
                     <input type="hidden" name="groupId" value="{{ groupId }}">
                     <input type="hidden" name="studentId" value="{{ studentId }}">

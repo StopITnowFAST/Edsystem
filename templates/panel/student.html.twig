@@ -4,21 +4,21 @@
 
 {% block body %}
 
-<div class="back-button centered">
-    <a href="{{ path('app_panel') }}" class="btn btn-secondary">Вернуться в панель</a>
+<div>
+    <a href="{{ path('app_panel') }}">Вернуться в панель</a>
 </div>
 
-<h1 class="page-title centered">Добавить студента</h1>
+<h1>Добавить студента</h1>
 
 <!-- Форма для добавления студента -->
 {% include 'block/student_form.html.twig' with {'students': students, 'groups': groups} %}
 
 
-<h1 class="page-title centered">Управление студентами</h1>
+<h1>Управление студентами</h1>
 
 <!-- Таблица студентов -->
-<div class="table-container">
-    <table class="table">
+<div>
+    <table>
         <thead> 
             <tr>
                 <th>Фамилия</th>
@@ -38,12 +38,12 @@
                 <td>{{ student.group_id }}</td>
                 <td>{{ student.age }}</td>
                 <td>
-                    <a href="{{ path('delete_student', { id: student.id }) }}" class="btn">Удалить</a>
+                    <a href="{{ path('delete_student', { id: student.id }) }}">Удалить</a>
                 </td> 
             </tr>
             {% else %}
             <tr>
-                <td colspan="6" class="no-data">Студенты не найдены.</td>
+                <td colspan="6">Студенты не найдены.</td>
             </tr>
             {% endfor %}
         </tbody>    

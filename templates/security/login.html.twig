@@ -3,32 +3,32 @@
 {% block title %}Log in{% endblock %}
 
 {% block body %}
-    <form method="post" class="login-form">
+    <form method="post">
         {% if error %}
-            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
         {% endif %}
 
         {% if app.user %}
-            <div class="mb-3">
+            <div>
                 You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
             </div>
         {% endif %}
 
-        <h1 class="centered">Войти в аккаунт</h1>        
-        <div class="add-group-container">
-            <div class="form-row">
+        <h1>Войти в аккаунт</h1>        
+        <div>
+            <div>
                 <label for="username">Почта</label>
-                <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="email" required autofocus>
+                <input type="email" value="{{ last_username }}" name="_username" id="username" autocomplete="email" required autofocus>
                 <label for="password">Пароль</label>
-                <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required>
+                <input type="password" name="_password" id="password" autocomplete="current-password" required>
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-                <button class="btn btn-lg btn-primary btn-block" type="submit">Войти</button>
+                <button type="submit">Войти</button>
             </div>
         </div>
     </form>
 
-    <div class="centered get-away">
-        <a href="{{ path('app_register') }}" class="btn btn-secondary">Регистрация</a>
-        <a href="{{ path('app_login') }}" class="btn btn-secondary">Войти в аккаунт</a>
+    <div>
+        <a href="{{ path('app_register') }}">Регистрация</a>
+        <a href="{{ path('app_login') }}">Войти в аккаунт</a>
     </div>
 {% endblock %}

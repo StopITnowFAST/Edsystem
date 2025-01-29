@@ -1,14 +1,14 @@
-<div class="student-grades">
+<div>
     {% if user is not null %}
-        <h1 class="student-name centered">Оценки студента: {{ user.lastName }} {{ user.firstName }}</h1>
+        <h1>Оценки студента: {{ user.lastName }} {{ user.firstName }}</h1>
     {% else %}
-        <p class="no-info">Информация о студенте не доступна.</p>
+        <p>Информация о студенте не доступна.</p>
     {% endif %}
 
     {% if lessons is null or lessons|length == 0 %}
-        <p class="no-info">Расписание для данного студента не выбрано.</p>
+        <p>Расписание для данного студента не выбрано.</p>
     {% else %}
-        <table class="table">
+        <table>
             <thead>
                 <tr>
                     <th>Предмет</th>

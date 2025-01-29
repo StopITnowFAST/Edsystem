@@ -6,23 +6,23 @@
 
 {% block body %}
 
-<div class="back-button centered">
-    <a href="{{ path('app_panel') }}" class="btn btn-secondary">Вернуться в панель</a>
+<div>
+    <a href="{{ path('app_panel') }}">Вернуться в панель</a>
 </div>
 
-<h1 class = "centered">Выбор студентов и пользователей</h1>
+<h1>Выбор студентов и пользователей</h1>
 
 <form action="{{ path('panel_accounts') }}" method="POST">
-    <div class="schedule-container">
-        <div class="form-row">
+    <div>
+        <div>
             <label for="student">Выберите студента:</label>
-            <select class="form-control" name="student" id="student">
+            <select name="student" id="student">
                 {% for student in students %}
                     <option value="{{ student.id }}">{{ student.firstName }} {{ student.middleName }} {{ student.lastName }}</option>
                 {% endfor %}
             </select>
             <label for="user">Выберите пользователя:</label>
-            <select class="form-control" name="user" id="user">
+            <select name="user" id="user">
                 {% for user in uniqueUsers %}
                     <option value="{{ user.id }}">{{ user.email }}</option>
                 {% endfor %}

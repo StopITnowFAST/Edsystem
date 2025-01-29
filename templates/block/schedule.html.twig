@@ -1,7 +1,7 @@
 
-<h1 class="centered">Расписание предметов</h1>
+<h1>Расписание предметов</h1>
 {% if schedule is not null %}
-    <div class="schedule-container">
+    <div>
 
         {% set daysOfWeek = {
             1: 'Понедельник',
@@ -15,7 +15,7 @@
         {% for day in days %}
             <div>
                 <h4 >{{ daysOfWeek[day.dayNumber] }}</h4>
-                <table class="schedule-table">
+                <table>
                     <thead>
                         <tr>
                             <th>Время</th>

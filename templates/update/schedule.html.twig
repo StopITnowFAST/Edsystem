@@ -4,21 +4,21 @@
 
 {% block body %}
 
-<div class="back-button">
-    <a href="{{ path('panel_groups') }}" class="btn btn-secondary">Вернуться к группам</a>
+<div>
+    <a href="{{ path('panel_groups') }}">Вернуться к группам</a>
 </div>
 
-<div class="schedule-container">
+<div>
 
     <form id="schedule-form" action="{{ path('save_schedule', { group_id: group_id }) }}" method="POST">
     <input type="hidden" id="deleted_lessons" name="deleted_lessons" value="">
     {% set days = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'] %}
     
-    <h1 class="centered">Редактирование расписания группы</h1>
+    <h1>Редактирование расписания группы</h1>
     {% for dayNumber in 1..6 %}
-    <div class="day-schedule">
-        <h2 class="centered">{{ days[dayNumber - 1] }}</h2>
-        <table class="day-table" data-day-number="{{ dayNumber }}">
+    <div>
+        <h2>{{ days[dayNumber - 1] }}</h2>
+        <table data-day-number="{{ dayNumber }}">
             <thead>
                 <tr>
                     <th>Время начала</th>
@@ -32,10 +32,10 @@
             <tbody>
                 {% for lesson in lessonsData[dayNumber] ?? [] %}
                     <tr data-lesson-id="{{ lesson.id }}">
-                        <td><input class="form-input" type="time" name="lessons[{{ dayNumber }}][start_time][]" value="{{ lesson.startTime|date('H:i') }}" required></td>
-                        <td><input class="form-input" type="time" name="lessons[{{ dayNumber }}][end_time][]" value="{{ lesson.endTime|date('H:i') }}" required></td>
+                        <td><input type="time" name="lessons[{{ dayNumber }}][start_time][]" value="{{ lesson.startTime|date('H:i') }}" required></td>
+                        <td><input type="time" name="lessons[{{ dayNumber }}][end_time][]" value="{{ lesson.endTime|date('H:i') }}" required></td>
                         <td>
-                            <select class="select-like form-input" name="lessons[{{ dayNumber }}][id][]" required>
+                            <select name="lessons[{{ dayNumber }}][id][]" required>
                                 <option value="" disabled {{ lesson.subjectId is not defined ? 'selected' }}>Выберите предмет</option>
                                 {% for subject in lessons %}
                                     <option value="{{ subject.id }}" {{ subject.id == lesson.subjectId ? 'selected' }}> 
@@ -44,17 +44,17 @@
                                 {% endfor %}
                             </select>
                         </td>
-                        <td><input class="form-input" type="text" name="lessons[{{ dayNumber }}][cabinet][]" value="{{ lesson.cabinet }}" required></td>
-                        <td><input class="form-input" type="text" name="lessons[{{ dayNumber }}][teacher][]" value="{{ lesson.teacher }}" required></td>
-                        <td><button type="button" class="delete-row-btn">Удалить</button></td>
+                        <td><input type="text" name="lessons[{{ dayNumber }}][cabinet][]" value="{{ lesson.cabinet }}" required></td>
+                        <td><input type="text" name="lessons[{{ dayNumber }}][teacher][]" value="{{ lesson.teacher }}" required></td>
+                        <td><button type="button" >Удалить</button></td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
-        <button type="button" class="add-lesson-btn" data-day-number="{{ dayNumber }}">+ Добавить урок</button>
+        <button type="button" data-day-number="{{ dayNumber }}">+ Добавить урок</button>
     </div>
     {% endfor %}
-    <button type="submit" class="save-schedule-btn get-away">Сохранить расписание</button>
+    <button type="submit">Сохранить расписание</button>
 </form>
 
 </div>
@@ -97,17 +97,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const options = lessonsList.map(lesson => `<option value="${lesson.id}">${lesson.name}</option>`).join('');
 
             row.innerHTML = `
-                <td><input type="time" class="form-input" name="lessons[${button.getAttribute('data-day-number')}][start_time][]" required></td>
-                <td><input type="time" class="form-input" name="lessons[${button.getAttribute('data-day-number')}][end_time][]" required></td>
+                <td><input type="time" name="lessons[${button.getAttribute('data-day-number')}][start_time][]" required></td>
+                <td><input type="time" name="lessons[${button.getAttribute('data-day-number')}][end_time][]" required></td>
                 <td>
-                    <select class="select-like form-input" name="lessons[${button.getAttribute('data-day-number')}][id][]" required>
+                    <select name="lessons[${button.getAttribute('data-day-number')}][id][]" required>
                         <option value="" disabled selected>Выберите предмет</option>
                         ${options}
                     </select>
                 </td>
-                <td><input type="text" class="form-input" name="lessons[${button.getAttribute('data-day-number')}][cabinet][]" required></td>
-                <td><input type="text" class="form-input" name="lessons[${button.getAttribute('data-day-number')}][teacher][]" required></td>
-                <td><button type="button" class="delete-row-btn">Удалить</button></td>
+                <td><input type="text" name="lessons[${button.getAttribute('data-day-number')}][cabinet][]" required></td>
+                <td><input type="text" name="lessons[${button.getAttribute('data-day-number')}][teacher][]" required></td>
+                <td><button type="button">Удалить</button></td>
             `;
             dayTable.appendChild(row);
 

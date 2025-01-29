@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div class="schedule centered">
+    <div>
         {% include 'block/schedule.html.twig' with {'group': group} %}
     </div>
-    <div class="grades">
+    <div>
         {% include 'block/grades.html.twig' with {'group': group} %}
     </div>    
-    <div class="profile">
+    <div>
         {% include 'block/profile.html.twig' with {'user': user} %}
     </div>
 {% endblock %}
