@@ -2,6 +2,13 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
+use App\Entity\Schedule;
+use App\Entity\Student;
+use App\Entity\Day;
+use App\Entity\Group;
+use App\Entity\Subject;
+use App\Entity\Grades;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
@@ -12,25 +19,29 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 
-class PagesController extends AbstractController {
+class ModeratorController extends AbstractController {
 
+    private $security;
     private $em;
     function __construct(
         EntityManagerInterface $em,
+        Security $security,
     ) {
         $this->em = $em;     
+        $this->security = $security;
     }
 
-    // Учительская страница редактирования ученика
-    #[Route(path: '/panel', name: 'app_panel')] 
-    function panelPage(Request $request, SluggerInterface $slugger) {
-        return $this->render('simplePages/panel.html.twig');        
+    #[Route(path: '/admin/moderators/{page}', name: 'admin_moderator')] 
+    function mainPage($page = 1) {
+        $users = $this->em->getRepository(User::class)->findAll();
+        return $this->render('moderator.html.twig', [
+            'tableData' => $users,
+        ]);
     }
 
-    // Главная
-    #[Route(path: '/', name: 'app_main')] 
-    function mainPage(Request $request, SluggerInterface $slugger) {
-        return $this->render('simplePages/main.html.twig');        
+    function formTableData($data) {
+
     }
 }

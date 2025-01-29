@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Модераторы | Интеллектуальный чат Энергомера{% endblock %}
+{% block description %}Интеллектуальный чат бот Энергомера{% endblock %}
+
+{% block stylesheets %}
+{% endblock %}
+
+{% block body %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Эл. почта</th>
+                <th>Роль</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in tableData %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.email }}</td>
+                    <td><input type="checkbox" value="{{ user.id }}"
+                        {% if "ROLE_MODERATOR" in user.roles %}
+                            checked
+                        {% endif %} />
+                        <label>Модератор</label>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>                   
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('/js/changeRole.js') }}"></script>
+{% endblock %}
