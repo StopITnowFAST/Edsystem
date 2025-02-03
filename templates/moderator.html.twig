@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Модераторы | Интеллектуальный чат Энергомера{% endblock %}
-{% block description %}Интеллектуальный чат бот Энергомера{% endblock %}
 
 {% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('/styles/moderators.css') }}">
 {% endblock %}
 
 {% block body %}
-    <table>
+    <table class="moderators-table">
         <thead>
             <tr>
                 <th>ID</th>

@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <link href="{{ asset('/styles/main.css') }}" type="text/css" rel="stylesheet" />
+        {% block stylesheets %}
+            
+        {% endblock %}
         <meta charset="UTF-8">
-        <title>{% block title %}Система Обучения{% endblock %}</title>
+        <title>{% block title %}Система Обучения{% endblock %}</title>        
     </head>
     <body>
         <header>
