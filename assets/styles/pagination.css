@@ -1,0 +1,44 @@
+.pagination__wrap {
+    display: flex;
+    background-color: var(--color-grey-200);
+    border-radius: var(--offset-xxs);
+    margin-top: 20px;
+    min-height: 6vh;
+}
+
+.pagination__counter {
+    position: absolute;
+    margin: 5px;
+    align-self: center;
+    align-items: center;
+    align-content: center;
+
+}
+
+.pagination__pages {
+    display: grid;
+    grid-auto-flow: column;
+    align-items: center;
+    margin: 0 auto;
+}
+
+.page__selected {
+    font-weight: bold;
+    border-radius: 50%;
+    background-color: var(--color-grey-400);
+}
+
+.pagination__pages a {
+    height: 36px;
+    width: 36px;
+    display: grid;
+    align-content: center;
+    justify-content: center;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 143%;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    color: var(--color-main);
+}

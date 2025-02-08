@@ -25,18 +25,26 @@ use Symfony\Bundle\SecurityBundle\Security;
 class AdminPagesController extends AbstractController {
 
     private $em;
+    private $table;
     function __construct(
-        EntityManagerInterface $em,
+        EntityManagerInterface $em, TableController $table
     ) {
         $this->em = $em;     
+        $this->table = $table;
     }
     
     // Модераторы
     #[Route(path: '/admin/moderators/{page}', name: 'admin_moderators')] 
     function adminModerators($page = 1) {
-        $users = $this->em->getRepository(User::class)->findAll();        
+        $paginationSize = 20;   
+        $pagination = $this->table->createPagination($page, $this->em->getRepository(User::class), $paginationSize);
         return $this->render('admin/moderators.html.twig', [
-            'tableData' => $users,
+            'notes' => $pagination['data'],
+            'totalNotes' => $pagination['totalNotes'],
+            'pagRow' => $pagination['row'],
+            'currentPage' => $page,
+            'paginationSize' => $paginationSize,
+            'formName' => 'admin_moderators',
         ]);
     }
 
@@ -93,4 +101,24 @@ class AdminPagesController extends AbstractController {
             'tableData' => $teachers,
         ]);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

@@ -1,0 +1,16 @@
+<div class="container">
+    <div class="pagination__wrap">
+        <div class="pagination__counter">
+            {{ notes|length + ((currentPage-1) * paginationSize)}} из {{ totalNotes }}
+        </div>
+
+        <div class="pagination__pages">
+            {% for item in pagRow %}
+                <a {% if item.args %} href="{{ path(formName) }}{{ item.args }}" {% endif %}
+                    {% if currentPage == item.text | raw %} class="page__selected" {% endif %}>
+                    {{ item.text | raw }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>

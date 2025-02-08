@@ -32,4 +32,27 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->persist($user);
         $this->getEntityManager()->flush();
     }
+
+    public function getTableData($offset, $limit) {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
+            SELECT `id`, `email`, `roles`
+            FROM user 
+            LIMIT $limit OFFSET $offset
+        ";
+        $resultSet = $conn->executeQuery($sql);        
+        return $resultSet->fetchAllAssociative();
+    }
+
+    public function getTotalPages() {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
+            SELECT `id` FROM user 
+        ";
+        $resultSet = $conn->executeQuery($sql);        
+        return $resultSet->rowCount();
+    }
+
+
+
 }
