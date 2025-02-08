@@ -14,7 +14,7 @@
 
 .moderators__table {
     width: 100%;
-    background-color: var(--color-main-button-dark);
+    background-color: var(--color-grey-200);
     border-radius: var(--offset-xxs);
     border-collapse: collapse;
     table-layout: fixed;
@@ -22,7 +22,7 @@
 
 .moderators__table td,
 .moderators__table th {
-    border: 2px solid black;
+    border: 2px solid var(--color-grey-400);
     width: 33%;
 }
 
@@ -32,7 +32,6 @@
     line-height: 143%;
     letter-spacing: 0.01em;
     text-align: center;
-    color: var(--color-font);
     padding: var(--offset-3xs);
 }
 
@@ -61,4 +60,13 @@ tr th:last-child, tr td:last-child {
 
 .moderators__table tr:last-child td {
     border-bottom-color: transparent;
+}
+
+a {
+    text-decoration: none;
+    color: var(--color-main);
+}
+
+a:hover {
+    transition: 0.3s;
 }
