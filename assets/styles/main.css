@@ -1,12 +1,9 @@
 :root {
-    --color-main: #f7f424;
-    --color-darker-main: #f8c822;
-    --color-more-darker-main: #c77e2c;
-
-    --color-dark: #000000;
-    --color-lighter-dark: #33343b;
-
-    --color-background: #4e5a6d;
+    --color-main-bright: #ffeb3b;
+    --color-dark-back: #2c2c2c;
+    --color-main-orange: #ff6f00;
+    --color-main-button-bright: #ffc107;
+    --color-main-button-dark: #ff9800;
 
     --color-font: #ffffff;
 
@@ -26,7 +23,7 @@
 }
 
 body {
-    background-color: var(--color-lighter-dark);
+    background-color: var(--color-dark-back);
     margin: 0;
 }
 
@@ -90,7 +87,7 @@ body {
     top: 0;
     left: 0;
     z-index: -100;
-    background-color: var(--color-main);
+    background-color: var(--color-main-100);
     opacity: 0.7;
     display: none;
 }

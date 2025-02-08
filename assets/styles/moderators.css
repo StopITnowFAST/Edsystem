@@ -8,17 +8,13 @@
 
 }
 
-.moderators__buttons {
-
-}
-
 .moderators__body {
 
 }
 
 .moderators__table {
     width: 100%;
-    background-color: var(--color-background);
+    background-color: var(--color-main-300);
     border-radius: var(--offset-xxs);
     border-collapse: collapse;
     table-layout: fixed;
