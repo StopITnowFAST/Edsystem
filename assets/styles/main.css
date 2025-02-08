@@ -80,10 +80,6 @@ body {
     color: var(--color-font-bright);
 }
 
-.btn-delete {
-
-}
-
 /* popup overlay */
 .overlay {
     position: fixed;

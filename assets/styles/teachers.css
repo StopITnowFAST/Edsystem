@@ -4,18 +4,6 @@
     gap: var(--offset-m);
 }
 
-.teachers__head {
-
-}
-
-.teachers__buttons {
-
-}
-
-.teachers__body {
-
-}
-
 .teachers__table {
     width: 100%;
     background-color: var(--color-grey-200);

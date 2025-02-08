@@ -1,17 +1,9 @@
-.header_account {
-
-}
-
 .header__wrap {
     background-color: var(--color-background);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     margin: 20px;
-}
-
-.header__logo {
-
 }
 
 .header__paths {

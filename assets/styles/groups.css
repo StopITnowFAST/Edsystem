@@ -4,18 +4,6 @@
     gap: var(--offset-m);
 }
 
-.groups__head {
-
-}
-
-.groups__buttons {
-
-}
-
-.groups__body {
-
-}
-
 .groups__table {
     width: 100%;
     background-color: var(--color-grey-200);

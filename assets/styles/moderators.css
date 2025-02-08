@@ -4,14 +4,6 @@
     gap: var(--offset-m);
 }
 
-.moderators__head {
-
-}
-
-.moderators__body {
-
-}
-
 .moderators__table {
     width: 100%;
     background-color: var(--color-grey-200);
