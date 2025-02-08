@@ -1,22 +1,22 @@
-.moderators__wrap {
+.teachers__wrap {
     display: grid;
     grid-auto-flow: row;
     gap: var(--offset-m);
 }
 
-.moderators__head {
+.teachers__head {
 
 }
 
-.moderators__buttons {
+.teachers__buttons {
 
 }
 
-.moderators__body {
+.teachers__body {
 
 }
 
-.moderators__table {
+.teachers__table {
     width: 100%;
     background-color: var(--color-background);
     border-radius: var(--offset-xxs);
@@ -24,13 +24,13 @@
     table-layout: fixed;
 }
 
-.moderators__table td,
-.moderators__table th {
+.teachers__table td,
+.teachers__table th {
     border: 2px solid var(--color-main);
     width: 33%;
 }
 
-.moderators__table th {
+.teachers__table th {
     font-family: 'Roboto', sans-serif;
     font-size: 14px;
     line-height: 143%;
@@ -40,7 +40,7 @@
     padding: var(--offset-3xs);
 }
 
-.moderators__table td {
+.teachers__table td {
     font-family: 'Roboto', sans-serif;
     font-weight: 400;
     font-size: 14px;
@@ -59,10 +59,10 @@ tr th:last-child, tr td:last-child {
     border-right-color: transparent;
 }
 
-.moderators__table th {
+.teachers__table th {
     border-top-color: transparent;
 }
 
-.moderators__table tr:last-child td {
+.teachers__table tr:last-child td {
     border-bottom-color: transparent;
 }

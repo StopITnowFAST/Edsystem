@@ -3,7 +3,7 @@
 }
 
 .header__wrap {
-    background-color: var(--color-red);
+    background-color: var(--color-background);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -19,7 +19,7 @@
 }
 
 .header__paths__link {
-    background-color: var(--color-dwhite);
+    /* background-color: var(--color-dwhite); */
     color: var(--color-font);
     text-decoration: none;
     align-content: center;
@@ -30,5 +30,5 @@
 
 .header__paths__link:hover {
     transition: 0.3s;
-    background-color: var(--color-dred);    
+    color: var(--color-main);    
 }

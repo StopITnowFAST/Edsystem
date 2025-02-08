@@ -11,7 +11,7 @@
         <div class="teachers__wrap">
             <div class="teachers__head">
                 <div class="teachers__buttons">
-                
+                    <a href="{{ path('admin_create_teacher') }}">Создать Преподавателя</a>
                 </div>
             </div>
             <div class="teachers__body">
@@ -34,7 +34,6 @@
                                 <td>{{ note.firstName }}</td>
                                 <td>{{ note.middleName }}</td>
                                 <td>{{ note.position }}</td>
-                                <td>Группа</td>
                                 <td>Редактировать</td>
                             </tr>
                         {% endfor %}

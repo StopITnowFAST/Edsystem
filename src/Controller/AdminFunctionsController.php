@@ -9,7 +9,6 @@ use App\Entity\Day;
 use App\Entity\Group;
 use App\Entity\Subject;
 use App\Entity\Grades;
-use App\Entity\Teacher;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
@@ -22,26 +21,18 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 
-class GroupsController extends AbstractController {
+class AdminFunctionsController extends AbstractController {
 
-    private $security;
     private $em;
     function __construct(
         EntityManagerInterface $em,
-        Security $security,
     ) {
-        $this->em = $em;     
-        $this->security = $security;
+        $this->em = $em;
     }
 
-    #[Route(path: '/admin/groups/{page}', name: 'admin_groups')] 
-    function adminGroups($page = 1) {
-        $teachers = $this->em->getRepository(Teacher::class)->findAll();
+    #[Route(path: '/admin/students/create', name: 'admin_create_teacher')] 
+    function adminStudentsCreate() {    
         
-
-        
-        return $this->render('admin/groups.html.twig', [
-            'tableData' => $teachers,
-        ]);
+        return $this->redirectToRoute('admin_teachers');
     }
 }

@@ -1,0 +1,96 @@
+<?php
+
+namespace App\Controller;
+
+use App\Entity\User;
+use App\Entity\Schedule;
+use App\Entity\Student;
+use App\Entity\Day;
+use App\Entity\Group;
+use App\Entity\Subject;
+use App\Entity\Grades;
+use App\Entity\Teacher;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Routing\Attribute\Route;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
+
+class AdminPagesController extends AbstractController {
+
+    private $em;
+    function __construct(
+        EntityManagerInterface $em,
+    ) {
+        $this->em = $em;     
+    }
+    
+    // Модераторы
+    #[Route(path: '/admin/moderators/{page}', name: 'admin_moderators')] 
+    function adminModerators($page = 1) {
+        $users = $this->em->getRepository(User::class)->findAll();        
+        return $this->render('admin/moderators.html.twig', [
+            'tableData' => $users,
+        ]);
+    }
+
+    // Группы
+    #[Route('/admin/groups/{page}', 'admin_groups')] 
+    function adminGroups($page = 1) {
+        $teachers = $this->em->getRepository(Teacher::class)->findAll();
+        return $this->render('admin/groups.html.twig', [
+            'tableData' => $teachers,
+        ]);
+    }
+
+    // Чаты
+    #[Route('admin/chats/{page}', 'admin_chats')]
+    function adminChats($page = 1) {
+        $teachers = $this->em->getRepository(Teacher::class)->findAll();
+        return $this->render('admin/chats.html.twig', [
+            'tableData' => $teachers,
+        ]);
+    }
+
+    // Загруженные файлы
+    #[Route('admin/files/{page}', name: 'admin_files')]
+    function adminFiles($page = 1) {
+        $teachers = $this->em->getRepository(Teacher::class)->findAll();
+        return $this->render('admin/files.html.twig', [
+            'tableData' => $teachers,
+        ]);
+    }
+    
+    // Студенты
+    #[Route('admin/students/{page}', name: 'admin_students')]
+    function adminStudents($page = 1) {
+        $students = $this->em->getRepository(Student::class)->findAll();
+        return $this->render('admin/students.html.twig', [
+            'tableData' => $students,
+        ]);
+    }
+
+    // Преподаватели
+    #[Route(path: '/admin/teachers/{page}', name: 'admin_teachers')] 
+    function adminTeachers($page = 1) {
+        $teachers = $this->em->getRepository(Teacher::class)->findAll();
+        return $this->render('admin/teachers.html.twig', [
+            'tableData' => $teachers,
+        ]);
+    }
+
+    // Тесты
+    #[Route('admin/tests/{page}', name: 'admin_tests')]
+    function adminTests($page = 1) {
+        $teachers = $this->em->getRepository(Teacher::class)->findAll();
+        return $this->render('admin/tests.html.twig', [
+            'tableData' => $teachers,
+        ]);
+    }
+}
