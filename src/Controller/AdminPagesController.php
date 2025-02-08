@@ -93,9 +93,15 @@ class AdminPagesController extends AbstractController {
     // Преподаватели
     #[Route(path: '/admin/teachers/{page}', name: 'admin_teachers')] 
     function adminTeachers($page = 1) {
-        $teachers = $this->em->getRepository(Teacher::class)->findAll();
+        $paginationSize = 20;   
+        $pagination = $this->table->createPagination($page, $this->em->getRepository(Teacher::class), $paginationSize);
         return $this->render('admin/teachers.html.twig', [
-            'tableData' => $teachers,
+            'notes' => $pagination['data'],
+            'totalNotes' => $pagination['totalNotes'],
+            'pagRow' => $pagination['row'],
+            'currentPage' => $page,
+            'paginationSize' => $paginationSize,
+            'formName' => 'admin_teachers',
         ]);
     }
 

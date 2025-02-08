@@ -4,6 +4,8 @@
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('/styles/teachers.css') }}">
+    <link rel="stylesheet" href="{{ asset('/styles/pagination.css') }}">
+    <link rel="stylesheet" href="{{ asset('/styles/popup.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -11,7 +13,7 @@
         <div class="teachers__wrap">
             <div class="teachers__head">
                 <div class="teachers__buttons">
-                    <a href="{{ path('admin_create_teacher') }}">Создать Преподавателя</a>
+                    <button class="btn btn-primary" onclick="openPopup()">Добавить преподавателя</button>
                 </div>
             </div>
             <div class="teachers__body">
@@ -27,14 +29,16 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for note in tableData %}
+                        {% for note in notes %}
                             <tr>
                                 <td>{{ note.id }}</td>
-                                <td>{{ note.lastName }}</td>
-                                <td>{{ note.firstName }}</td>
-                                <td>{{ note.middleName }}</td>
+                                <td>{{ note.last_name }}</td>
+                                <td>{{ note.first_name }}</td>
+                                <td>{{ note.middle_name }}</td>
                                 <td>{{ note.position }}</td>
-                                <td>Редактировать</td>
+                                <td>
+                                    <a href={{ path('admin_user_card', {id: note.id}) }}>Редактировать</a></td>
+                                </tr>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -42,8 +46,11 @@
             </div>
         </div>     
     </div>          
+    <div class="overlay"></div>
+    {% include('blocks/pagination.html.twig') %}
+    {% include('admin/popup/popup_add_teacher.html.twig') %}
 {% endblock %}
 
 {% block javascripts %}
-    <script src="{{ asset('/js/changeRole.js') }}"></script>
+    <script src="{{ asset('/js/admin_teachers.js') }}"></script>
 {% endblock %}

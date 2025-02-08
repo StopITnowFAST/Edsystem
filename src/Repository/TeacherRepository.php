@@ -16,28 +16,23 @@ class TeacherRepository extends ServiceEntityRepository
         parent::__construct($registry, Teacher::class);
     }
 
-    //    /**
-    //     * @return Teacher[] Returns an array of Teacher objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('t.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function getTableData($offset, $limit) {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
+            SELECT `id`, `first_name`, `middle_name`, `last_name`, `position`
+            FROM teacher 
+            LIMIT $limit OFFSET $offset
+        ";
+        $resultSet = $conn->executeQuery($sql);        
+        return $resultSet->fetchAllAssociative();
+    }
 
-    //    public function findOneBySomeField($value): ?Teachers
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function getTotalPages() {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
+            SELECT `id` FROM teacher 
+        ";
+        $resultSet = $conn->executeQuery($sql);        
+        return $resultSet->rowCount();
+    }
 }
