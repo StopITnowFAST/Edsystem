@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 
-class TeachersController extends AbstractController {
+class GroupsController extends AbstractController {
 
     private $security;
     private $em;
@@ -34,13 +34,13 @@ class TeachersController extends AbstractController {
         $this->security = $security;
     }
 
-    #[Route(path: '/admin/teachers/{page}', name: 'admin_teachers')] 
-    function adminTeachers($page = 1) {
+    #[Route(path: '/admin/groups/{page}', name: 'admin_groups')] 
+    function adminGroups($page = 1) {
         $teachers = $this->em->getRepository(Teacher::class)->findAll();
         
 
         
-        return $this->render('admin/teachers.html.twig', [
+        return $this->render('admin/groups.html.twig', [
             'tableData' => $teachers,
         ]);
     }

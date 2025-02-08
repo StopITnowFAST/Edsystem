@@ -18,13 +18,13 @@ class Teacher
     private ?int $user_id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $name = null;
+    private ?string $first_name = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $middle_name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $last_name = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $second_name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $grade = null;
@@ -40,6 +40,15 @@ class Teacher
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
+
+    #[ORM\Column]
+    private ?int $status = null;
+
+    #[ORM\Column]
+    private ?int $created_at = null;
+
+    #[ORM\Column]
+    private ?int $updated_at = null;
 
     public function getId(): ?int
     {
@@ -58,14 +67,14 @@ class Teacher
         return $this;
     }
 
-    public function getName(): ?string
+    public function getFirstName(): ?string
     {
-        return $this->name;
+        return $this->first_name;
     }
 
-    public function setName(?string $name): static
+    public function setFirstName(?string $first_name): static
     {
-        $this->name = $name;
+        $this->first_name = $first_name;
 
         return $this;
     }
@@ -82,14 +91,14 @@ class Teacher
         return $this;
     }
 
-    public function getSecondName(): ?string
+    public function getMiddleName(): ?string
     {
-        return $this->second_name;
+        return $this->middle_name;
     }
 
-    public function setSecondName(?string $second_name): static
+    public function setMiddleName(?string $middle_name): static
     {
-        $this->second_name = $second_name;
+        $this->middle_name = $middle_name;
 
         return $this;
     }
@@ -152,5 +161,49 @@ class Teacher
         $this->description = $description;
 
         return $this;
+    }    public function getStatus(): ?int
+    {
+        return $this->status;
+    }
+
+    public function setStatus(int $status): static
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?int
+    {
+        return $this->created_at;
+    }
+
+    public function setCreatedAt(int $created_at): static
+    {
+        $this->created_at = $created_at;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?int
+    {
+        return $this->updated_at;
+    }
+
+    public function setUpdatedAt(int $updated_at): static
+    {
+        $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
+    public function updateTimestamps()
+    {
+        $this->setUpdatedAt(time());
+        if ($this->getCreatedAt() === null) {
+            $this->setCreatedAt(time());
+        }
     }
 }
