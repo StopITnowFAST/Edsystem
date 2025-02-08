@@ -16,28 +16,29 @@ class GroupRepository extends ServiceEntityRepository
         parent::__construct($registry, Group::class);
     }
 
-    //    /**
-    //     * @return Group[] Returns an array of Group objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('g')
-    //            ->andWhere('g.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('g.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function getTableData($offset, $limit) {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
+            SELECT 
+                `id`, 
+                `name`, 
+                `code`, 
+                `year`, 
+                `semester`,
+                `course`
+            FROM `group`
+            LIMIT $limit OFFSET $offset
+        ";
+        $resultSet = $conn->executeQuery($sql);        
+        return $resultSet->fetchAllAssociative();
+    }
 
-    //    public function findOneBySomeField($value): ?Group
-    //    {
-    //        return $this->createQueryBuilder('g')
-    //            ->andWhere('g.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function getTotalPages() {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
+            SELECT `id` FROM `group` 
+        ";
+        $resultSet = $conn->executeQuery($sql);        
+        return $resultSet->rowCount();
+    }
 }

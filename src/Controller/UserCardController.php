@@ -33,11 +33,4 @@ class UserCardController extends AbstractController {
         $this->security = $security;
     }
 
-    #[Route(path: '/admin/moderators/user/{id}', name: 'admin_user_card')] 
-    function adminUserCard() {
-        
-        return $this->render('admin/user_card.html.twig', [
-
-        ]);
-    }
 }

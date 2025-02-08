@@ -51,9 +51,15 @@ class AdminPagesController extends AbstractController {
     // Группы
     #[Route('/admin/groups/{page}', 'admin_groups')] 
     function adminGroups($page = 1) {
-        $teachers = $this->em->getRepository(Teacher::class)->findAll();
+        $paginationSize = 20;   
+        $pagination = $this->table->createPagination($page, $this->em->getRepository(Group::class), $paginationSize);
         return $this->render('admin/groups.html.twig', [
-            'tableData' => $teachers,
+            'notes' => $pagination['data'],
+            'totalNotes' => $pagination['totalNotes'],
+            'pagRow' => $pagination['row'],
+            'currentPage' => $page,
+            'paginationSize' => $paginationSize,
+            'formName' => 'admin_groups',
         ]);
     }
 
@@ -69,10 +75,6 @@ class AdminPagesController extends AbstractController {
     // Загруженные файлы
     #[Route('admin/files/{page}', name: 'admin_files')]
     function adminFiles($page = 1) {
-        $teachers = $this->em->getRepository(Teacher::class)->findAll();
-        return $this->render('admin/files.html.twig', [
-            'tableData' => $teachers,
-        ]);
     }
     
     // Студенты
@@ -115,6 +117,21 @@ class AdminPagesController extends AbstractController {
     }
 
 
+    #[Route(path: '/admin/moderators/user/{id}', name: 'admin_user_card')] 
+    function adminUserCard() {
+        
+        return $this->render('admin/user_card.html.twig', [
+
+        ]);
+    }
+
+    #[Route(path: '/admin/moderators/user/{id}', name: 'admin_group_card')] 
+    function adminGroupCard() {
+        
+        return $this->render('admin/user_card.html.twig', [
+
+        ]);
+    }
 
 
 
