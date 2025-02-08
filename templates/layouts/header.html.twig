@@ -1,0 +1,25 @@
+<header>
+    <div class="container">
+        <div class="header__wrap">
+            <div class="header__logo">
+                Логотип и прочее описание
+            </div>
+
+            <div class="header__paths">
+                {# Добавить проверку ролей на аккаунты #}
+                {% if app.user %}
+                    <a class="header__paths__link" href="{{ path('admin_moderators') }}">Модераторы</a>
+                    <a class="header__paths__link" href="{{ path('admin_students') }}">Студенты</a>
+                    <a class="header__paths__link" href="{{ path('admin_teachers') }}">Преподаватели</a>
+                    <a class="header__paths__link" href="{{ path('admin_chats') }}">Чаты</a>
+                    <a class="header__paths__link" href="{{ path('admin_files') }}">Файлы</a>
+                    <a class="header__paths__link" href="{{ path('admin_tests') }}">Тесты</a>
+                    
+                    <div class="header_account">
+                        Аккаунт
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</header>

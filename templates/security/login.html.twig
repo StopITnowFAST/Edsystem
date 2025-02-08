@@ -1,34 +1,36 @@
+{# templates/login/index.html.twig #}
 {% extends 'base.html.twig' %}
 
-{% block title %}Log in{% endblock %}
+{# ... #}
+
+{% block title %}Войти | KITEDU {% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('/styles/login.css') }}">
+{% endblock %}
 
 {% block body %}
-    <form method="post">
-        {% if error %}
-            <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-        {% endif %}
-
-        {% if app.user %}
-            <div>
-                You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
-            </div>
-        {% endif %}
-
-        <h1>Войти в аккаунт</h1>        
-        <div>
-            <div>
-                <label for="username">Почта</label>
-                <input type="email" value="{{ last_username }}" name="_username" id="username" autocomplete="email" required autofocus>
-                <label for="password">Пароль</label>
-                <input type="password" name="_password" id="password" autocomplete="current-password" required>
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-                <button type="submit">Войти</button>
+    <div class="container">
+        <div class="login__wrap">
+            <div class="login__inputs">
+                <form action="{{ path('app_login') }}" method="post">
+                    <label for="username">Email</label>
+                    <input type="email" id="username" name="_username"
+                        value="{{ last_username }}" placeholder="Ваш Email"
+                        pattern="^(.+)@(\S+)$" required>
+                    <label for="password">Пароль</label>
+                    <input type="password" id="password" name="_password" placeholder="Ваш пароль" required>
+                    {# <input type="hidden" name="_target_path" value="https://energomera.linkityan.ru/panel/reports"> #}
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                    {% if error %}
+                        <p>Неверный логин или пароль. Попробуйте ещё раз.</p>
+                    {% endif %}
+                    {% if successReg %}
+                        <p>Вы успешно зарегистрировались. Теперь вы можете войти</p>
+                    {% endif %}
+                    <button type="submit" name="login-button" class="btn btn-primary">Войти</button>
+                </form>
             </div>
         </div>
-    </form>
-
-    <div>
-        <a href="{{ path('app_register') }}">Регистрация</a>
-        <a href="{{ path('app_login') }}">Войти в аккаунт</a>
     </div>
 {% endblock %}

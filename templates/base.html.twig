@@ -1,27 +1,22 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link href="{{ asset('/styles/main.css') }}" type="text/css" rel="stylesheet" />
-        {% block stylesheets %}
-            
-        {% endblock %}
         <meta charset="UTF-8">
-        <title>{% block title %}Система Обучения{% endblock %}</title>        
+        <title>{% block title %}{% endblock %}</title>
+        <link rel="stylesheet" href="{{ asset('/styles/main.css') }}">
+        <link rel="stylesheet" href="{{ asset('/styles/header.css') }}">
+        {% block stylesheets %}{% endblock %}
+        <link rel="stylesheet" href="{{ asset('/styles/footer.css') }}">
+
     </head>
     <body>
-        <header>
-        </header>
-
-        <main>
+    <div class="page-wrapper">
+        {{ include('layouts/header.html.twig') }}
+        <div class="page-main">
             {% block body %}{% endblock %}
-        </main>
-        
-        <footer>
-        </footer>
-
-        {% block javascripts %}
-        {% endblock %}
+        </div>
+        {{ include('layouts/footer.html.twig') }}
+    </div>
     </body>
+    {% block javascripts %}{% endblock %}
 </html>
-
-

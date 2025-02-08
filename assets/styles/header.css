@@ -1,0 +1,34 @@
+.header_account {
+
+}
+
+.header__wrap {
+    background-color: var(--color-red);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--offset-xxs);
+}
+
+.header__logo {
+
+}
+
+.header__paths {
+    display: flex;
+}
+
+.header__paths__link {
+    background-color: var(--color-dwhite);
+    color: var(--color-font);
+    text-decoration: none;
+    align-content: center;
+    text-align: center;
+    height: 30px;
+    width: 200px;
+}
+
+.header__paths__link:hover {
+    transition: 0.3s;
+    background-color: var(--color-dred);    
+}

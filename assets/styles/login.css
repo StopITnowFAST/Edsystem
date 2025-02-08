@@ -1,0 +1,23 @@
+.login__wrap {
+    display: grid;
+    grid-auto-flow: row;
+    gap: var(--offset-m);
+    justify-content: center;
+}
+
+.login__inputs {
+    display: grid;
+    grid-auto-flow: column;
+}
+
+form {
+    margin: 20px;
+}
+
+input {
+    width: 100%;
+    margin-bottom: 10px;
+    display: grid;
+    grid-auto-flow: column;
+    box-sizing: border-box;
+}

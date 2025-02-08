@@ -27,16 +27,13 @@ class Student
     private ?string $last_name = null;
 
     #[ORM\Column(nullable: true)]
-    private ?int $missed = null;
-
-    #[ORM\Column(nullable: true)]
     private ?int $group_id = null;
 
     #[ORM\Column]
     private ?int $birthday_date = null;
 
     #[ORM\Column]
-    private ?int $student_status = null;
+    private ?int $status = null;
 
     #[ORM\Column]
     private ?int $created_at = null;
@@ -97,18 +94,6 @@ class Student
         return $this;
     }
 
-    public function getMissed(): ?int
-    {
-        return $this->missed;
-    }
-
-    public function setMissed(?int $missed): static
-    {
-        $this->missed = $missed;
-
-        return $this;
-    }
-
     public function getGroupId(): ?int
     {
         return $this->group_id;
@@ -133,14 +118,14 @@ class Student
         return $this;
     }
 
-    public function getStudentStatus(): ?int
+    public function getStatus(): ?int
     {
-        return $this->student_status;
+        return $this->status;
     }
 
-    public function setStudentStatus(int $student_status): static
+    public function setStatus(int $status): static
     {
-        $this->student_status = $student_status;
+        $this->status = $status;
 
         return $this;
     }

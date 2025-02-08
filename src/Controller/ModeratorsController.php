@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 
-class ModeratorController extends AbstractController {
+class ModeratorsController extends AbstractController {
 
     private $security;
     private $em;
@@ -33,15 +33,14 @@ class ModeratorController extends AbstractController {
         $this->security = $security;
     }
 
-    #[Route(path: '/admin/moderators/{page}', name: 'admin_moderator')] 
-    function mainPage($page = 1) {
+    #[Route(path: '/admin/moderators/{page}', name: 'admin_moderators')] 
+    function adminModerators($page = 1) {
         $users = $this->em->getRepository(User::class)->findAll();
-        return $this->render('moderator.html.twig', [
+
+
+        
+        return $this->render('admin/moderators.html.twig', [
             'tableData' => $users,
         ]);
-    }
-
-    function formTableData($data) {
-
     }
 }

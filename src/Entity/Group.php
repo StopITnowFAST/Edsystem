@@ -26,13 +26,22 @@ class Group
     private ?string $description = null;
 
     #[ORM\Column]
-    private ?int $group_status = null;
+    private ?int $status = null;
 
     #[ORM\Column]
     private ?int $created_at = null;
 
     #[ORM\Column]
     private ?int $updated_at = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $course = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $semester = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $year = null;
 
     public function getId(): ?int
     {
@@ -75,14 +84,14 @@ class Group
         return $this;
     }
 
-    public function getGroupStatus(): ?int
+    public function getStatus(): ?int
     {
-        return $this->group_status;
+        return $this->status;
     }
 
-    public function setGroupStatus(int $group_status): static
+    public function setStatus(int $status): static
     {
-        $this->group_status = $group_status;
+        $this->status = $status;
 
         return $this;
     }
@@ -119,5 +128,41 @@ class Group
         if ($this->getCreatedAt() === null) {
             $this->setCreatedAt(time());
         }
+    }
+
+    public function getCourse(): ?int
+    {
+        return $this->course;
+    }
+
+    public function setCourse(?int $course): static
+    {
+        $this->course = $course;
+
+        return $this;
+    }
+
+    public function getSemester(): ?int
+    {
+        return $this->semester;
+    }
+
+    public function setSemester(?int $semester): static
+    {
+        $this->semester = $semester;
+
+        return $this;
+    }
+
+    public function getYear(): ?int
+    {
+        return $this->year;
+    }
+
+    public function setYear(?int $year): static
+    {
+        $this->year = $year;
+
+        return $this;
     }
 }

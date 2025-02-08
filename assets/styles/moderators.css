@@ -1,8 +1,68 @@
-.moderators-table {
-    border-collapse: collapse;
-    border: 1px solid grey;
+.moderators__wrap {
+    display: grid;
+    grid-auto-flow: row;
+    gap: var(--offset-m);
 }
 
-th, td, tr {
-    color: var(--some-color-five);
+.moderators__head {
+
+}
+
+.moderators__buttons {
+
+}
+
+.moderators__body {
+
+}
+
+.moderators__table {
+    width: 100%;
+    background-color: var(--color-dwhite);
+    border-radius: var(--offset-xxs);
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.moderators__table td,
+.moderators__table th {
+    border: 2px solid var(--color-white);
+    width: 33%;
+}
+
+.moderators__table th {
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    line-height: 143%;
+    letter-spacing: 0.01em;
+    text-align: center;
+    color: var(--color-font);
+    padding: var(--offset-3xs);
+}
+
+.moderators__table td {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 129%;
+    letter-spacing: 0.01em;
+    text-align: center;
+    color: var(--color-font);
+    padding: var(--offset-3xs);
+}
+
+tr th:first-child, tr td:first-child {
+    border-left-color: transparent;
+}
+
+tr th:last-child, tr td:last-child {
+    border-right-color: transparent;
+}
+
+.moderators__table th {
+    border-top-color: transparent;
+}
+
+.moderators__table tr:last-child td {
+    border-bottom-color: transparent;
 }

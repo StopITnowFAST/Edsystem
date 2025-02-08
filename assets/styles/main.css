@@ -1,7 +1,97 @@
 :root {
-    --some-color-one: #3d348b;
-    --some-color-two: #7678ed;
-    --some-color-three: #f7b801;
-    --some-color-four: #f18701;
-    --some-color-five: #f35b04;
+    --color-dwhite: #9aa8a7;
+    --color-white: #d3e8e8;
+    --color-red: #c33322;
+    --color-dred: #951f19;
+    --color-bred: #570707;
+    --color-font: #000000;
+
+
+    --offset-3xs: 8px;
+    --offset-xxs: 12px;
+    --offset-xs: 16px;
+    --offset-s: 24px;
+    --offset-m: 32px;
+    --offset-l: 56px;
+    --offset-xl: 96px;
+    --offset-xxl: 240px;
+
+    --break-xl: 1440px;
+    --break-lg: 1040px;
+    --break-md: 768px;
+    --break-sm: 490px;
+}
+
+html {
+    background-color: var(--color-white);
+}
+
+.container {
+    width: 100%;
+    max-width: var(--break-xl);
+    margin: 0 auto;
+    padding: 0 var(--offset-l);
+}
+
+.page-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}   
+
+.page-main {
+    flex-grow: 1;
+}
+
+.btn {
+    display: grid;
+    align-content: center;
+    justify-content: center;
+    border: unset;
+    border-radius: var(--offset-3xs);
+    padding: var(--offset-xxs) var(--offset-s);
+    width: 100%;
+    height: 52px;
+    min-width: 280px;
+    max-width: 440px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 125%;
+    cursor: pointer;
+    transition: 0.3s all;
+}
+
+.btn-primary {
+    transition: 0.3s all;
+    background-color: var(--color-dred);
+    color: var(--color-font);
+}
+
+.btn-secondary {
+    background-color: var(--color-dwhite);
+    color: var(--color-font);
+    transition: 0.3s all;
+}
+
+.btn-delete {
+
+}
+
+/* popup overlay */
+.overlay {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: -100;
+    background-color: var(--color-red);
+    opacity: 0.7;
+    display: none;
+}
+
+.overlay--active {
+    display: block;
+    z-index: 100;
 }

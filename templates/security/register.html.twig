@@ -1,43 +1,52 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Register{% endblock %}
+{% block title %}Зарегистрироваться | Интеллектуальный чат бот Энергомера{% endblock %}
+{% block description %}Интеллектуальный чат бот Энергомера{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('/styles/login.css') }}">
+{% endblock %}
 
 {% block body %}
-
-    <!-- Отображение ошибок формы -->
-    {% if form_errors(registrationForm) %}
-        <div>
-            {{ form_errors(registrationForm) }}
-        </div>
-    {% endif %}
-
-    <!-- Форма регистрации -->
-    <div>
-        {{ form_start(registrationForm, {'attr': {'class': 'registration-form'}}) }}
-            <h1>Регистрация</h1>
-            <div>
-                <div>
-                    {{ form_row(registrationForm.email, {
-                        'attr': {'class': 'form-control-slice', 'placeholder': 'Ваш email'},
-                        'label_attr': {'class': 'reg-label'}
-                    }) }}
-                    {{ form_row(registrationForm.plainPassword, {
-                        'attr': {'class': 'form-control-slice', 'placeholder': 'Пароль'},
-                        'label': 'Пароль',
-                        'label_attr': {'class': 'reg-label'}
-                    }) }}
-                    <button type="submit">Зарегистрироваться</button>  
+    <section class="login-site">
+        <div class="container">
+            <div class="login__wrap">
+                <div class="login__photo">
+                    <img src="{{ asset('/img/login.png') }}" alt="" class="login__bg" loading="lazy">
                 </div>
+                <div class="login__body">
+                    <form action="{{ path('app_register') }}" method="post" class="login__form">
+                        <div class="form__title">Зарегистрироваться</div>
+                        <div class="form__body">
+                            <div class="form__name">
+                                <label for="login" class="form__label">Email</label>
+                                <input type="email" class="form__field" id="login" name="login"
+                                       pattern="^(.+)@(\S+)$"
+                                       placeholder="Ваш Email" required>
+                            </div>
+                            <div class="form__pass">
+                                <label for="password" class="form__label">Пароль</label>
+                                <input type="password" class="form__field field__password" id="password" name="password"
+                                       placeholder="Ваш пароль" required>
+                            </div>
+                            {% if error %}
+                                <p class="form__error">Пользователь с таким Email уже зарегистрирован. Попробуйте другой Email</p>
+                            {% endif %}
+                        </div>
+                        <div class="form__bottom">
+                            <button type="submit" class="btn btn-primary form__button" name="login-button">Войти</button>
+                            <p>
+                                <a href="#" class="link">Забыли пароль?</a>
+                            </p>
+                            <p>
+                                У вас нет аккаунта?
+                                <a href="#" class="link">Создать</a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+
             </div>
-
-
-            <div>
-            </div>
-        {{ form_end(registrationForm) }}
-    </div>
-
-    <div>
-        <a href="{{ path('app_register') }}">Регистрация</a>
-        <a href="{{ path('app_login') }}">Войти в аккаунт</a>
-    </div>
+        </div>
+    </section>
 {% endblock %}
