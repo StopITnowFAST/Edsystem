@@ -4,6 +4,8 @@
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('/styles/students.css') }}">
+    <link rel="stylesheet" href="{{ asset('/styles/pagination.css') }}">
+    <link rel="stylesheet" href="{{ asset('/styles/popup.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -11,7 +13,7 @@
         <div class="students__wrap">
             <div class="students__head">
                 <div class="students__buttons">
-                    <button class="btn btn-primary" >Добавить студента</button>
+                    <button class="btn btn-primary" onclick="openPopup()">Добавить студента</button>
                 </div>
             </div>
             <div class="students__body">
@@ -27,23 +29,27 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for note in tableData %}
+                        {% for note in notes %}
                             <tr>
                                 <td>{{ note.id }}</td>
-                                <td>{{ note.firstName }}</td>
-                                <td>{{ note.middleName }}</td>
-                                <td>{{ note.lastName }}</td>
-                                <td>Группа</td>
-                                <td>Редактировать</td>
-                            </tr>
+                                <td>{{ note.first_name }}</td>
+                                <td>{{ note.middle_name }}</td>
+                                <td>{{ note.last_name }}</td>
+                                <td>{{ note.code }}</td>
+                                <td>
+                                    <a href={{ path('admin_user_card', {id: note.id}) }}>Редактировать</a></td>
+                                </tr>
                         {% endfor %}
                     </tbody>
                 </table>    
             </div>
         </div>     
-    </div>          
+    </div>
+    <div class="overlay"></div>
+    {% include('blocks/pagination.html.twig') %}
+    {% include('admin/popup/popup_add_students.html.twig') %}
 {% endblock %}
 
 {% block javascripts %}
-    <script src="{{ asset('/js/changeRole.js') }}"></script>
+    <script src="{{ asset('/js/admin_students.js') }}"></script>
 {% endblock %}

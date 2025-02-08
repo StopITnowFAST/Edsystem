@@ -16,28 +16,29 @@ class StudentRepository extends ServiceEntityRepository
         parent::__construct($registry, Student::class);
     }
 
-    //    /**
-    //     * @return Student[] Returns an array of Student objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('s.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function getTableData($offset, $limit) {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
+            SELECT 
+            `student`.`id`, 
+            `student`.`first_name`, 
+            `student`.`middle_name`, 
+            `student`.`last_name`,
+            `group`.`code`
+            FROM `student`
+            LEFT JOIN `group` ON `student`.`group_id` = `group`.`id`
+            LIMIT $limit OFFSET $offset
+        ";
+        $resultSet = $conn->executeQuery($sql);        
+        return $resultSet->fetchAllAssociative();
+    }
 
-    //    public function findOneBySomeField($value): ?Student
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function getTotalPages() {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
+            SELECT `id` FROM `student` 
+        ";
+        $resultSet = $conn->executeQuery($sql);        
+        return $resultSet->rowCount();
+    }
 }

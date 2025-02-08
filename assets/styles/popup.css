@@ -1,0 +1,121 @@
+.popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+    min-width: 600px;
+    z-index: 101;
+    color: var(--color-font-bright);
+}
+
+.popup__wrap {
+    border: solid var(--color-main);
+    border-width: 1px;
+    position: relative;
+    background-color: var(--color-grey-400);
+    border-radius: var(--offset-xxs);
+    padding: var(--offset-xs);
+    display: grid;
+    grid-auto-flow: row;
+    gap: var(--offset-xs);
+}
+
+.popup__buttons {
+    margin-top: 20px;
+    display: flex;    
+    gap: 10px;
+}
+
+.popup__close {
+    width: 24px;
+    height: 24px;
+    display: grid;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    justify-self: end;
+}
+
+.popup__close span {
+    width: 1px;
+    height: 20px;
+    background-color: var(--color-main);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+}
+
+.popup__close span:first-child {
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.popup__close span:last-child {
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.popup__title {
+    text-align: center;    
+    font-size: 24px;
+}
+
+.popup__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--offset-xs);
+}
+
+.popup__head {
+    display: flex;
+    justify-content: space-between;
+}
+
+.popup__body__row {
+    width: 100%;
+    display: grid;
+    grid-auto-flow: row;
+    gap: 4px;
+}
+
+.popup__body__row p {
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    letter-spacing: 0.01em;
+    text-align: left;
+    color: var(--base-1000);
+}
+
+.popup__body__input {
+    box-sizing: border-box;
+    height: 45px;
+    width: 100%;
+    border-radius: var(--offset-3xs);
+    border: 2px solid var(--color-grey-400);
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 150%;
+    letter-spacing: 0.01em;
+    background-color: var(--color-grey-100);
+    color: var(--color-font-bright);
+    padding: var(--offset-xxs) var(--offset-xs);
+    transition: 0.3s all;
+}
+
+.popup__body__input:focus {
+    transition: 0.3s all;
+    border: 2px solid var(--color-main);
+}
+
+.popup__body__input::placeholder {
+    appearance: none;
+    color: var(--color-grey-400);
+}
+.popup__body__input::-webkit-input-placeholder {
+    -webkit-appearance: none;
+    color: var(--color-grey-400);
+}
+.popup__body__input::-moz-placeholder {
+    -moz-appearance: none;
+    color: var(--color-grey-400);
+}

@@ -70,14 +70,14 @@ body {
 
 .btn-primary {
     transition: 0.3s all;
-    background-color: var(--color-main);
-    color: var(--color-font);
+    background-color: var(--color-grey-200);
+    color: var(--color-font-bright);
 }
 
 .btn-secondary {
-    background-color: var(--color-background);
-    color: var(--color-font);
     transition: 0.3s all;
+    background-color: var(--color-grey-300);
+    color: var(--color-font-bright);
 }
 
 .btn-delete {
@@ -92,7 +92,7 @@ body {
     top: 0;
     left: 0;
     z-index: -100;
-    background-color: var(--color-main-100);
+    background-color: var(--color-grey-400);
     opacity: 0.7;
     display: none;
 }

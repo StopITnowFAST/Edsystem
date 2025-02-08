@@ -30,9 +30,16 @@ class AdminFunctionsController extends AbstractController {
         $this->em = $em;
     }
 
-    #[Route(path: '/admin/students/create', name: 'admin_create_teacher')] 
-    function adminStudentsCreate() {    
+    #[Route(path: '/admin/teachers/create', name: 'admin_create_teacher')] 
+    function adminTeachersCreate() {    
         
         return $this->redirectToRoute('admin_teachers');
+    }
+
+    
+    #[Route(path: '/admin/students/create', name: 'admin_create_student')] 
+    function adminStudentsCreate() {    
+        
+        return $this->redirectToRoute('admin_students');
     }
 }

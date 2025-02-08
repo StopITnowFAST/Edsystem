@@ -18,7 +18,7 @@
 
 .students__table {
     width: 100%;
-    background-color: var(--color-background);
+    background-color: var(--color-grey-200);
     border-radius: var(--offset-xxs);
     border-collapse: collapse;
     table-layout: fixed;
@@ -26,7 +26,7 @@
 
 .students__table td,
 .students__table th {
-    border: 2px solid var(--color-main);
+    border: 2px solid var(--color-grey-400);
     width: 33%;
 }
 
@@ -36,7 +36,6 @@
     line-height: 143%;
     letter-spacing: 0.01em;
     text-align: center;
-    color: var(--color-font);
     padding: var(--offset-3xs);
 }
 
@@ -65,4 +64,18 @@ tr th:last-child, tr td:last-child {
 
 .students__table tr:last-child td {
     border-bottom-color: transparent;
+}
+
+a {
+    text-decoration: none;
+    color: var(--color-main);
+}
+
+a:hover {
+    transition: 0.3s;
+}
+
+.btn:hover {
+    transition: 0.3s;
+    background-color: var(--color-main);
 }
