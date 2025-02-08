@@ -14,7 +14,7 @@
 
 .moderators__table {
     width: 100%;
-    background-color: var(--color-main-300);
+    background-color: var(--color-main-button-dark);
     border-radius: var(--offset-xxs);
     border-collapse: collapse;
     table-layout: fixed;
@@ -22,7 +22,7 @@
 
 .moderators__table td,
 .moderators__table th {
-    border: 2px solid var(--color-main);
+    border: 2px solid black;
     width: 33%;
 }
 
