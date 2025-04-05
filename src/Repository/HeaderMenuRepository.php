@@ -15,29 +15,26 @@ class HeaderMenuRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, HeaderMenu::class);
     }
-
-    //    /**
-    //     * @return HeaderMenu[] Returns an array of HeaderMenu objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('h')
-    //            ->andWhere('h.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('h.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?HeaderMenu
-    //    {
-    //        return $this->createQueryBuilder('h')
-    //            ->andWhere('h.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    
+    public function findAllItems() {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
+            SELECT 
+                header_menu.id,
+                parent.name AS parent_name,
+                header_menu.item_level,
+                header_menu.name,
+                header_menu.url,
+                header_menu.place_order,
+                status.name AS status
+            FROM 
+                header_menu
+            LEFT JOIN 
+                header_menu parent ON header_menu.parent_id = parent.id
+            LEFT JOIN 
+                status ON header_menu.status = status.id
+        ";
+        $resultSet = $conn->executeQuery($sql);        
+        return $resultSet->fetchAllAssociative();
+    }
 }

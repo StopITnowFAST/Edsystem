@@ -24,7 +24,6 @@
                             <th>Родительский элемент</th>
                             <th>Уровень вложенности</th>
                             <th>Ссылка</th>
-                            <th>Порядок</th>
                             <th>Статус</th>
                             <th>Действия</th>
                         </tr>
@@ -34,10 +33,9 @@
                             <tr>
                                 <td>{{ note.id }}</td>
                                 <td>{{ note.name }}</td>
-                                <td>{{ note.parentId }}</td>
-                                <td>{{ note.ItemLevel }}</td>
+                                <td>{{ note.parent_name }}</td>
+                                <td>{{ note.item_level }}</td>
                                 <td>{{ note.url }}</td>
-                                <td>{{ note.placeOrder }}</td>
                                 <td>{{ note.status }}</td>
                                 <td></td>
                                 {# <td>
