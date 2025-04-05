@@ -1,0 +1,102 @@
+.admin-create__input-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--offset-s);
+    margin: 20px 0px;
+}
+
+.admin-create__field {
+    display: grid;
+    flex: 1 1 calc(50% - 100px);
+}
+
+.admin-create__input {
+    box-sizing: border-box;
+    height: 50px;
+    width: 100%;
+    border-radius: var(--offset-3xs);
+    border: 2px solid var(--color-grey-400);
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 150%;
+    letter-spacing: 0.01em;
+    background-color: var(--color-grey-100);
+    color: var(--color-font-bright);
+    padding: var(--offset-xxs) var(--offset-xs);
+    transition: 0.3s all;
+}
+
+.admin-create__input:focus {
+    transition: 0.3s all;
+    border: 2px solid var(--color-main);
+}
+
+.admin-create__input::placeholder {
+    appearance: none;
+    color: var(--color-grey-400);
+}
+.admin-create__input::-webkit-input-placeholder {
+    -webkit-appearance: none;
+    color: var(--color-grey-400);
+}
+.admin-create__input::-moz-placeholder {
+    -moz-appearance: none;
+    color: var(--color-grey-400);
+}
+
+.admin-create__select {
+    box-sizing: border-box;
+    height: 50px;
+    width: 100%;
+    border-radius: var(--offset-3xs);
+    border: 2px solid var(--color-grey-400);
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 150%;
+    letter-spacing: 0.01em;
+    background-color: var(--color-grey-100);
+    color: var(--color-font-bright);
+    padding: var(--offset-xxs) var(--offset-xs);
+    transition: 0.3s all;
+    appearance: none;
+    background-repeat: no-repeat;
+    background-position: right var(--offset-xs) center;
+    background-size: 20px;
+    cursor: pointer;
+}
+
+.admin-create__select:focus {
+    transition: 0.3s all;
+    border: 2px solid var(--color-main);
+    outline: none;
+}
+
+.admin-create__select option {
+    background-color: var(--color-grey-100);
+    color: var(--color-font-bright);
+    padding: 8px;
+}
+
+.admin-create__select option:disabled {
+    color: var(--color-grey-400);
+}
+
+.admin-create__select:-webkit-autofill,
+.admin-create__select:-webkit-autofill:hover, 
+.admin-create__select:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--color-font-bright);
+    -webkit-box-shadow: 0 0 0px 1000px var(--color-grey-100) inset;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+.admin-create__select:hover {
+    border-color: var(--color-grey-500);
+}
+
+.admin-create__select:disabled {
+    background-color: var(--color-grey-200);
+    color: var(--color-grey-400);
+    cursor: not-allowed;
+}

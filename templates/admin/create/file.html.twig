@@ -1,22 +1,22 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Добавить файлы | Интеллектуальный чат Энергомера{% endblock %}
+{% block title %}Добавить файлы | {{ app_title }}{% endblock %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset('/styles/files.css') }}">
+    <link rel="stylesheet" href="{{ asset('/styles/admin_tables.css') }}">
 {% endblock %}
  
 {% block body %}
     <div class="container">
-        <div class="files__wrap">
-            <div class="files__head">
+        <div class="admin-table__wrap">
+            <div class="admin-table__head">
                 <h1>Добавить файлы</h1>
                 <a href="{{ path('admin_files') }}", class="btn btn-primary">Отменить</a>
             </div>
-            <div class="files__body">
+            <div class="admin-table__body">
                 <form action="{{ path('file_save') }}", method="POST", enctype="multipart/form-data">
 
-                    <div class="files__file-item">
+                    <div class="admin-table__file-item">
                         <input type="file" name="file">
                         <input type="text" name="url">
                         <button class="btn icon-button">

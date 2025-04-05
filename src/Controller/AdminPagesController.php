@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Entity\Schedule;
+use App\Entity\Status;
 use App\Entity\Student;
 use App\Service\File;
 use App\Entity\File as FileEntity;
@@ -197,10 +197,27 @@ class AdminPagesController extends AbstractController {
         ]);
     }
 
-
-
-
-
+    // Создание пункта меню
+    #[Route(path: '/admin/create/header-menu', name: 'admin_create_header-menu')] 
+    function adminCreateHeaderMenu(Request $request) {
+        if ($request->isMethod('POST')) {
+            $headerItem = new HeaderMenu;
+            $headerItem->setParentId($_POST['parent_id']);
+            $headerItem->setItemLevel($_POST['item_level']);
+            $headerItem->setName($_POST['name']);
+            $headerItem->setUrl($_POST['url']);
+            $headerItem->setPlaceOrder($_POST['place_order']);
+            $headerItem->setStatus($_POST['status']);
+            $this->em->persist($headerItem);
+            $this->em->flush();
+        }
+        $parents = $this->em->getRepository(HeaderMenu::class)->findAll();
+        $statuses = $this->em->getRepository(Status::class)->findAll();
+        return $this->render('admin/create/header_menu.html.twig', [
+            'parents' => $parents,
+            'statuses' => $statuses,
+        ]);
+    }
     
     // Создание файла
     #[Route(path: '/admin/create/file', name: 'admin_file')] 

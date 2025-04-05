@@ -1,7 +1,7 @@
 .admin-table__wrap {
     display: grid;
     grid-auto-flow: row;
-    gap: var(--offset-m);
+    /* gap: var(--offset-m); */
 }
 
 .admin-table__table {

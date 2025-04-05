@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Пункты меню | Интеллектуальный чат Энергомера{% endblock %}
+{% block title %}Пункты меню | {{ app_title }}{% endblock %}
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('/styles/admin_tables.css') }}">
@@ -11,11 +11,9 @@
 {% block body %}
     <div class="container">
         <div class="admin-table__wrap">
-            <div class="admin-table__head">
+            <div class="admin-table__buttons">
                 <h1>Пункты меню</h1>
-                <div class="admin-table__buttons">
-                    <button class="btn btn-primary" onclick="openPopup()">Добавить пункт меню</button>
-                </div>
+                <a href="{{ path('admin_create_header-menu') }}" class="btn btn-primary" onclick="openPopup()">Добавить файл</a>
             </div>
             <div class="admin-table__body">
                 <table class="admin-table__table">
@@ -23,10 +21,11 @@
                         <tr>
                             <th>ID</th>
                             <th>Название</th>
-                            <th>Код</th>
-                            <th>Год</th>
-                            <th>Семестр</th>
-                            <th>Курс</th>
+                            <th>Родительский элемент</th>
+                            <th>Уровень вложенности</th>
+                            <th>Ссылка</th>
+                            <th>Порядок</th>
+                            <th>Статус</th>
                             <th>Действия</th>
                         </tr>
                     </thead>
@@ -35,13 +34,15 @@
                             <tr>
                                 <td>{{ note.id }}</td>
                                 <td>{{ note.name }}</td>
-                                <td>{{ note.code }}</td>
-                                <td>{{ note.year }}</td>
-                                <td>{{ note.semester }}</td>
-                                <td>{{ note.course }}</td>
-                                <td>
+                                <td>{{ note.parentId }}</td>
+                                <td>{{ note.ItemLevel }}</td>
+                                <td>{{ note.url }}</td>
+                                <td>{{ note.placeOrder }}</td>
+                                <td>{{ note.status }}</td>
+                                <td></td>
+                                {# <td>
                                     <a href={{ path('admin_group', {id: note.id}) }}>Редактировать</a></td>
-                                </tr>
+                                </tr> #}
                         {% endfor %}
                     </tbody>
                 </table>    
