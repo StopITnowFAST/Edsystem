@@ -3,21 +3,22 @@
 {% block title %}Преподаватели | Интеллектуальный чат Энергомера{% endblock %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset('/styles/teachers.css') }}">
+    <link rel="stylesheet" href="{{ asset('/styles/admin_tables.css') }}">
     <link rel="stylesheet" href="{{ asset('/styles/pagination.css') }}">
     <link rel="stylesheet" href="{{ asset('/styles/popup.css') }}">
 {% endblock %}
 
 {% block body %}
     <div class="container">
-        <div class="teachers__wrap">
-            <div class="teachers__head">
-                <div class="teachers__buttons">
+        <div class="admin-table__wrap">
+            <div class="admin-table__head">
+                <div class="admin-table__buttons">
+                    <h1>Преподаватели</h1>
                     <button class="btn btn-primary" onclick="openPopup()">Добавить преподавателя</button>
                 </div>
             </div>
-            <div class="teachers__body">
-                <table class="teachers__table">
+            <div class="admin-table__body">
+                <table class="admin-table__table">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -37,7 +38,7 @@
                                 <td>{{ note.middle_name }}</td>
                                 <td>{{ note.position }}</td>
                                 <td>
-                                    <a href={{ path('admin_user_card', {id: note.id}) }}>Редактировать</a></td>
+                                    <a href={{ path('admin_user', {id: note.id}) }}>Редактировать</a></td>
                                 </tr>
                             </tr>
                         {% endfor %}

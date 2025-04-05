@@ -3,21 +3,22 @@
 {% block title %}Группы | Интеллектуальный чат Энергомера{% endblock %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset('/styles/groups.css') }}">
+    <link rel="stylesheet" href="{{ asset('/styles/admin_tables.css') }}">
     <link rel="stylesheet" href="{{ asset('/styles/pagination.css') }}">
     <link rel="stylesheet" href="{{ asset('/styles/popup.css') }}">
 {% endblock %}
 
 {% block body %}
     <div class="container">
-        <div class="groups__wrap">
-            <div class="groups__head">
-                <div class="groups__buttons">
+        <div class="admin-table__wrap">
+            <div class="admin-table__head">
+                <h1>Группы</h1>
+                <div class="admin-table__buttons">
                     <button class="btn btn-primary" onclick="openPopup()">Добавить группу</button>
                 </div>
             </div>
-            <div class="groups__body">
-                <table class="groups__table">
+            <div class="admin-table__body">
+                <table class="admin-table__table">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -39,7 +40,7 @@
                                 <td>{{ note.semester }}</td>
                                 <td>{{ note.course }}</td>
                                 <td>
-                                    <a href={{ path('admin_group_card', {id: note.id}) }}>Редактировать</a></td>
+                                    <a href={{ path('admin_group', {id: note.id}) }}>Редактировать</a></td>
                                 </tr>
                         {% endfor %}
                     </tbody>
@@ -49,7 +50,6 @@
     </div>
     <div class="overlay"></div>
     {% include('blocks/pagination.html.twig') %}
-    {% include('admin/popup/popup_add_groups.html.twig') %}
 {% endblock %}
 
 {% block javascripts %}

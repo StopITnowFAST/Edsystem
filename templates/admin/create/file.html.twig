@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Добавить файлы | Интеллектуальный чат Энергомера{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('/styles/files.css') }}">
+{% endblock %}
+ 
+{% block body %}
+    <div class="container">
+        <div class="files__wrap">
+            <div class="files__head">
+                <h1>Добавить файлы</h1>
+                <a href="{{ path('admin_files') }}", class="btn btn-primary">Отменить</a>
+            </div>
+            <div class="files__body">
+                <form action="{{ path('file_save') }}", method="POST", enctype="multipart/form-data">
+
+                    <div class="files__file-item">
+                        <input type="file" name="file">
+                        <input type="text" name="url">
+                        <button class="btn icon-button">
+                        <svg class="svg-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 1L15 15M15 1L1 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        </button>
+                    </div>
+
+                    <button class="btn icon-button">
+                        <svg class="svg-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 1V15M1 8H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+
+
+                    <button type="sumbit">Сохранить</button>
+                </form>
+            </div>
+        </div>     
+    </div>
+    <div class="overlay"></div>
+{% endblock %}
+
+{% block javascripts %}
+    {# <script src="{{ asset('/js/admin_files.js') }}"></script> #}
+{% endblock %}

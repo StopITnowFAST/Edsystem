@@ -1,5 +1,6 @@
 :root {
     --color-main: #7289da;
+    --color-grey-0: #727579;
     --color-grey-100: #424549;
     --color-grey-200: #36393e;
     --color-grey-300: #282b30;
@@ -55,7 +56,7 @@ body {
     justify-content: center;
     border: unset;
     border-radius: var(--offset-3xs);
-    padding: var(--offset-xxs) var(--offset-s);
+    /* padding: var(--offset-xxs) var(--offset-s); */
     width: 100%;
     height: 52px;
     min-width: 280px;
@@ -97,3 +98,21 @@ body {
     display: block;
     z-index: 100;
 }
+
+.icon-button {
+    width: 50px;
+    height: 50px;
+    min-width: 0;
+    min-height: 0;
+    background-color: var(--color-grey-0);
+}
+
+.svg-icon {
+    width: 30px;
+    height: 30px;
+    stroke: var(--color-main);
+    display: inline-block;   /* Для правильного выравнивания */
+    vertical-align: middle;  /* Выравнивание по центру */    
+    fill: none;
+}
+

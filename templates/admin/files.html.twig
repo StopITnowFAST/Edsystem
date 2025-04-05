@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Студенты | Интеллектуальный чат Энергомера{% endblock %}
+{% block title %}Файлы | Интеллектуальный чат Энергомера{% endblock %}
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('/styles/admin_tables.css') }}">
@@ -12,9 +12,9 @@
     <div class="container">
         <div class="admin-table__wrap">
             <div class="admin-table__head">
-                <h1>Студенты</h1>
                 <div class="admin-table__buttons">
-                    <button class="btn btn-primary" onclick="openPopup()">Добавить студента</button>
+                    <h1>Файлы</h1>
+                    <a href="{{ path('admin_file') }}" class="btn btn-primary" onclick="openPopup()">Добавить файл</a>
                 </div>
             </div>
             <div class="admin-table__body">
@@ -22,23 +22,24 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Фамилия</th>
-                            <th>Имя</th>
-                            <th>Отчество</th>
-                            <th>Группа</th>
-                            <th>Действия</th>
+                            <th>Имя файла</th>
+                            <th>Расширение</th>
+                            <th>Размер</th>
+                            <th>Особенная ссылка</th>
+                            <th>Создан</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for note in notes %}
                             <tr>
                                 <td>{{ note.id }}</td>
-                                <td>{{ note.first_name }}</td>
-                                <td>{{ note.middle_name }}</td>
-                                <td>{{ note.last_name }}</td>
-                                <td>{{ note.code }}</td>
+                                <td>{{ note.fileName }}</td>
+                                <td>{{ note.extension }}</td>
+                                <td>{{ note.size }}</td>
+                                <td>{{ note.url }}</td>
+                                <td>{{ note.createdBy }}</td>
                                 <td>
-                                    <a href={{ path('admin_user', {id: note.id}) }}>Редактировать</a></td>
+                                    <a href={{ path('admin_group', {id: note.id}) }}>Редактировать</a></td>
                                 </tr>
                         {% endfor %}
                     </tbody>
@@ -48,9 +49,8 @@
     </div>
     <div class="overlay"></div>
     {% include('blocks/pagination.html.twig') %}
-    {% include('admin/popup/popup_add_students.html.twig') %}
 {% endblock %}
 
 {% block javascripts %}
-    <script src="{{ asset('/js/admin_students.js') }}"></script>
+    {# <script src="{{ asset('/js/admin_files.js') }}"></script> #}
 {% endblock %}

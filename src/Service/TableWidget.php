@@ -1,19 +1,13 @@
 <?php
 
-namespace App\Controller;
+namespace App\Service;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use App\Form\RegistrationFormType;
-use App\Entity\User;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-use Symfony\Component\HttpFoundation\Request;
+use App\Entity\Redirect as RedirectEntity;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
-class TableController extends AbstractController {
-
+class TableWidget
+{
     function createPagination($page, $rep, $paginationSize) {
         $pagination = [];
         $limit = $paginationSize; 
