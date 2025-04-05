@@ -133,10 +133,12 @@ class AdminPagesController extends AbstractController {
         ]);
     }
 
-    // Таблица меню header (не работает)
+    // Таблица меню header
     #[Route('admin/header-menu', name: 'admin_tests')]
     function adminHeaderMenu() {
         $menu = $this->em->getRepository(HeaderMenu::class)->findAll();
+        
+
         return $this->render('admin/header_menu.html.twig', [
             'notes' => $menu,
         ]);

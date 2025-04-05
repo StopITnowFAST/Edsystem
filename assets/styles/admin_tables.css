@@ -76,3 +76,6 @@ a:hover {
     background-color: var(--color-main);
 }
 
+table {
+    margin: var(--offset-s) 0px;
+}
