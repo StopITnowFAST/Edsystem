@@ -13,7 +13,7 @@
         <div class="admin-table__wrap">
             <h1>Пункты меню</h1>
             <div class="admin-table__buttons">
-                <a href="{{ path('admin_create_header-menu') }}" class="btn btn-primary" onclick="openPopup()">Добавить файл</a>
+                <a href="{{ path('admin_create_header-menu') }}" class="btn btn-primary" onclick="openPopup()">Добавить пункт</a>
             </div>
             <div class="admin-table__body">
                 <table class="admin-table__table">
@@ -22,7 +22,6 @@
                             <th>ID</th>
                             <th>Название</th>
                             <th>Родительский элемент</th>
-                            <th>Уровень вложенности</th>
                             <th>Ссылка</th>
                             <th>Статус</th>
                             <th>Действия</th>
@@ -34,7 +33,6 @@
                                 <td>{{ note.id }}</td>
                                 <td>{{ note.name }}</td>
                                 <td>{{ note.parent_name }}</td>
-                                <td>{{ note.item_level }}</td>
                                 <td>{{ note.url }}</td>
                                 <td>{{ note.status }}</td>
                                 <td></td>

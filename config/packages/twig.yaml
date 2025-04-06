@@ -2,6 +2,7 @@ twig:
     file_name_pattern: '*.twig'
     globals:
         app_title: '%app_title%'
+        menu_items: '@menu_data_provider'
 
 when@test:
     twig:

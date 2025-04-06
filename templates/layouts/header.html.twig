@@ -1,26 +1,40 @@
 <header>
     <div class="container">
         <div class="header__wrap">
-            <div class="header__logo">
-                Логотип и прочее описание
-            </div>
-
-            <div class="header__paths">
-                {# Добавить проверку ролей на аккаунты #}
-                {% if app.user %}
-                    <a class="header__paths__link" href="{{ path('admin_moderators') }}">Модераторы</a>
-                    <a class="header__paths__link" href="{{ path('admin_students') }}">Студенты</a>
-                    <a class="header__paths__link" href="{{ path('admin_teachers') }}">Преподаватели</a>
-                    <a class="header__paths__link" href="{{ path('admin_groups') }}">Группы</a>
-                    <a class="header__paths__link" href="{{ path('admin_chats') }}">Чаты</a>
-                    <a class="header__paths__link" href="{{ path('admin_files') }}">Файлы</a>
-                    <a class="header__paths__link" href="{{ path('admin_tests') }}">Тесты</a>
-                    
-                    <div class="header_account">
-                        Аккаунт
-                    </div>
-                {% endif %}
-            </div>
+            Какие нибудь дополнительные параметры
+            <div class="header__menu">
+                <div class="header__menu-groups">
+                    {# Перебор групп элементов header #}
+                    {% for menu_group in menu_items %}
+                        <button onclick="openHeaderMenu({{ menu_group.id }})" class="header__menu-group">{{ menu_group.name }}</button>
+                        <div id="header_sub_menu_{{ menu_group.id }}" class="header__sub-menu">
+                            <div class="container">
+                                <div class="header__menu-items">
+                                    {% if menu_group.children is defined%}
+                                        {# Перебор категорий групп элементов header #}
+                                        {% for category in menu_group.children %}
+                                            <div class="header__sub-menu-category-block">
+                                                <a href="{{ category.url }}" class="header__sub-menu-category">{{ category.name }}</a>
+                                                {% if category.children is defined%}
+                                                    {% for item in category.children %}
+                                                        <a href="{{ item.url }}">{{ item.name }}</a>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>            
         </div>
     </div>
 </header>
+
+<div id="header_overlay" class="header__overlay"></div>
+
+{% block javascripts %}
+    <script src="{{ asset('/js/header_menu.js') }}"></script>
+{% endblock %}

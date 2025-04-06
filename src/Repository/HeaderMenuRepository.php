@@ -22,7 +22,6 @@ class HeaderMenuRepository extends ServiceEntityRepository
             SELECT 
                 header_menu.id,
                 parent.name AS parent_name,
-                header_menu.item_level,
                 header_menu.name,
                 header_menu.url,
                 header_menu.place_order,

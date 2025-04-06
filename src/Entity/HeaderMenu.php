@@ -17,9 +17,6 @@ class HeaderMenu
     #[ORM\Column]
     private ?int $parent_id = null;
 
-    #[ORM\Column(length: 1)]
-    private ?string $item_level = null;
-
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $url = null;
 
@@ -45,18 +42,6 @@ class HeaderMenu
     public function setParentId(int $parent_id): static
     {
         $this->parent_id = $parent_id;
-
-        return $this;
-    }
-
-    public function getItemLevel(): ?string
-    {
-        return $this->item_level;
-    }
-
-    public function setItemLevel(string $item_level): static
-    {
-        $this->item_level = $item_level;
 
         return $this;
     }

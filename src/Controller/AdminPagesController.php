@@ -203,7 +203,6 @@ class AdminPagesController extends AbstractController {
         if ($request->isMethod('POST')) {
             $headerItem = new HeaderMenu;
             $headerItem->setParentId($_POST['parent_id']);
-            $headerItem->setItemLevel($_POST['item_level']);
             $headerItem->setName($_POST['name']);
             $headerItem->setUrl($_POST['url']);
             $headerItem->setPlaceOrder($_POST['place_order']);

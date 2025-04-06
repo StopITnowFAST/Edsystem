@@ -8,6 +8,9 @@ parameters:
     app_title: '%env(APP_TITLE)%'
     
 services:
+    menu_data_provider:
+        class: array
+        factory: ['@App\Service\Header', 'getHeaderMenu']
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.

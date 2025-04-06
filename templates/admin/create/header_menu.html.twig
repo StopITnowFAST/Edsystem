@@ -22,18 +22,6 @@
                             <input id="name" class="admin-create__input" name="name" required>
                         </div>
                         <div class="admin-create__field">
-                            <label for="nesting-level">Уровень вложенности</label>
-                            <select id="nesting-level" name="item_level" class="admin-create__select" required>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                            </select>
-                        </div>
-                        <div class="admin-create__field">
-                            <label for="link">Ссылка</label>
-                            <input id="link" class="admin-create__input" name="url" required>
-                        </div>
-                        <div class="admin-create__field">
                             <label for="parent">Родительский элемент</label>
                             <select id="parent" name="parent_id" class="admin-create__select" required>
                                 <option value="0">Без родителя</option>
@@ -53,6 +41,10 @@
                                     <option value="{{ status.id }}">{{ status.name }}</option>
                                 {% endfor %}
                             </select>
+                        </div>
+                        <div class="admin-create__field">
+                            <label for="link">Ссылка</label>
+                            <input id="link" class="admin-create__input" name="url" required>
                         </div>
                     </div>
                     <button class="btn btn-primary" type="sumbit">Сохранить</button>
