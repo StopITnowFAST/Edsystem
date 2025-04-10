@@ -99,14 +99,6 @@ body {
     z-index: 100;
 }
 
-.icon-button {
-    width: 50px;
-    height: 50px;
-    min-width: 0;
-    min-height: 0;
-    background-color: var(--color-grey-0);
-}
-
 .svg-icon {
     width: 30px;
     height: 30px;
@@ -116,3 +108,12 @@ body {
     fill: none;
 }
 
+
+.icon-button:hover {
+    color: #007bff; /* Синий при наведении */
+    transform: scale(1.1);
+}
+
+.icon-button[title="Удалить"]:hover {
+    color: #dc3545; /* Красный для удаления */
+}

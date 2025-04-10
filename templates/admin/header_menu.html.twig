@@ -35,10 +35,10 @@
                                 <td>{{ note.parent_name }}</td>
                                 <td>{{ note.url }}</td>
                                 <td>{{ note.status }}</td>
-                                <td></td>
-                                {# <td>
-                                    <a href={{ path('admin_group', {id: note.id}) }}>Редактировать</a></td>
-                                </tr> #}
+                                {{ include('blocks/action_cell.html.twig', {
+                                    'delete_path': path('admin_delete_header-menu', {'id': note.id}),
+                                    'change_path': path('admin_update_header-menu', {'id': note.id}),
+                                }) }}
                         {% endfor %}
                     </tbody>
                 </table>    

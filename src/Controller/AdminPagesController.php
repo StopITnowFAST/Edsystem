@@ -162,6 +162,14 @@ class AdminPagesController extends AbstractController {
         ]);
     }
 
+    // Редактирование меню
+    #[Route(path: '/admin/update/header-menu/{id}', name: 'admin_update_header-menu')] 
+    function adminUpdateHeaderMenu($id) {        
+        return $this->render('admin/update/user.html.twig', [
+
+        ]);
+    }
+
     // Редактирование файла
     #[Route(path: '/admin/update/file/{id}', name: 'admin_file')] 
     function adminUpdateFileCard($id) {
@@ -258,6 +266,16 @@ class AdminPagesController extends AbstractController {
         return $this->render('admin/create/redirect.html.twig', [
             'parents' => $parents,
             'statuses' => $statuses,
+        ]);
+    }
+
+    // Далее идут маршруты удаления записей
+
+    // Удаление меню
+    #[Route(path: '/admin/delete/header-menu/{id}', name: 'admin_delete_header-menu')] 
+    function adminDeleteHeaderMenu() {        
+        return $this->render('admin/create/file.html.twig', [
+
         ]);
     }
     
