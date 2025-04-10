@@ -74,7 +74,7 @@ class AdminPagesController extends AbstractController {
     }
 
     // Таблица загруженные файлы
-    #[Route('admin/files/{page}', name: 'admin_files')]
+    #[Route('/admin/files/{page}', name: 'admin_files')]
     function adminFiles($page = 1) {
         $pagination = $this->table->createPagination($page, $this->em->getRepository(FileEntity::class), self::PAGINATION_SIZE);
         return $this->render('admin/files.html.twig', [
@@ -88,7 +88,7 @@ class AdminPagesController extends AbstractController {
     }
     
     // Таблица студенты
-    #[Route('admin/students/{page}', name: 'admin_students')]
+    #[Route('/admin/students/{page}', name: 'admin_students')]
     function adminStudents($page = 1) {
         $pagination = $this->table->createPagination($page, $this->em->getRepository(Student::class), self::PAGINATION_SIZE);
         return $this->render('admin/students.html.twig', [
@@ -116,7 +116,7 @@ class AdminPagesController extends AbstractController {
     }
 
     // Таблица тесты (не работает)
-    #[Route('admin/tests/{page}', name: 'admin_tests')]
+    #[Route('/admin/tests/{page}', name: 'admin_tests')]
     function adminTests($page = 1) {
         $teachers = $this->em->getRepository(Teacher::class)->findAll();
         return $this->render('admin/tests.html.twig', [
@@ -125,7 +125,7 @@ class AdminPagesController extends AbstractController {
     }
 
     // Таблица редиректы (не работает)
-    #[Route('admin/tests/{page}', name: 'admin_tests')]
+    #[Route('/admin/redirects/{page}', name: 'admin_redirects')]
     function adminRedirects($page = 1) {
         $redirects = $this->em->getRepository(Redirect::class)->findAll();
         return $this->render('admin/redirects.html.twig', [
@@ -134,7 +134,7 @@ class AdminPagesController extends AbstractController {
     }
 
     // Таблица меню header
-    #[Route('admin/header-menu', name: 'admin_tests')]
+    #[Route('/admin/header-menu', name: 'admin_tests')]
     function adminHeaderMenu() {
         $menu = $this->em->getRepository(HeaderMenu::class)->findAllItems();
         return $this->render('admin/header_menu.html.twig', [
@@ -204,11 +204,12 @@ class AdminPagesController extends AbstractController {
             $headerItem = new HeaderMenu;
             $headerItem->setParentId($_POST['parent_id']);
             $headerItem->setName($_POST['name']);
-            $headerItem->setUrl($_POST['url']);
+            $headerItem->setUrl($_POST['url'] ?? NULL);
             $headerItem->setPlaceOrder($_POST['place_order']);
             $headerItem->setStatus($_POST['status']);
             $this->em->persist($headerItem);
             $this->em->flush();
+            return $this->redirectToRoute('admin_tests');
         }
         $parents = $this->em->getRepository(HeaderMenu::class)->findAll();
         $statuses = $this->em->getRepository(Status::class)->findAll();
