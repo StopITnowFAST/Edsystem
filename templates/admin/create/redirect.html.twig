@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% set title = "Добавить редирект" %}
+
+{% block title %}{{ title }} | {{ app_title }}{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('/styles/admin_tables.css') }}">
+    <link rel="stylesheet" href="{{ asset('/styles/admin_create.css') }}">
+{% endblock %}
+ 
+{% block body %}
+    <div class="container">
+        <div class="admin-table__wrap">
+            <div class="admin-table__head">
+                <h1>{{ title }}</h1>
+                <a href="{{ path('admin_redirects') }}", class="btn btn-primary">Отменить</a>
+            </div>
+            <div class="admin-table__body">
+                <form method="POST", enctype="multipart/form-data">
+                    <div class="admin-create__input-list">                     
+                        <div class="admin-create__field">
+                            <label for="description">Описание</label>
+                            <input id="description" class="admin-create__input" name="description" required>
+                        </div>
+                        <div class="admin-create__field">
+                            <label for="status">Статус</label>
+                            <select id="status" name="status" class="admin-create__select" required>
+                                {% for status in statuses %}
+                                    <option value="{{ status.id }}">{{ status.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="admin-create__field">
+                            <label for="from">Перенаправлять с адреса...</label>
+                            <input id="from" class="admin-create__input" name="from" required>
+                        </div>
+                        <div class="admin-create__field">
+                            <label for="to">Перенаправлять на адрес...</label>
+                            <input id="to" class="admin-create__input" name="to" required>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" type="sumbit">Сохранить</button>
+                </form>
+            </div>
+        </div>     
+    </div>
+    <div class="overlay"></div>
+{% endblock %}
+
+{% block javascripts %}
+    {# <script src="{{ asset('/js/files-table.js') }}"></script> #}
+{% endblock %}

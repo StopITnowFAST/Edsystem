@@ -125,11 +125,11 @@ class AdminPagesController extends AbstractController {
     }
 
     // Таблица редиректы (не работает)
-    #[Route('/admin/redirects/{page}', name: 'admin_redirects')]
-    function adminRedirects($page = 1) {
+    #[Route('/admin/redirects', name: 'admin_redirects')]
+    function adminRedirects() {
         $redirects = $this->em->getRepository(Redirect::class)->findAll();
         return $this->render('admin/redirects.html.twig', [
-            'redirects' => $redirects,
+            'notes' => $redirects,
         ]);
     }
 
@@ -238,6 +238,27 @@ class AdminPagesController extends AbstractController {
         
         die;        
         // return $this->redirectToRoute('admin_file', ['id' => $id]);
+    }
+
+    // Создание редиректа
+    #[Route(path: '/admin/create/redirect', name: 'admin_create_redirect')] 
+    function adminCreateRedirect(Request $request) {
+        if ($request->isMethod('POST')) {
+            $red = new Redirect;
+            $red->setDescription($_POST['description']);
+            $red->setRedirectFrom($_POST['from']);
+            $red->setRedirectTo($_POST['to']);
+            $red->setStatus($_POST['status']);
+            $this->em->persist($red);
+            $this->em->flush();
+            return $this->redirectToRoute('admin_redirects');
+        }
+        $parents = $this->em->getRepository(HeaderMenu::class)->findAll();
+        $statuses = $this->em->getRepository(Status::class)->findAll();
+        return $this->render('admin/create/redirect.html.twig', [
+            'parents' => $parents,
+            'statuses' => $statuses,
+        ]);
     }
     
 

@@ -13,7 +13,7 @@ class Header
     }
     
     public function getHeaderMenu() {
-        $menu = $this->em->getRepository(HeaderMenu::class)->findBy(['status' => 1]);
+        $menu = $this->em->getRepository(HeaderMenu::class)->findBy(['status' => 1], ['place_order' => 'asc']);
         $menuData = $this->buildTree($menu);
 
         return $menuData;
