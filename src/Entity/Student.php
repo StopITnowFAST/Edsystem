@@ -30,7 +30,7 @@ class Student
     private ?int $group_id = null;
 
     #[ORM\Column]
-    private ?int $birthday_date = null;
+    private ?string $birthday_date = null;
 
     #[ORM\Column]
     private ?int $status = null;
@@ -106,12 +106,12 @@ class Student
         return $this;
     }
 
-    public function getBirthdayDate(): ?int
+    public function getBirthdayDate(): ?string
     {
         return $this->birthday_date;
     }
 
-    public function setBirthdayDate(int $birthday_date): static
+    public function setBirthdayDate(string $birthday_date): static
     {
         $this->birthday_date = $birthday_date;
 

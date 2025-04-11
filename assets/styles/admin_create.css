@@ -100,3 +100,9 @@
     color: var(--color-grey-400);
     cursor: not-allowed;
 }
+
+.textarea-input {
+    height: auto !important; 
+    overflow: hidden;
+    resize: none;
+}

@@ -14,7 +14,7 @@
             <div class="admin-table__head">
                 <h1>Студенты</h1>
                 <div class="admin-table__buttons">
-                    <button class="btn btn-primary" onclick="openPopup()">Добавить студента</button>
+                    <a href="{{ path('admin_create_student') }}" class="btn btn-primary">Добавить студента</a>
                 </div>
             </div>
             <div class="admin-table__body">
@@ -37,8 +37,10 @@
                                 <td>{{ note.middle_name }}</td>
                                 <td>{{ note.last_name }}</td>
                                 <td>{{ note.code }}</td>
-                                <td>
-                                    <a href={{ path('admin_user', {id: note.id}) }}>Редактировать</a></td>
+                                {{ include('blocks/action_cell.html.twig', {
+                                    'delete_path': path('admin_delete_note', {'id': note.id, 'type': 'students'}),
+                                    'change_path': path('admin_update_note', {'id': note.id, 'type': 'students'}),
+                                }) }}
                                 </tr>
                         {% endfor %}
                     </tbody>

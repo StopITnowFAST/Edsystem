@@ -10,7 +10,6 @@ use App\Entity\File as FileEntity;
 use App\Entity\Group;
 use App\Service\TableWidget;
 use App\Entity\Redirect;
-use App\Entity\Grades;
 use App\Entity\HeaderMenu;
 use App\Entity\Teacher;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -146,10 +145,29 @@ class AdminPagesController extends AbstractController {
 
     // Создание студента
     #[Route(path: '/admin/create/student', name: 'admin_create_student')] 
-    function adminCreateStudent() {        
+    function adminCreateStudent(Request $request, $element = null) {
+        if ($request->isMethod('POST')) {
+            $student = (isset($_POST['isUpdate'])) ? $this->em->getRepository(Student::class)->find($_POST['updateId']) : new Student;                
+            $student->setFirstName($_POST['firstName']);
+            $student->setMiddlename($_POST['middleName']);
+            $student->setLastName($_POST['lastName']);
+            $student->setGroupid($_POST['group']);
+            $student->setBirthdayDate(strtotime($_POST['birthdayDate']));
+            $student->setStatus($_POST['status']);
+            $this->em->persist($student);
+            $this->em->flush();
+            return $this->redirectToRoute('admin_students');
+        }
+        if ($element) {
+            $element->setBirthdayDate(gmdate("Y-m-d",$element->getBirthdayDate()+100));
+        }        
+        $groups = $this->em->getRepository(Group::class)->findAll();
+        $statuses = $this->em->getRepository(Status::class)->findAll();
         return $this->render('admin/redact/student.html.twig', [
-
-        ]);
+            'groups' => $groups,
+            'statuses' => $statuses,
+            'updating_element' => $element,
+        ]); 
     }
 
     // Создание преподавателя
@@ -258,6 +276,7 @@ class AdminPagesController extends AbstractController {
             'header-menu' => $this->em->getRepository(HeaderMenu::class)->find($id),
             'redirects' => $this->em->getRepository(Redirect::class)->find($id),
             'groups' => $this->em->getRepository(Group::class)->find($id),
+            'students' => $this->em->getRepository(Student::class)->find($id),
         };        
         $this->em->remove($element);
         $this->em->flush();
@@ -277,6 +296,9 @@ class AdminPagesController extends AbstractController {
             case 'groups':
                 $element = $this->em->getRepository(Group::class)->find($id);
                 return $this->adminCreateGroup($request, $element);
+            case 'students':
+                $element = $this->em->getRepository(Student::class)->find($id);
+                return $this->adminCreateStudent($request, $element);
             default:
                 return $this->redirectToRoute('admin_moderators');
         }
