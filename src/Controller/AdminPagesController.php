@@ -8,10 +8,10 @@ use App\Entity\Student;
 use App\Service\File;
 use App\Entity\File as FileEntity;
 use App\Entity\Group;
+use App\Entity\Teacher;
 use App\Service\TableWidget;
 use App\Entity\Redirect;
 use App\Entity\HeaderMenu;
-use App\Entity\Teacher;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
@@ -171,10 +171,29 @@ class AdminPagesController extends AbstractController {
     }
 
     // Создание преподавателя
-    #[Route(path: '/admin/create/teacher', name: 'admin_create_teacher')] 
-    function adminCreateTeacher() {        
-        return $this->render('admin/redact/teacher.html.twig', [
 
+    #[Route(path: '/admin/create/teacher', name: 'admin_create_teacher')] 
+    function adminCreateTeacher(Request $request, $element = null) {
+        if ($request->isMethod('POST')) {
+            $teacher = (isset($_POST['isUpdate'])) ? $this->em->getRepository(Teacher::class)->find($_POST['updateId']) : new Teacher;
+            $teacher->setDescription($_POST['description']);
+            $teacher->setFirstName($_POST['firstName']);
+            $teacher->setMiddleName($_POST['middleName']);
+            $teacher->setLastName($_POST['lastName']);
+            $teacher->setGrade($_POST['grade']);
+            $teacher->setPosition($_POST['position']);
+            $teacher->setInstitut($_POST['institut']);
+            $teacher->setDivision($_POST['division']);
+            $teacher->setDescription($_POST['description']);
+            $teacher->setStatus($_POST['status']);
+            $this->em->persist($teacher);
+            $this->em->flush();
+            return $this->redirectToRoute('admin_teachers');
+        }
+        $statuses = $this->em->getRepository(Status::class)->findAll();
+        return $this->render('admin/redact/teacher.html.twig', [
+            'statuses' => $statuses,
+            'updating_element' => $element,
         ]);
     }
 
@@ -277,6 +296,7 @@ class AdminPagesController extends AbstractController {
             'redirects' => $this->em->getRepository(Redirect::class)->find($id),
             'groups' => $this->em->getRepository(Group::class)->find($id),
             'students' => $this->em->getRepository(Student::class)->find($id),
+            'teachers' => $this->em->getRepository(Teacher::class)->find($id),
         };        
         $this->em->remove($element);
         $this->em->flush();
@@ -299,6 +319,9 @@ class AdminPagesController extends AbstractController {
             case 'students':
                 $element = $this->em->getRepository(Student::class)->find($id);
                 return $this->adminCreateStudent($request, $element);
+            case 'teachers': 
+                $element = $this->em->getRepository(Teacher::class)->find($id);
+                return $this->adminCreateTeacher($request, $element);
             default:
                 return $this->redirectToRoute('admin_moderators');
         }

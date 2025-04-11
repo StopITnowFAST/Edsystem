@@ -1,0 +1,84 @@
+{% extends 'base.html.twig' %}
+
+{% set title = "Добавить преподавателя" %}
+{% block title %}{{ title }} | {{ app_title }}{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('/styles/admin_tables.css') }}">
+    <link rel="stylesheet" href="{{ asset('/styles/admin_create.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="admin-table__wrap">
+            <div class="admin-table__head">
+                <h1>{{ title }}</h1>
+                <a href="{{ path('admin_teachers') }}", class="btn btn-primary">Отменить</a>
+            </div>
+            <div class="admin-table__body">
+                <form method="POST", enctype="multipart/form-data">
+                    {% if updating_element is not empty %}
+                        <input type="hidden" value="true" name="isUpdate">
+                        <input type="hidden" value="{{ updating_element.id }}" name="updateId">
+                    {% endif %}
+                    <div class="admin-create__input-list">                     
+                        <div class="admin-create__field">
+                            <label for="lastName">Фамилия</label>
+                            <input id="lastName" class="admin-create__input" name="lastName" required
+                                value="{{ (updating_element is not empty) ? updating_element.lastName : "" }}">
+                        </div>
+                        <div class="admin-create__field">
+                            <label for="firstName">Имя</label>
+                            <input id="firstName" class="admin-create__input" name="firstName" required
+                                value="{{ (updating_element is not empty) ? updating_element.firstName : "" }}">
+                        </div>
+                        <div class="admin-create__field">
+                            <label for="middleName">Отчество</label>
+                            <input id="middleName" class="admin-create__input" name="middleName" required
+                                value="{{ (updating_element is not empty) ? updating_element.middleName : "" }}">
+                        </div>
+                        <div class="admin-create__field">
+                            <label for="grade">Степень</label>
+                            <input id="grade" class="admin-create__input" name="grade" required
+                                value="{{ (updating_element is not empty) ? updating_element.grade : "" }}">
+                        </div>
+                        <div class="admin-create__field">
+                            <label for="position">Должность</label>
+                            <input id="position" class="admin-create__input" name="position" required
+                                value="{{ (updating_element is not empty) ? updating_element.position : "" }}">
+                        </div>
+                        <div class="admin-create__field">
+                            <label for="institut">Институт</label>
+                            <input id="institut" class="admin-create__input" name="institut" required
+                                value="{{ (updating_element is not empty) ? updating_element.institut : "" }}">
+                        </div>
+                        <div class="admin-create__field">
+                            <label for="division">Подразделение</label>
+                            <input id="division" class="admin-create__input" name="division" required
+                                value="{{ (updating_element is not empty) ? updating_element.division : "" }}">
+                        </div>
+                        <div class="admin-create__field">
+                            <label for="status">Статус</label>
+                            <select id="status" name="status" class="admin-create__select" required>
+                                {% for status in statuses %}
+                                    <option value="{{ status.id }}" {{ (updating_element is not empty and updating_element.status == status.id) ? "selected" : "" }}>{{ status.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="admin-create__field">
+                            <label for="description">Описание</label>
+                            <textarea rows="5" id="description" class="textarea-input admin-create__input" name="description" required
+                                >{{ (updating_element is not empty) ? updating_element.description : "" }}</textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" type="sumbit">Сохранить</button>
+                </form>
+            </div>
+        </div>     
+    </div>
+    <div class="overlay"></div>
+{% endblock %}
+
+{% block javascripts %}
+    {# <script src="{{ asset('/js/files-table.js') }}"></script> #}
+{% endblock %}

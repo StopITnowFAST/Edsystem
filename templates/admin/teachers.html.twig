@@ -1,6 +1,7 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Преподаватели | {{ app_title }}{% endblock %}
+{% set title = "Преподаватели" %}
+{% block title %}{{ title }} | {{ app_title }}{% endblock %}
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('/styles/admin_tables.css') }}">
@@ -12,9 +13,9 @@
     <div class="container">
         <div class="admin-table__wrap">
             <div class="admin-table__head">
-                <h1>Преподаватели</h1>
+                <h1>{{ title }}</h1>
                 <div class="admin-table__buttons">
-                    <button class="btn btn-primary" onclick="openPopup()">Добавить преподавателя</button>
+                    <a href="{{ path('admin_create_student') }}" class="btn btn-primary">Добавить преподавателя</a>
                 </div>
             </div>
             <div class="admin-table__body">
@@ -37,8 +38,10 @@
                                 <td>{{ note.first_name }}</td>
                                 <td>{{ note.middle_name }}</td>
                                 <td>{{ note.position }}</td>
-                                <td>
-                                    <a href={{ path('admin_user', {id: note.id}) }}>Редактировать</a></td>
+                                {{ include('blocks/action_cell.html.twig', {
+                                    'delete_path': path('admin_delete_note', {'id': note.id, 'type': 'teachers'}),
+                                    'change_path': path('admin_update_note', {'id': note.id, 'type': 'teachers'}),
+                                }) }}
                                 </tr>
                             </tr>
                         {% endfor %}
@@ -49,7 +52,6 @@
     </div>          
     <div class="overlay"></div>
     {% include('blocks/pagination.html.twig') %}
-    {% include('admin/popup/popup_add_teacher.html.twig') %}
 {% endblock %}
 
 {% block javascripts %}
