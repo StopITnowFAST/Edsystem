@@ -1,18 +1,19 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Добавить пункт меню | {{ app_title }}{% endblock %}
+{% set title = "Добавить группу" %}
+{% block title %}{{ title }} | {{ app_title }}{% endblock %}
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('/styles/admin_tables.css') }}">
     <link rel="stylesheet" href="{{ asset('/styles/admin_create.css') }}">
 {% endblock %}
- 
+
 {% block body %}
     <div class="container">
         <div class="admin-table__wrap">
             <div class="admin-table__head">
-                <h1>Добавить пункт меню</h1>
-                <a href="{{ path('admin_header-menu') }}", class="btn btn-primary">Отменить</a>
+                <h1>{{ title }}</h1>
+                <a href="{{ path('admin_groups') }}", class="btn btn-primary">Отменить</a>
             </div>
             <div class="admin-table__body">
                 <form method="POST", enctype="multipart/form-data">
@@ -27,18 +28,30 @@
                                 value="{{ (updating_element is not empty) ? updating_element.name : "" }}">
                         </div>
                         <div class="admin-create__field">
-                            <label for="parent">Родительский элемент</label>
-                            <select id="parent" name="parent_id" class="admin-create__select" required>
-                                <option value="0">Без родителя</option>
-                                {% for parent in parents %}
-                                    <option value="{{ parent.id }}" {{ (updating_element is not empty and updating_element.parentId == parent.id) ? "selected" : "" }}>{{ parent.name }}</option>
+                            <label for="course">Курс</label>
+                            <select id="course" name="course" class="admin-create__select" required>
+                                {% for i in 1..4 %}
+                                    <option value="{{ i }}" {{ (updating_element is not empty and updating_element.course == i) ? "selected" : "" }}>{{ i }}</option>
                                 {% endfor %}
                             </select>
                         </div>
                         <div class="admin-create__field">
-                            <label for="order">Порядок</label>
-                            <input id="order" class="admin-create__input" name="place_order" required
-                                value="{{ (updating_element is not empty) ? updating_element.placeOrder : "" }}">
+                            <label for="code">Код</label>
+                            <input id="code" class="admin-create__input" name="code" required
+                                value="{{ (updating_element is not empty) ? updating_element.code : "" }}">
+                        </div>
+                        <div class="admin-create__field">
+                            <label for="semester">Семестр</label>
+                            <select id="semester" name="semester" class="admin-create__select" required>
+                                {% for i in 1..8 %}
+                                    <option value="{{ i }}" {{ (updating_element is not empty and updating_element.semester == i) ? "selected" : "" }}>{{ i }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="admin-create__field">
+                            <label for="year">Год</label>
+                            <input id="year" class="admin-create__input" name="year" required
+                                value="{{ (updating_element is not empty) ? updating_element.year : "" }}">
                         </div>
                         <div class="admin-create__field">
                             <label for="status">Статус</label>
@@ -49,9 +62,9 @@
                             </select>
                         </div>
                         <div class="admin-create__field">
-                            <label for="link">Ссылка</label>
-                            <input id="link" class="admin-create__input" name="url"
-                                value="{{ (updating_element is not empty) ? updating_element.url : "" }}">
+                            <label for="description">Описание</label>
+                            <textarea rows="5" id="description" class="textarea-input admin-create__input" name="description" required
+                                >{{ (updating_element is not empty) ? updating_element.description : "" }}</textarea>
                         </div>
                     </div>
                     <button class="btn btn-primary" type="sumbit">Сохранить</button>

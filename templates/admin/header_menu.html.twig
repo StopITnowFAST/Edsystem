@@ -36,8 +36,8 @@
                                 <td>{{ note.url }}</td>
                                 <td>{{ note.status }}</td>
                                 {{ include('blocks/action_cell.html.twig', {
-                                    'delete_path': path('admin_delete_header-menu', {'id': note.id}),
-                                    'change_path': path('admin_update_header-menu', {'id': note.id}),
+                                    'delete_path': path('admin_delete_note', {'id': note.id, 'type': 'header-menu'}),
+                                    'change_path': path('admin_update_note', {'id': note.id, 'type': 'header-menu'}),
                                 }) }}
                         {% endfor %}
                     </tbody>

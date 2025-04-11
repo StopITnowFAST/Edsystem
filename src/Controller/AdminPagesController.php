@@ -124,7 +124,7 @@ class AdminPagesController extends AbstractController {
         ]);
     }
 
-    // Таблица редиректы (не работает)
+    // Таблица редиректы
     #[Route('/admin/redirects', name: 'admin_redirects')]
     function adminRedirects() {
         $redirects = $this->em->getRepository(Redirect::class)->findAll();
@@ -143,14 +143,6 @@ class AdminPagesController extends AbstractController {
     }
 
     // Далее идут пути для создания записей
-
-    // Создание группы
-    #[Route(path: '/admin/create/group', name: 'admin_create_group')] 
-    function adminCreateGroup() {        
-        return $this->render('admin/redact/group.html.twig', [
-
-        ]);
-    }
 
     // Создание студента
     #[Route(path: '/admin/create/student', name: 'admin_create_student')] 
@@ -180,7 +172,7 @@ class AdminPagesController extends AbstractController {
             $headerItem->setStatus($_POST['status']);
             $this->em->persist($headerItem);
             $this->em->flush();
-            return $this->redirectToRoute('admin_tests');
+            return $this->redirectToRoute('admin_header-menu');
         }
         $parents = $this->em->getRepository(HeaderMenu::class)->findAll();
         $statuses = $this->em->getRepository(Status::class)->findAll();
@@ -234,28 +226,42 @@ class AdminPagesController extends AbstractController {
         ]);
     }
 
+    // Создание группы
+    #[Route(path: '/admin/create/group', name: 'admin_create_group')] 
+    function adminCreateGroup(Request $request, $element = null) {
+        if ($request->isMethod('POST')) {
+            $group = (isset($_POST['isUpdate'])) ? $this->em->getRepository(Group::class)->find($_POST['updateId']) : new Group;
+            $group->setName($_POST['name']);
+            $group->setCode($_POST['code']);
+            $group->setYear($_POST['year']);
+            $group->setSemester($_POST['semester']);
+            $group->setCourse($_POST['course']);
+            $group->setDescription($_POST['description']);
+            $group->setStatus($_POST['status']);
+            $this->em->persist($group);
+            $this->em->flush();
+            return $this->redirectToRoute('admin_groups');
+        }
+        $statuses = $this->em->getRepository(Status::class)->findAll();
+        return $this->render('admin/redact/group.html.twig', [
+            'statuses' => $statuses,
+            'updating_element' => $element,
+        ]);
+    }
+
     // Далее идут маршруты действий
 
     // Удаление элемента
     #[Route(path: '/admin/delete/{type}/{id}', name: 'admin_delete_note')] 
     function adminDeleteNote($id, $type) {
-        switch ($type) {
-            case 'header-menu':
-                $element = $this->em->getRepository(HeaderMenu::class)->find($id);
-                $route = 'admin_header-menu';
-                break;
-            case 'redirect':
-                $element = $this->em->getRepository(Redirect::class)->find($id);
-                $route = 'admin_redirects';
-                break;
-            default:
-                $element = null;
-                $route = 'admin_moderators';
-                break;
-        }
+        $element = match($type) {
+            'header-menu' => $this->em->getRepository(HeaderMenu::class)->find($id),
+            'redirects' => $this->em->getRepository(Redirect::class)->find($id),
+            'groups' => $this->em->getRepository(Group::class)->find($id),
+        };        
         $this->em->remove($element);
         $this->em->flush();
-        return $this->redirectToRoute($route);
+        return $this->redirectToRoute("admin_$type");
     }
     
     // Редактирование элемента
@@ -265,9 +271,12 @@ class AdminPagesController extends AbstractController {
             case 'header-menu':
                 $element = $this->em->getRepository(HeaderMenu::class)->find($id);
                 return $this->adminCreateHeaderMenu($request, $element);
-            case 'redirect':
+            case 'redirects':
                 $element = $this->em->getRepository(Redirect::class)->find($id);
                 return $this->adminCreateRedirect($request, $element);
+            case 'groups':
+                $element = $this->em->getRepository(Group::class)->find($id);
+                return $this->adminCreateGroup($request, $element);
             default:
                 return $this->redirectToRoute('admin_moderators');
         }

@@ -79,3 +79,9 @@ a:hover {
 table {
     margin: var(--offset-s) 0px;
 }
+
+.textarea-input {
+    height: auto !important; 
+    overflow: hidden;
+    resize: none;
+}

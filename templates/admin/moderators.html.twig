@@ -28,9 +28,7 @@
                     <tbody>
                         {% for user in notes %}
                             <tr>
-                                <td>
-                                    <a href={{ path('admin_user', {id: user.id}) }}>{{ user.id }}</a>
-                                </td>
+                                <td>{{ user.id }}</td>
                                 <td>{{ user.email }}</td>
                                 <td><input type="checkbox" value="{{ user.id }}"
                                     {% if "ROLE_MODERATOR" in user.roles %}

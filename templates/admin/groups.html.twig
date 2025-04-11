@@ -14,7 +14,7 @@
             <h1>Группы</h1>
             <div class="admin-table__head">
                 <div class="admin-table__buttons">
-                    <button class="btn btn-primary" onclick="openPopup()">Добавить группу</button>
+                <a href="{{ path('admin_create_group') }}" class="btn btn-primary">Добавить группу</a>
                 </div>
             </div>
             <div class="admin-table__body">
@@ -39,9 +39,10 @@
                                 <td>{{ note.year }}</td>
                                 <td>{{ note.semester }}</td>
                                 <td>{{ note.course }}</td>
-                                <td>
-                                    <a href={{ path('admin_group', {id: note.id}) }}>Редактировать</a></td>
-                                </tr>
+                                {{ include('blocks/action_cell.html.twig', {
+                                    'delete_path': path('admin_delete_note', {'id': note.id, 'type': 'groups'}),
+                                    'change_path': path('admin_update_note', {'id': note.id, 'type': 'groups'}),
+                                }) }}
                         {% endfor %}
                     </tbody>
                 </table>    
