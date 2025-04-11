@@ -134,48 +134,11 @@ class AdminPagesController extends AbstractController {
     }
 
     // Таблица меню header
-    #[Route('/admin/header-menu', name: 'admin_tests')]
+    #[Route('/admin/header-menu', name: 'admin_header-menu')]
     function adminHeaderMenu() {
         $menu = $this->em->getRepository(HeaderMenu::class)->findAllItems();
         return $this->render('admin/header_menu.html.twig', [
             'notes' => $menu,
-        ]);
-    }
-
-    // Далее идут пути для редактирования записей
-
-    // Редактирование пользователя
-    #[Route(path: '/admin/update/user/{id}', name: 'admin_user')] 
-    function adminUpdateUserCard($id) {
-        
-        return $this->render('admin/update/user.html.twig', [
-
-        ]);
-    }
-
-    // Редактирование группы
-    #[Route(path: '/admin/update/group/{id}', name: 'admin_group')] 
-    function adminUpdateGroupCard($id) {
-        
-        return $this->render('admin/update/user.html.twig', [
-
-        ]);
-    }
-
-    // Редактирование меню
-    #[Route(path: '/admin/update/header-menu/{id}', name: 'admin_update_header-menu')] 
-    function adminUpdateHeaderMenu($id) {        
-        return $this->render('admin/update/user.html.twig', [
-
-        ]);
-    }
-
-    // Редактирование файла
-    #[Route(path: '/admin/update/file/{id}', name: 'admin_file')] 
-    function adminUpdateFileCard($id) {
-        
-        return $this->render('admin/update/file.html.twig', [
-
         ]);
     }
 
@@ -184,7 +147,7 @@ class AdminPagesController extends AbstractController {
     // Создание группы
     #[Route(path: '/admin/create/group', name: 'admin_create_group')] 
     function adminCreateGroup() {        
-        return $this->render('admin/create/group.html.twig', [
+        return $this->render('admin/redact/group.html.twig', [
 
         ]);
     }
@@ -192,7 +155,7 @@ class AdminPagesController extends AbstractController {
     // Создание студента
     #[Route(path: '/admin/create/student', name: 'admin_create_student')] 
     function adminCreateStudent() {        
-        return $this->render('admin/create/student.html.twig', [
+        return $this->render('admin/redact/student.html.twig', [
 
         ]);
     }
@@ -200,16 +163,16 @@ class AdminPagesController extends AbstractController {
     // Создание преподавателя
     #[Route(path: '/admin/create/teacher', name: 'admin_create_teacher')] 
     function adminCreateTeacher() {        
-        return $this->render('admin/create/teacher.html.twig', [
+        return $this->render('admin/redact/teacher.html.twig', [
 
         ]);
     }
 
     // Создание пункта меню
     #[Route(path: '/admin/create/header-menu', name: 'admin_create_header-menu')] 
-    function adminCreateHeaderMenu(Request $request) {
+    function adminCreateHeaderMenu(Request $request, $element = null) {
         if ($request->isMethod('POST')) {
-            $headerItem = new HeaderMenu;
+            $headerItem = (isset($_POST['isUpdate'])) ? $this->em->getRepository(HeaderMenu::class)->find($_POST['updateId']) : new HeaderMenu;
             $headerItem->setParentId($_POST['parent_id']);
             $headerItem->setName($_POST['name']);
             $headerItem->setUrl($_POST['url'] ?? NULL);
@@ -221,16 +184,17 @@ class AdminPagesController extends AbstractController {
         }
         $parents = $this->em->getRepository(HeaderMenu::class)->findAll();
         $statuses = $this->em->getRepository(Status::class)->findAll();
-        return $this->render('admin/create/header_menu.html.twig', [
+        return $this->render('admin/redact/header_menu.html.twig', [
             'parents' => $parents,
             'statuses' => $statuses,
+            'updating_element' => $element,
         ]);
     }
     
     // Создание файла
     #[Route(path: '/admin/create/file', name: 'admin_file')] 
     function adminCreateFileCard() {        
-        return $this->render('admin/create/file.html.twig', [
+        return $this->render('admin/redact/file.html.twig', [
 
         ]);
     }
@@ -250,9 +214,9 @@ class AdminPagesController extends AbstractController {
 
     // Создание редиректа
     #[Route(path: '/admin/create/redirect', name: 'admin_create_redirect')] 
-    function adminCreateRedirect(Request $request) {
+    function adminCreateRedirect(Request $request, $element = null) {
         if ($request->isMethod('POST')) {
-            $red = new Redirect;
+            $red = (isset($_POST['isUpdate'])) ? $this->em->getRepository(Redirect::class)->find($_POST['updateId']) : new Redirect;
             $red->setDescription($_POST['description']);
             $red->setRedirectFrom($_POST['from']);
             $red->setRedirectTo($_POST['to']);
@@ -263,21 +227,57 @@ class AdminPagesController extends AbstractController {
         }
         $parents = $this->em->getRepository(HeaderMenu::class)->findAll();
         $statuses = $this->em->getRepository(Status::class)->findAll();
-        return $this->render('admin/create/redirect.html.twig', [
+        return $this->render('admin/redact/redirect.html.twig', [
             'parents' => $parents,
             'statuses' => $statuses,
+            'updating_element' => $element,
         ]);
     }
 
-    // Далее идут маршруты удаления записей
+    // Далее идут маршруты действий
 
-    // Удаление меню
-    #[Route(path: '/admin/delete/header-menu/{id}', name: 'admin_delete_header-menu')] 
-    function adminDeleteHeaderMenu() {        
-        return $this->render('admin/create/file.html.twig', [
-
-        ]);
+    // Удаление элемента
+    #[Route(path: '/admin/delete/{type}/{id}', name: 'admin_delete_note')] 
+    function adminDeleteNote($id, $type) {
+        switch ($type) {
+            case 'header-menu':
+                $element = $this->em->getRepository(HeaderMenu::class)->find($id);
+                $route = 'admin_header-menu';
+                break;
+            case 'redirect':
+                $element = $this->em->getRepository(Redirect::class)->find($id);
+                $route = 'admin_redirects';
+                break;
+            default:
+                $element = null;
+                $route = 'admin_moderators';
+                break;
+        }
+        $this->em->remove($element);
+        $this->em->flush();
+        return $this->redirectToRoute($route);
     }
     
+    // Редактирование элемента
+    #[Route(path: '/admin/update/{type}/{id}', name: 'admin_update_note')] 
+    function adminUpdateNote($id, $type, Request $request) {
+        switch ($type) {
+            case 'header-menu':
+                $element = $this->em->getRepository(HeaderMenu::class)->find($id);
+                return $this->adminCreateHeaderMenu($request, $element);
+            case 'redirect':
+                $element = $this->em->getRepository(Redirect::class)->find($id);
+                return $this->adminCreateRedirect($request, $element);
+            default:
+                return $this->redirectToRoute('admin_moderators');
+        }
+    }
+
+    // Далее идут вспомогательные функции
+
+    // Проверка 
+    function handleExistence() {
+
+    }
 
 }

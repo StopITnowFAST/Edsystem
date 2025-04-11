@@ -35,10 +35,10 @@
                                 <td>{{ note.redirectFrom }}</td>
                                 <td>{{ note.redirectTo }}</td>
                                 <td>{{ note.status }}</td>
-                                <td></td>
-                                {# <td>
-                                    <a href={{ path('admin_group', {id: note.id}) }}>Редактировать</a></td>
-                                </tr> #}
+                                {{ include('blocks/action_cell.html.twig', {
+                                    'delete_path': path('admin_delete_note', {'id': note.id, 'type': 'redirect'}),
+                                    'change_path': path('admin_update_note', {'id': note.id, 'type': 'redirect'}),
+                                }) }}
                         {% endfor %}
                     </tbody>
                 </table>    

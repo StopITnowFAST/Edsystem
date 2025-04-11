@@ -18,26 +18,34 @@
             </div>
             <div class="admin-table__body">
                 <form method="POST", enctype="multipart/form-data">
+                    {% if updating_element is not empty %}
+                        <input type="hidden" value="true" name="isUpdate">
+                        <input type="hidden" value="{{ updating_element.id }}" name="updateId">
+                    {% endif %}
                     <div class="admin-create__input-list">                     
                         <div class="admin-create__field">
                             <label for="description">Описание</label>
-                            <input id="description" class="admin-create__input" name="description" required>
+                            <input id="description" class="admin-create__input" name="description"  required
+                                value="{{ (updating_element is not empty) ? updating_element.description : "" }}">
                         </div>
                         <div class="admin-create__field">
                             <label for="status">Статус</label>
-                            <select id="status" name="status" class="admin-create__select" required>
+                            <select id="status" name="status" class="admin-create__select" required
+                                value="{{ (updating_element is not empty) ? updating_element.status : "" }}">
                                 {% for status in statuses %}
-                                    <option value="{{ status.id }}">{{ status.name }}</option>
+                                    <option value="{{ status.id }}" {{ (updating_element is not empty and updating_element.status == status.id) ? "selected" : "" }}>{{ status.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
                         <div class="admin-create__field">
                             <label for="from">Перенаправлять с адреса...</label>
-                            <input id="from" class="admin-create__input" name="from" required>
+                            <input id="from" class="admin-create__input" name="from" required
+                                value="{{ (updating_element is not empty) ? updating_element.redirectFrom : "" }}">
                         </div>
                         <div class="admin-create__field">
                             <label for="to">Перенаправлять на адрес...</label>
-                            <input id="to" class="admin-create__input" name="to" required>
+                            <input id="to" class="admin-create__input" name="to" required
+                                value="{{ (updating_element is not empty) ? updating_element.redirectTo : "" }}">
                         </div>
                     </div>
                     <button class="btn btn-primary" type="sumbit">Сохранить</button>
