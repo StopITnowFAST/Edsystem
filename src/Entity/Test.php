@@ -26,6 +26,15 @@ class Test
     #[ORM\Column]
     private ?int $updated_at = null;
 
+    #[ORM\Column(length: 1)]
+    private ?string $shuffle = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $time = null;
+
+    #[ORM\Column(type: Types::TEXT)]
+    private ?string $student_groups = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -75,6 +84,42 @@ class Test
     public function setUpdatedAt(int $updated_at): static
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    public function getShuffle(): ?string
+    {
+        return $this->shuffle;
+    }
+
+    public function setShuffle(string $shuffle): static
+    {
+        $this->shuffle = $shuffle;
+
+        return $this;
+    }
+
+    public function getTime(): ?int
+    {
+        return $this->time;
+    }
+
+    public function setTime(?int $time): static
+    {
+        $this->time = $time;
+
+        return $this;
+    }
+
+    public function getStudentGroups(): ?string
+    {
+        return $this->student_groups;
+    }
+
+    public function setStudentGroups(string $student_groups): static
+    {
+        $this->student_groups = $student_groups;
 
         return $this;
     }

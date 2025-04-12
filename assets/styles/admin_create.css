@@ -106,3 +106,8 @@
     overflow: hidden;
     resize: none;
 }
+
+.admin-create__head-buttons {
+    display: flex;
+    gap: var(--offset-s);
+}

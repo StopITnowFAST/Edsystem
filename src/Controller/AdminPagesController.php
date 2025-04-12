@@ -12,6 +12,7 @@ use App\Entity\Teacher;
 use App\Service\TableWidget;
 use App\Entity\Redirect;
 use App\Entity\HeaderMenu;
+use App\Entity\Test;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
@@ -114,12 +115,12 @@ class AdminPagesController extends AbstractController {
         ]);
     }
 
-    // Таблица тесты (не работает)
-    #[Route('/admin/tests/{page}', name: 'admin_tests')]
-    function adminTests($page = 1) {
-        $teachers = $this->em->getRepository(Teacher::class)->findAll();
+    // Таблица тесты
+    #[Route('/admin/tests', name: 'admin_tests')]
+    function adminTests() {
+        $tests = $this->em->getRepository(Test::class)->findAll();
         return $this->render('admin/tests.html.twig', [
-            'tableData' => $teachers,
+            'notes' => $tests,
         ]);
     }
 
@@ -171,7 +172,6 @@ class AdminPagesController extends AbstractController {
     }
 
     // Создание преподавателя
-
     #[Route(path: '/admin/create/teacher', name: 'admin_create_teacher')] 
     function adminCreateTeacher(Request $request, $element = null) {
         if ($request->isMethod('POST')) {
@@ -281,6 +281,29 @@ class AdminPagesController extends AbstractController {
         }
         $statuses = $this->em->getRepository(Status::class)->findAll();
         return $this->render('admin/redact/group.html.twig', [
+            'statuses' => $statuses,
+            'updating_element' => $element,
+        ]);
+    }
+
+    // Создание теста
+    #[Route(path: '/admin/create/test', name: 'admin_create_test')] 
+    function adminCreateTest(Request $request, $element = null) {
+        if ($request->isMethod('POST')) {
+            $test = (isset($_POST['isUpdate'])) ? $this->em->getRepository(Test::class)->find($_POST['updateId']) : new Test;
+            $test->setName($_POST['name']);
+            $test->setCode($_POST['code']);
+            $test->setYear($_POST['year']);
+            $test->setSemester($_POST['semester']);
+            $test->setCourse($_POST['course']);
+            $test->setDescription($_POST['description']);
+            $test->setStatus($_POST['status']);
+            $this->em->persist($test);
+            $this->em->flush();
+            return $this->redirectToRoute('admin_tests');
+        }
+        $statuses = $this->em->getRepository(Status::class)->findAll();
+        return $this->render('admin/redact/test.html.twig', [
             'statuses' => $statuses,
             'updating_element' => $element,
         ]);
