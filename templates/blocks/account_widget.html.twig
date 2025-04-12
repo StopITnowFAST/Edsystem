@@ -1,0 +1,13 @@
+{% set colors = ['#4a6fa5', '#5cb85c', '#5bc0de', '#f0ad4e', '#d9534f'] %}
+{% set color = colors[app.user.id % colors|length] %}
+
+<div class="header__account__widget">
+    <button class="account-avatar" style="background-color: {{ color }}" onclick="toggleAccountMenu()">
+        {{ app.user.email|slice(0, 2)|upper }}
+    </button>
+    
+    <div class="account-menu" id="accountMenu">
+        {# <a href="{{ path('app_account') }}">Профиль</a> #}
+        <a href="{{ path('app_logout') }}">Выйти</a>
+    </div>
+</div>

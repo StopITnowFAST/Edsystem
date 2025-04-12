@@ -1,3 +1,5 @@
+// ФУНКЦИИ ДЛЯ МЕНЮ
+
 const headerOverlay = document.getElementById("header_overlay");
 const allMenu = Array.from(document.querySelectorAll('[id^="header_sub_menu_"]'));
 
@@ -78,4 +80,21 @@ document.querySelectorAll('.header__menu-group').forEach(button => {
             openHeaderMenu(menuId);
         }
     });
+});
+
+// ФУНКЦИИ ДЛЯ АККАУНТА
+
+function toggleAccountMenu() {
+    const menu = document.getElementById('accountMenu');
+    menu.classList.toggle('show');
+}
+
+// Закрывать меню при клике вне его
+window.addEventListener('click', function(event) {
+    const menu = document.getElementById('accountMenu');
+    const avatar = document.querySelector('.account-avatar');
+    
+    if (!avatar.contains(event.target) && !menu.contains(event.target)) {
+        menu.classList.remove('show');
+    }
 });
