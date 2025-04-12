@@ -115,12 +115,17 @@ class AdminPagesController extends AbstractController {
         ]);
     }
 
-    // Таблица тесты
-    #[Route('/admin/tests', name: 'admin_tests')]
-    function adminTests() {
-        $tests = $this->em->getRepository(Test::class)->findAll();
+    // Таблица преподаватели
+    #[Route(path: '/admin/tests/{page}', name: 'admin_tests')] 
+    function adminTests($page = 1) {
+        $pagination = $this->table->createPagination($page, $this->em->getRepository(Test::class), self::PAGINATION_SIZE);
         return $this->render('admin/tests.html.twig', [
-            'notes' => $tests,
+            'notes' => $pagination['data'],
+            'totalNotes' => $pagination['totalNotes'],
+            'pagRow' => $pagination['row'],
+            'currentPage' => $page,
+            'paginationSize' => self::PAGINATION_SIZE,
+            'formName' => 'admin_tests',
         ]);
     }
 
@@ -292,22 +297,25 @@ class AdminPagesController extends AbstractController {
         if ($request->isMethod('POST')) {
             $test = (isset($_POST['isUpdate'])) ? $this->em->getRepository(Test::class)->find($_POST['updateId']) : new Test;
             $test->setName($_POST['name']);
-            $test->setCode($_POST['code']);
-            $test->setYear($_POST['year']);
-            $test->setSemester($_POST['semester']);
-            $test->setCourse($_POST['course']);
-            $test->setDescription($_POST['description']);
+            $test->setShuffle($_POST['shuffle']);
+            $test->setTime($_POST['time']);
             $test->setStatus($_POST['status']);
             $this->em->persist($test);
             $this->em->flush();
-            return $this->redirectToRoute('admin_tests');
+            if ($_POST['action'] == 'appoint') {
+                return $this->redirectToRoute('admin_tests_appoint'); // Назначение групп 
+            } else if ($_POST['action'] == 'redact') {
+                return $this->redirectToRoute('admin_tests_redact'); // Добавление вопросов                
+            } else {
+                return $this->redirectToRoute('admin_tests'); // Обычное сохранение
+            }
         }
         $statuses = $this->em->getRepository(Status::class)->findAll();
         return $this->render('admin/redact/test.html.twig', [
             'statuses' => $statuses,
             'updating_element' => $element,
         ]);
-    }
+    }  
 
     // Далее идут маршруты действий
 
@@ -320,6 +328,7 @@ class AdminPagesController extends AbstractController {
             'groups' => $this->em->getRepository(Group::class)->find($id),
             'students' => $this->em->getRepository(Student::class)->find($id),
             'teachers' => $this->em->getRepository(Teacher::class)->find($id),
+            'tests' => $this->em->getRepository(Test::class)->find($id),
         };        
         $this->em->remove($element);
         $this->em->flush();
@@ -345,6 +354,9 @@ class AdminPagesController extends AbstractController {
             case 'teachers': 
                 $element = $this->em->getRepository(Teacher::class)->find($id);
                 return $this->adminCreateTeacher($request, $element);
+            case 'tests':
+                $element = $this->em->getRepository(Test::class)->find($id);
+                return $this->adminCreateTest($request, $element);
             default:
                 return $this->redirectToRoute('admin_moderators');
         }

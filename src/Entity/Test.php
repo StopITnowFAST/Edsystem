@@ -20,20 +20,17 @@ class Test
     #[ORM\Column(nullable: true)]
     private ?int $status = null;
 
-    #[ORM\Column]
-    private ?int $created_at = null;
-
-    #[ORM\Column]
-    private ?int $updated_at = null;
-
     #[ORM\Column(length: 1)]
     private ?string $shuffle = null;
 
     #[ORM\Column(nullable: true)]
-    private ?int $time = null;
+    private ?string $time = null;
 
-    #[ORM\Column(type: Types::TEXT)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $student_groups = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $description = null;
 
     public function getId(): ?int
     {
@@ -64,30 +61,6 @@ class Test
         return $this;
     }
 
-    public function getCreatedAt(): ?int
-    {
-        return $this->created_at;
-    }
-
-    public function setCreatedAt(int $created_at): static
-    {
-        $this->created_at = $created_at;
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?int
-    {
-        return $this->updated_at;
-    }
-
-    public function setUpdatedAt(int $updated_at): static
-    {
-        $this->updated_at = $updated_at;
-
-        return $this;
-    }
-
     public function getShuffle(): ?string
     {
         return $this->shuffle;
@@ -100,12 +73,12 @@ class Test
         return $this;
     }
 
-    public function getTime(): ?int
+    public function getTime(): ?string
     {
         return $this->time;
     }
 
-    public function setTime(?int $time): static
+    public function setTime(?string $time): static
     {
         $this->time = $time;
 
@@ -120,6 +93,18 @@ class Test
     public function setStudentGroups(string $student_groups): static
     {
         $this->student_groups = $student_groups;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
 
         return $this;
     }

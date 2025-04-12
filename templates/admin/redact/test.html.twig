@@ -14,17 +14,18 @@
             <div class="admin-table__head">
                 <h1>{{ title }}</h1>
                 <div class="admin-create__head-buttons">
-                    <a href="{{ path('admin_teachers') }}", class="btn btn-primary">Отменить</a>
-                    <a href="{{ path('admin_teachers') }}", class="btn btn-primary">Назначить тест</a>
-                    <a href="{{ path('admin_teachers') }}", class="btn btn-primary">Добавить вопросы</a>
+                    <a href="{{ path('admin_tests') }}", class="btn btn-primary">Отменить</a>
+                    <button class="btn btn-primary" onclick="submit('appoint')">Назначить тест</a>
+                    <button class="btn btn-primary" onclick="submit('redact')">Редактировать вопросы</a>
                 </div>
             </div>
             <div class="admin-table__body">
-                <form method="POST", enctype="multipart/form-data">
+                <form id="test" method="POST", enctype="multipart/form-data">
                     {% if updating_element is not empty %}
                         <input type="hidden" value="true" name="isUpdate">
                         <input type="hidden" value="{{ updating_element.id }}" name="updateId">
                     {% endif %}
+                    <input id="actionType" type="hidden" value="" name="action">
                     <div class="admin-create__input-list">     
                         <div class="admin-create__field">
                             <label for="name">Название теста</label>
@@ -32,10 +33,10 @@
                                 value="{{ (updating_element is not empty) ? updating_element.name : "" }}">
                         </div>
                         <div class="admin-create__field">
-                            <label for="shufle">Перемешать вопросы</label>
-                            <select id="shufle" name="shufle" class="admin-create__select" required>
-                                <option value="0" {{ (updating_element is not empty and updating_element.shufle == 0) ? "selected" : "" }}>Нет</option>
-                                <option value="1" {{ (updating_element is not empty and updating_element.shufle == 1) ? "selected" : "" }}>Да</option>
+                            <label for="shuffle">Перемешать вопросы</label>
+                            <select id="shuffle" name="shuffle" class="admin-create__select" required>
+                                <option value="0" {{ (updating_element is not empty and updating_element.shuffle == 0) ? "selected" : "" }}>Нет</option>
+                                <option value="1" {{ (updating_element is not empty and updating_element.shuffle == 1) ? "selected" : "" }}>Да</option>
                             </select>
                         </div>     
                         <div class="admin-create__field">
@@ -51,11 +52,6 @@
                                 {% endfor %}
                             </select>
                         </div>
-                        <div class="admin-create__field">
-                            <label for="description">Описание теста</label>
-                            <textarea rows="5" id="description" class="textarea-input admin-create__input" name="description" required
-                                >{{ (updating_element is not empty) ? updating_element.description : "" }}</textarea>
-                        </div>
                     </div>
                     <button class="btn btn-primary" type="sumbit">Сохранить</button>
                 </form>
@@ -66,5 +62,5 @@
 {% endblock %}
 
 {% block javascripts %}
-    {# <script src="{{ asset('/js/files-table.js') }}"></script> #}
+    <script src="{{ asset('/js/test_redact.js') }}"></script>
 {% endblock %}

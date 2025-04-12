@@ -24,6 +24,8 @@
                         <tr>
                             <th>ID</th>
                             <th>Название</th>
+                            <th>Перемешивание</th>
+                            <th>Время на тест</th>
                             <th>Действия</th>
                         </tr>
                     </thead>
@@ -31,13 +33,12 @@
                         {% for note in notes %}
                             <tr>
                                 <td>{{ note.id }}</td>
-                                <td>{{ note.last_name }}</td>
-                                <td>{{ note.first_name }}</td>
-                                <td>{{ note.middle_name }}</td>
-                                <td>{{ note.position }}</td>
+                                <td>{{ note.name }}</td>
+                                <td>{{ note.shuffle }}</td>
+                                <td>{{ note.time }}</td>
                                 {{ include('blocks/action_cell.html.twig', {
-                                    'delete_path': path('admin_delete_note', {'id': note.id, 'type': 'teachers'}),
-                                    'change_path': path('admin_update_note', {'id': note.id, 'type': 'teachers'}),
+                                    'delete_path': path('admin_delete_note', {'id': note.id, 'type': 'tests'}),
+                                    'change_path': path('admin_update_note', {'id': note.id, 'type': 'tests'}),
                                 }) }}
                                 </tr>
                             </tr>
@@ -48,6 +49,7 @@
         </div>     
     </div>          
     <div class="overlay"></div>
+    {% include('blocks/pagination.html.twig') %}
 {% endblock %}
 
 {% block javascripts %}{% endblock %}
