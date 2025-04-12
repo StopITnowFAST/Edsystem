@@ -3,7 +3,7 @@
         <div class="header__wrap">
             {% if app.user %}
                 <div class="header__head">
-                    Какие нибудь дополнительные параметры
+                    <img src="{{ asset('logo.svg') }}" alt="KITEDU" class="header__logo">
                     {{ include('blocks/account_widget.html.twig') }}
                 </div>
                 <div class="header__menu">

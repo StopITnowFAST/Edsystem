@@ -23,7 +23,6 @@
                             <th>Описание</th>
                             <th>От</th>
                             <th>К</th>
-                            <th>Статус</th>
                             <th>Действия</th>
                         </tr>
                     </thead>
@@ -34,7 +33,6 @@
                                 <td>{{ note.description }}</td>
                                 <td>{{ note.redirectFrom }}</td>
                                 <td>{{ note.redirectTo }}</td>
-                                <td>{{ note.status }}</td>
                                 {{ include('blocks/action_cell.html.twig', {
                                     'delete_path': path('admin_delete_note', {'id': note.id, 'type': 'redirects'}),
                                     'change_path': path('admin_update_note', {'id': note.id, 'type': 'redirects'}),

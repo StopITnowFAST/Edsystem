@@ -1,0 +1,14 @@
+<svg width="400" height="80" viewBox="0 0 500 80" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="discord-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#5865F2"/> <!-- Discord Blurple -->
+      <stop offset="100%" stop-color="#EB459E"/> <!-- Discord Pink -->
+    </linearGradient>
+  </defs>
+  
+  <!-- Минималистичный текст -->
+  <text x="130" y="80" font-family="'Segoe UI', Arial, sans-serif" font-size="80" 
+        font-weight="600" text-anchor="middle" fill="url(#discord-gradient)">
+    KITEDU
+  </text>
+</svg>

@@ -33,7 +33,7 @@ class HeaderMenuRepository extends ServiceEntityRepository
             LEFT JOIN 
                 status ON header_menu.status = status.id
         ";
-        $resultSet = $conn->executeQuery($sql);        
+        $resultSet = $conn->executeQuery($sql); 
         return $resultSet->fetchAllAssociative();
     }
 }
