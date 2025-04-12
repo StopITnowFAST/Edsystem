@@ -25,6 +25,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use App\Service\BreadcrumbsGenerator;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class AdminPagesController extends AbstractController {
 
@@ -35,15 +36,16 @@ class AdminPagesController extends AbstractController {
         private TableWidget $table,
         private File $file,
         private BreadcrumbsGenerator $breadcrumbs,
+        private UrlGeneratorInterface $router,
     ) {
     }
     
     // Таблица модераторы
     #[Route(path: '/admin/moderators/{page}', name: 'admin_moderators')] 
     function adminModerators($page = 1) {
-        $breadcrumbs = $this->registerBreadcrumpbs([
+        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
             'Модераторы' => 'admin_moderators',
-        ]);
+        ], $this->router);
 
         $pagination = $this->table->createPagination($page, $this->em->getRepository(User::class), self::PAGINATION_SIZE);
         return $this->render('admin/moderators.html.twig', [
@@ -60,9 +62,9 @@ class AdminPagesController extends AbstractController {
     // Таблица группы
     #[Route('/admin/groups/{page}', 'admin_groups')] 
     function adminGroups($page = 1) {
-        $breadcrumbs = $this->registerBreadcrumpbs([
+        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
             'Группы' => 'admin_groups',
-        ]);
+        ], $this->router);
         $pagination = $this->table->createPagination($page, $this->em->getRepository(Group::class), self::PAGINATION_SIZE);
         return $this->render('admin/groups.html.twig', [
             'breadcrumbs' => $breadcrumbs,
@@ -78,9 +80,9 @@ class AdminPagesController extends AbstractController {
     // Таблица чаты
     #[Route('admin/chats/{page}', 'admin_chats')]
     function adminChats($page = 1) {
-        $breadcrumbs = $this->registerBreadcrumpbs([
+        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
             'Чаты' => 'admin_chats',
-        ]);
+        ], $this->router);
         $teachers = $this->em->getRepository(Teacher::class)->findAll();
         return $this->render('admin/chats.html.twig', [
             'breadcrumbs' => $breadcrumbs,
@@ -91,9 +93,9 @@ class AdminPagesController extends AbstractController {
     // Таблица загруженные файлы
     #[Route('/admin/files/{page}', name: 'admin_files')]
     function adminFiles($page = 1) {
-        $breadcrumbs = $this->registerBreadcrumpbs([
+        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
             'Файлы' => 'admin_files',
-        ]);
+        ], $this->router);
         $pagination = $this->table->createPagination($page, $this->em->getRepository(FileEntity::class), self::PAGINATION_SIZE);
         return $this->render('admin/files.html.twig', [
             'breadcrumbs' => $breadcrumbs,
@@ -109,9 +111,9 @@ class AdminPagesController extends AbstractController {
     // Таблица студенты
     #[Route('/admin/students/{page}', name: 'admin_students')]
     function adminStudents($page = 1) {
-        $breadcrumbs = $this->registerBreadcrumpbs([
+        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
             'Студенты' => 'admin_students',
-        ]);
+        ], $this->router);
         $pagination = $this->table->createPagination($page, $this->em->getRepository(Student::class), self::PAGINATION_SIZE);
         return $this->render('admin/students.html.twig', [
             'breadcrumbs' => $breadcrumbs,
@@ -127,9 +129,9 @@ class AdminPagesController extends AbstractController {
     // Таблица преподаватели
     #[Route(path: '/admin/teachers/{page}', name: 'admin_teachers')] 
     function adminTeachers($page = 1) {
-        $breadcrumbs = $this->registerBreadcrumpbs([
+        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
             'Преподаватели' => 'admin_teachers',
-        ]);
+        ], $this->router);
         $pagination = $this->table->createPagination($page, $this->em->getRepository(Teacher::class), self::PAGINATION_SIZE);
         return $this->render('admin/teachers.html.twig', [
             'breadcrumbs' => $breadcrumbs,
@@ -145,9 +147,9 @@ class AdminPagesController extends AbstractController {
     // Таблица тесты
     #[Route(path: '/admin/tests/{page}', name: 'admin_tests')] 
     function adminTests($page = 1) {
-        $breadcrumbs = $this->registerBreadcrumpbs([
+        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
             'Тесты' => 'admin_tests',
-        ]);
+        ], $this->router);
         $pagination = $this->table->createPagination($page, $this->em->getRepository(Test::class), self::PAGINATION_SIZE);
         return $this->render('admin/tests.html.twig', [
             'breadcrumbs' => $breadcrumbs,
@@ -163,9 +165,9 @@ class AdminPagesController extends AbstractController {
     // Таблица редиректы
     #[Route('/admin/redirects', name: 'admin_redirects')]
     function adminRedirects() {
-        $breadcrumbs = $this->registerBreadcrumpbs([
+        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
             'Редиректы' => 'admin_redirects',
-        ]);
+        ], $this->router);
         $redirects = $this->em->getRepository(Redirect::class)->findAll();
         return $this->render('admin/redirects.html.twig', [
             'breadcrumbs' => $breadcrumbs,
@@ -176,9 +178,9 @@ class AdminPagesController extends AbstractController {
     // Таблица меню header
     #[Route('/admin/header-menu', name: 'admin_header-menu')]
     function adminHeaderMenu() {
-        $breadcrumbs = $this->registerBreadcrumpbs([
+        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
             'Меню' => 'admin_header-menu',
-        ]);
+        ], $this->router);
         $menu = $this->em->getRepository(HeaderMenu::class)->findAllItems();
         return $this->render('admin/header_menu.html.twig', [
             'breadcrumbs' => $breadcrumbs,
@@ -203,10 +205,10 @@ class AdminPagesController extends AbstractController {
             $this->em->flush();
             return $this->redirectToRoute('admin_students');
         }
-        $breadcrumbs = $this->registerBreadcrumpbs([
+        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
             'Студенты' => 'admin_students',
             'Добавить студента' => 'admin_create_student',
-        ]);
+        ], $this->router);
         if ($element) {
             $element->setBirthdayDate(gmdate("Y-m-d",$element->getBirthdayDate()+100));
         }        
@@ -239,10 +241,10 @@ class AdminPagesController extends AbstractController {
             $this->em->flush();
             return $this->redirectToRoute('admin_teachers');
         }
-        $breadcrumbs = $this->registerBreadcrumpbs([
+        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
             'Преподаватели' => 'admin_teachers',
             'Добавить преподавателя' => 'admin_create_teacher',
-        ]);
+        ], $this->router);
         $statuses = $this->em->getRepository(Status::class)->findAll();
         return $this->render('admin/redact/teacher.html.twig', [
             'breadcrumbs' => $breadcrumbs,
@@ -265,10 +267,10 @@ class AdminPagesController extends AbstractController {
             $this->em->flush();
             return $this->redirectToRoute('admin_header-menu');
         }
-        $breadcrumbs = $this->registerBreadcrumpbs([
+        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
             'Меню' => 'admin_header-menu',
             'Добавить пункт меню' => 'admin_create_header-menu',
-        ]);
+        ], $this->router);
         $parents = $this->em->getRepository(HeaderMenu::class)->findAll();
         $statuses = $this->em->getRepository(Status::class)->findAll();
         return $this->render('admin/redact/header_menu.html.twig', [
@@ -313,10 +315,10 @@ class AdminPagesController extends AbstractController {
             $this->em->flush();
             return $this->redirectToRoute('admin_redirects');
         }
-        $breadcrumbs = $this->registerBreadcrumpbs([
+        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
             'Редиректы' => 'admin_redirects',
             'Добавить редирект' => 'admin_create_redirect',
-        ]);
+        ], $this->router);
         $parents = $this->em->getRepository(HeaderMenu::class)->findAll();
         $statuses = $this->em->getRepository(Status::class)->findAll();
         return $this->render('admin/redact/redirect.html.twig', [
@@ -343,10 +345,10 @@ class AdminPagesController extends AbstractController {
             $this->em->flush();
             return $this->redirectToRoute('admin_groups');
         }
-        $breadcrumbs = $this->registerBreadcrumpbs([
+        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
             'Группы' => 'admin_groups',
             'Добавить группу' => 'admin_create_group',
-        ]);
+        ], $this->router);
         $statuses = $this->em->getRepository(Status::class)->findAll();
         return $this->render('admin/redact/group.html.twig', [
             'breadcrumbs' => $breadcrumbs,
@@ -367,17 +369,17 @@ class AdminPagesController extends AbstractController {
             $this->em->persist($test);
             $this->em->flush();
             if ($_POST['action'] == 'appoint') {
-                return $this->redirectToRoute('admin_tests_appoint'); // Назначение групп 
+                return $this->redirectToRoute('admin_tests_appoint', ['testId' => $test->getId()]); // Назначение групп 
             } else if ($_POST['action'] == 'redact') {
                 return $this->redirectToRoute('admin_tests_redact'); // Добавление вопросов                
             } else {
                 return $this->redirectToRoute('admin_tests'); // Обычное сохранение
             }
         }
-        $breadcrumbs = $this->registerBreadcrumpbs([
+        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
             'Тесты' => 'admin_tests',
             'Добавить тест' => 'admin_create_test',
-        ]);
+        ], $this->router);
         $statuses = $this->em->getRepository(Status::class)->findAll();
         return $this->render('admin/redact/test.html.twig', [
             'breadcrumbs' => $breadcrumbs,
@@ -406,7 +408,7 @@ class AdminPagesController extends AbstractController {
     
     // Редактирование элемента
     #[Route(path: '/admin/update/{type}/{id}', name: 'admin_update_note')] 
-    function adminUpdateNote($id, $type, Request $request) {
+    function adminUpdateNote($type, $id, Request $request) {
         switch ($type) {
             case 'header-menu':
                 $element = $this->em->getRepository(HeaderMenu::class)->find($id);
@@ -433,11 +435,4 @@ class AdminPagesController extends AbstractController {
 
     // Далее идут вспомогательные функции
 
-    // Настройка хлебных крошек
-    function registerBreadcrumpbs($breadArray) {
-        foreach ($breadArray as $name => $route) {
-            $this->breadcrumbs->addItem($name, $this->generateUrl($route));
-        }
-        return $this->breadcrumbs->getItems();
-    }
 }

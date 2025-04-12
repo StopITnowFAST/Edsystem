@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% set title = "Тест доступен для групп" %}
+
+{% block title %}{{ title }} | {{ app_title }}{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('/styles/admin_tables.css') }}">
+    <link rel="stylesheet" href="{{ asset('/styles/pagination.css') }}">
+    <link rel="stylesheet" href="{{ asset('/styles/popup.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        {{ include('blocks/breadcrumbs.html.twig') }}
+        <div class="admin-table__wrap">
+            <h1>{{ title }}</h1>
+            <div class="admin-table__head">
+                <form method="POST">
+                    <div class="admin-create__field">
+                        <label for="group">Группа</label>
+                        <select id="group" name="group" class="admin-create__select" required>
+                            {% for group in groups %}
+                                <option value="{{ group.id }}" {{ (updating_element is not empty and updating_element.groupId == group.id) ? "selected" : "" }}>{{ group.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>  
+                    <button>Добавить</button>
+                </form>
+            </div>
+            <div class="admin-table__body">
+                <table class="admin-table__table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Название</th>
+                            <th>Код</th>
+                            <th>Год</th>
+                            <th>Семестр</th>
+                            <th>Курс</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for note in notes %}
+                            <tr>
+                                <td>{{ note.id }}</td>
+                                <td>{{ note.name }}</td>
+                                <td>{{ note.code }}</td>
+                                {{ include('blocks/action_cell.html.twig', {
+                                    'delete_path': path('admin_delete_note', {'id': note.id, 'type': 'groups'}),
+                                    'change_path': path('admin_update_note', {'id': note.id, 'type': 'groups'}),
+                                }) }}
+                        {% endfor %}
+                    </tbody>
+                </table>    
+            </div>
+        </div>     
+    </div>
+    <div class="overlay"></div>
+    {% include('blocks/pagination.html.twig') %}
+{% endblock %}
+
+{% block javascripts %}
+    {# <script src="{{ asset('/js/admin_groups.js') }}"></script> #}
+{% endblock %}
