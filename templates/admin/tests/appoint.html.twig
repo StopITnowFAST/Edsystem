@@ -47,7 +47,6 @@
                                 <td>{{ note.code }}</td>
                                 {{ include('blocks/action_cell.html.twig', {
                                     'delete_path': path('admin_tests_appoint_delete', {'testId': testId, 'groupId': note.id}),
-                                    'change_path': path('admin_update_note', {'id': note.id, 'type': 'groups'}),
                                 }) }}
                         {% endfor %}
                     </tbody>
