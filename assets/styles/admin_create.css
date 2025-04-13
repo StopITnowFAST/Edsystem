@@ -111,3 +111,9 @@
     display: flex;
     gap: var(--offset-s);
 }
+
+.admin-create__group-appoint {
+    display: flex;
+    gap: var(--offset-s);
+    align-items: flex-end;
+}

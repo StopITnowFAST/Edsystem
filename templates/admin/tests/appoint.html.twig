@@ -1,13 +1,14 @@
 {% extends 'base.html.twig' %}
 
-{% set title = "Тест доступен для групп" %}
+{% set title = "Назначить тест" %}
+{% set testId = app.request.attributes.get('testId') %}
 
 {% block title %}{{ title }} | {{ app_title }}{% endblock %}
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('/styles/admin_tables.css') }}">
+    <link rel="stylesheet" href="{{ asset('/styles/admin_create.css') }}">
     <link rel="stylesheet" href="{{ asset('/styles/pagination.css') }}">
-    <link rel="stylesheet" href="{{ asset('/styles/popup.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -16,16 +17,16 @@
         <div class="admin-table__wrap">
             <h1>{{ title }}</h1>
             <div class="admin-table__head">
-                <form method="POST">
+                <form method="POST" class="admin-create__group-appoint">
                     <div class="admin-create__field">
                         <label for="group">Группа</label>
                         <select id="group" name="group" class="admin-create__select" required>
                             {% for group in groups %}
-                                <option value="{{ group.id }}" {{ (updating_element is not empty and updating_element.groupId == group.id) ? "selected" : "" }}>{{ group.name }}</option>
+                                <option value="{{ group.id }}">{{ group.name }}</option>
                             {% endfor %}
                         </select>
                     </div>  
-                    <button>Добавить</button>
+                    <button class="btn btn-primary">Добавить</button>
                 </form>
             </div>
             <div class="admin-table__body">
@@ -35,9 +36,6 @@
                             <th>ID</th>
                             <th>Название</th>
                             <th>Код</th>
-                            <th>Год</th>
-                            <th>Семестр</th>
-                            <th>Курс</th>
                             <th>Действия</th>
                         </tr>
                     </thead>
@@ -48,7 +46,7 @@
                                 <td>{{ note.name }}</td>
                                 <td>{{ note.code }}</td>
                                 {{ include('blocks/action_cell.html.twig', {
-                                    'delete_path': path('admin_delete_note', {'id': note.id, 'type': 'groups'}),
+                                    'delete_path': path('admin_tests_appoint_delete', {'testId': testId, 'groupId': note.id}),
                                     'change_path': path('admin_update_note', {'id': note.id, 'type': 'groups'}),
                                 }) }}
                         {% endfor %}
@@ -58,7 +56,6 @@
         </div>     
     </div>
     <div class="overlay"></div>
-    {% include('blocks/pagination.html.twig') %}
 {% endblock %}
 
 {% block javascripts %}
