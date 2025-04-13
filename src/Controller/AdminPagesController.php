@@ -369,7 +369,7 @@ class AdminPagesController extends AbstractController {
             if ($_POST['action'] == 'appoint') {
                 return $this->redirectToRoute('admin_tests_appoint', ['testId' => $test->getId()]); // Назначение групп 
             } else if ($_POST['action'] == 'redact') {
-                return $this->redirectToRoute('admin_tests_redact'); // Добавление вопросов                
+                return $this->redirectToRoute('admin_tests_redact',  ['testId' => $test->getId()]); // Добавление вопросов                
             } else {
                 return $this->redirectToRoute('admin_tests'); // Обычное сохранение
             }

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Answer;
 use App\Entity\UserCard;
 use App\Entity\User;
 use App\Entity\Status;
@@ -13,6 +14,7 @@ use App\Entity\Teacher;
 use App\Service\TableWidget;
 use App\Entity\Redirect;
 use App\Entity\HeaderMenu;
+use App\Entity\Question;
 use App\Entity\Test;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -27,6 +29,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use App\Service\BreadcrumbsGenerator;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 
 class TestController extends AbstractController {
 
@@ -78,24 +81,157 @@ class TestController extends AbstractController {
         return $this->redirectToRoute('admin_tests_appoint', ['testId' => $testId]);
     }
 
-    // // Добавление вопросов для теста
-    // #[Route('/admin/tests', name: 'admin_tests_redact')]
-    // function adminTestsRedact() {
-    //     $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
-    //         'Тесты' => 'admin_tests',
-    //         'Добавить тест' => ['admin_create_test', $testId],
-    //     ], $this->router);
+    // Удаление вопроса
+    #[Route('/admin/tests/{testId}/redact/delete/{questionId}', name: 'admin_tests_redact_delete')]
+    function adminTestsRedactDelete($testId, $questionId) {
+        $question = $this->em->getRepository(Question::class)->find($questionId);
+        $answers = $this->em->getRepository(Answer::class)->findBy(['question_id' => $questionId]);
+        foreach ($answers as $answer) {
+            $this->em->remove($answer);
+        }
+        $this->em->remove($question);
+        $this->em->flush();
+        return $this->redirectToRoute('admin_tests_redact', ['testId' => $testId]);
+    }
+
+    // Редактирование вопросов для теста
+    #[Route('/admin/tests/{testId}/redact', name: 'admin_tests_redact')]
+    function adminTestsRedact($testId, Request $request) {
+        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
+            'Тесты' => 'admin_tests',
+            'Добавить тест' => ['admin_update_note', ['id' => $testId, 'type' => 'tests']],
+            'Редактировать вопросы' => ['admin_tests_redact', ['testId' => $testId]]
+        ], $this->router);        
+        $notes = $this->em->getRepository(Question::class)->findBy(['test_id' => $testId]);
+        return $this->render('admin/tests/redact.html.twig', [
+            'notes' => $notes,
+            'breadcrumbs' => $breadcrumbs,
+        ]);
+    }
 
 
-    //     $pagination = $this->table->createPagination($page, $this->em->getRepository(Group::class), self::PAGINATION_SIZE);
-    //     return $this->render('admin/groups.html.twig', [
-    //         'breadcrumbs' => $breadcrumbs,
-    //         'notes' => $pagination['data'],
-    //         'totalNotes' => $pagination['totalNotes'],
-    //         'pagRow' => $pagination['row'],
-    //         'currentPage' => $page,
-    //         'paginationSize' => self::PAGINATION_SIZE,
-    //         'formName' => 'admin_groups',
-    //     ]);
-    // }
+    // Добавление вопросов для теста
+    #[Route('/admin/tests/{testId}/redact/add', name: 'admin_tests_redact_add')]
+    function adminTestsRedactAdd(
+        $testId, 
+        Request $request
+    ) {
+        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
+            'Тесты' => 'admin_tests',
+            'Добавить тест' => ['admin_update_note', ['id' => $testId, 'type' => 'tests']],
+            'Редактировать вопросы' => ['admin_tests_redact', ['testId' => $testId]],
+            'Добавить вопрос' => ['admin_tests_redact_add', ['testId' => $testId]],
+        ], $this->router);
+        
+        if ($request->isMethod('POST')) {
+            // Обработка данных
+            $answers = [];
+            $answers['correct_count'] = 0;
+            $answers['question'] = $_POST['question_text'];
+            foreach ($_POST as $key => $value) {
+                if (str_starts_with($key, 'answers_')) {
+                    $id = substr($key, strlen('answers_'));
+                    $answers['answers'][$id] = [
+                        'text' => $value,
+                        'points' => (int) $_POST['points_'.$id] ?? '',
+                        'is_correct' => isset($_POST['isCorrect_'.$id])
+                    ];
+                    $answers['correct_count'] += ($answers['answers'][$id]['is_correct']) ? 1 : 0;
+                }
+            }
+            // Сохранение данных
+            $question = new Question();
+            $question->setTestId($_POST['testId']);
+            $question->setCorrectAnswers($answers['correct_count']);
+            $question->setText($answers['question']);
+            $this->em->persist($question);
+            // $this->em->flush();
+
+            $questionId = $question->getId();
+
+            foreach ($answers['answers'] as $key => $answer) {
+                $ans = new Answer();
+                $ans->setCorrect($answer['is_correct']);
+                $ans->setPoints($answer['points']);
+                $ans->setText($answer['text']);
+                $ans->setQuestionId($questionId);
+                $this->em->persist($ans);
+                // $this->em->flush();
+            }
+            
+            $this->redirectToRoute('admin_tests_redact', ['testId' => $testId]);
+        }
+        
+        return $this->render('admin/tests/add_question.html.twig', [
+            'breadcrumbs' => $breadcrumbs,
+        ]);
+    }
+
+
+    // Редактирование вопросов для теста
+    #[Route('/admin/tests/{testId}/redact/update/{questionId}', name: 'admin_tests_redact_update')]
+    function adminTestsRedactUpdate(
+        $testId, 
+        $questionId,
+        Request $request
+    ) { 
+        if ($request->isMethod('POST')) {
+            // Обработка данных
+            $answers = [];
+            $answers['correct_count'] = 0;
+            $answers['question'] = $_POST['question_text'];
+            foreach ($_POST as $key => $value) {
+                if (str_starts_with($key, 'answers_')) {
+                    $id = substr($key, strlen('answers_'));
+                    $answers['answers'][$id] = [
+                        'text' => $value,
+                        'points' => (int) $_POST['points_'.$id] ?? '',
+                        'is_correct' => isset($_POST['isCorrect_'.$id])
+                    ];
+                    $answers['correct_count'] += ($answers['answers'][$id]['is_correct']) ? 1 : 0;
+                }
+            }
+            // Сохранение данных
+            $question = $this->em->getRepository(Question::class)->find($questionId);
+            $question->setTestId($_POST['testId']);
+            $question->setCorrectAnswers($answers['correct_count']);
+            $question->setText($answers['question']);
+            $this->em->persist($question);
+            // $this->em->flush();
+
+            $questionId = $question->getId();
+            $oldAnswers = $this->em->getRepository(Answer::class)->findBy(['question_id' => $questionId]);
+            foreach ($oldAnswers as $answer) {
+                $this->em->remove($answer);
+            }
+            // $this->em->flush();
+
+            foreach ($answers['answers'] as $key => $answer) {
+                $ans = new Answer();
+                $ans->setCorrect($answer['is_correct']);
+                $ans->setPoints($answer['points']);
+                $ans->setText($answer['text']);
+                $ans->setQuestionId($questionId);
+                $this->em->persist($ans);
+                // $this->em->flush();
+            }
+            $this->redirectToRoute('admin_tests_redact', ['testId' => $testId]);
+        }
+        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
+            'Тесты' => 'admin_tests',
+            'Добавить тест' => ['admin_update_note', ['id' => $testId, 'type' => 'tests']],
+            'Редактировать вопросы' => ['admin_tests_redact', ['testId' => $testId]],
+            'Изменить вопрос' => ['admin_tests_redact_update', ['testId' => $testId, 'questionId' => $questionId]],
+        ], $this->router);
+
+        $question = $this->em->getRepository(Question::class)->find($questionId);
+        $answers = $this->em->getRepository(Answer::class)->findBy(['question_id' => $questionId]);
+        
+        return $this->render('admin/tests/add_question.html.twig', [
+            'breadcrumbs' => $breadcrumbs,
+            'question' => $question,
+            'answers' => $answers,
+        ]);
+    }
+
 }

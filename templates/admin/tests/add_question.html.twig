@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% set title = "Добавить Вопрос" %}
+{% block title %}{{ title }} | {{ app_title }}{% endblock %}
+{% set testId = app.request.attributes.get('testId') %}
+{% set i = 1 %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('/styles/admin_tables.css') }}">
+    <link rel="stylesheet" href="{{ asset('/styles/admin_create.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        {{ include('blocks/breadcrumbs.html.twig') }}
+        <div class="admin-table__wrap">
+            <div class="admin-table__head">
+                <h1>{{ title }}</h1>
+                <div class="admin-create__head-buttons">
+                    <a href="{{ path('admin_tests_redact', {'testId': testId}) }}", class="btn btn-primary">Отменить</a>
+                    <button form="test" class="btn btn-primary" type="sumbit">Сохранить</button>
+                </div>
+            </div>
+            <div class="admin-table__body">
+                <form id="test" method="POST", enctype="multipart/form-data" 
+                    action="{{ question is defined ? path('admin_tests_redact_update', {'testId': testId, 'questionId':question.id}): ''}}">
+                    <h2>Вопрос</h2>
+                    <input type="hidden" value="{{ testId }}" name="testId"> 
+
+                    <div class="admin-create__input-list">
+                        <div class="admin-create__field">
+                            <textarea rows="5" id="question_text" class="textarea-input admin-create__input" name="question_text" required>{{ question is defined ? question.text : '' }}</textarea>
+                        </div>
+                    </div>
+                    <div id="answersDiv" class="admin-create__answers">
+                        <h2>Ответы</h2>
+                        {# Сюда добавляются варианты ответов #}
+                        <button type="button" class="btn btn-primary" onclick="addAnswerItem()">Добавить ответ</button>
+                        {% if answers is defined %}
+                            {% for answer in answers %} 
+                                <div class="admin-create__answer-item">
+                                    <textarea rows="2" id="text_{{ i }}" 
+                                            class="textarea-input admin-create__input ckeditor" 
+                                            name="answers_{{ i }}" required>{{ answer.text }}</textarea>
+                                    <dib class="admin-create__question-controls">
+                                        <button type="button" class="btn btn-main" onclick="this.parentNode.parentNode.parentNode.remove()">Удалить</button>
+                                        <div style="display: flex; justify-content: center; align-items: center; gap: 10px;">                
+                                            <label for="points_{{ i }}">Баллы</label>
+                                            <input id="points_{{ i }}" type="points" name="points_{{ i }}" class="admin-create__input" value="{{ answer.points }}">   
+                                        </div>       
+                                        <div style="display: flex; justify-content: center; align-items: center; gap: 10px;">
+                                            <label for="checkbox_{{ i }}">Правильный ответ</label>
+                                            <input id="checkbox_{{ i }}" type="checkbox" name="isCorrect_{{ i }}" class="admin-create__checkbox" {{ answer.isCorrect ? 'checked' : '' }}>   
+                                        </div>       
+                                    </dib>
+                                </div>
+                                {% set i = i + 1 %}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>     
+    </div>
+    <div class="overlay"></div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>let answerCounter = {{ i + 1 }}</script>
+    <script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
+    <script src="{{ asset('/js/add_answers.js') }}"></script>
+{% endblock %}

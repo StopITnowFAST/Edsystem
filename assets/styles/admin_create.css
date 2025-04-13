@@ -117,3 +117,140 @@
     gap: var(--offset-s);
     align-items: flex-end;
 }
+
+.admin-create__answers {
+    display: grid;
+    gap: var(--offset-s);
+    margin-bottom: var(--offset-s);
+}
+
+.admin-create__answer-item {    
+    background-color: var(--color-grey-400);
+    border-radius: var(--offset-s);
+    padding: var(--offset-s);
+}
+
+.admin-create__checkbox {
+    width: 52px;
+    height: 52px; /* или нужная вам высота */
+    background-color: var(--color-grey-200);
+    border-radius: 4px;
+}
+
+.admin-create__question-controls {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Основные стили (без анимаций) */
+.cke_chrome {
+    border: 1px solid var(--color-grey-400) !important;
+    background: var(--color-grey-300) !important;
+}
+
+/* Область редактирования (только белый текст) */
+.cke_editable, 
+.cke_wysiwyg_div {
+    background: var(--color-grey-200) !important;
+    color: #fff !important; /* Белый текст */
+    padding: 12px !important;
+    font-family: inherit !important;
+    line-height: 1.5 !important;
+}
+
+/* Панель инструментов */
+.cke_top {
+    background: var(--color-grey-300) !important;
+    border-bottom: 1px solid var(--color-grey-400) !important;
+    padding: 4px 0 !important;
+}
+
+/* Кнопки (без анимаций) */
+.cke_button {
+    background: transparent !important;
+    border-radius: 3px !important;
+}
+.cke_button:hover {
+    background: var(--color-grey-100) !important;
+}
+.cke_button_on {
+    background: var(--color-main) !important;
+}
+
+/* Иконки кнопок (светлые) */
+.cke_button_icon {
+    filter: invert(1) brightness(0.9);
+}
+
+/* Выпадающие меню */
+.cke_combo_text {
+    color: #fff !important;
+}
+.cke_combo_open {
+    background: var(--color-grey-100) !important;
+}
+
+/* Подвал редактора */
+.cke_bottom {
+    background: var(--color-grey-400) !important;
+    border-top: 1px solid var(--color-grey-400) !important;
+}
+
+/* Диалоговые окна */
+.cke_dialog {
+    background: var(--color-grey-300) !important;
+}
+.cke_dialog_title {
+    background: var(--color-grey-400) !important;
+    color: #fff !important;
+}
+
+/* Главный контейнер содержимого */
+.cke_contents {
+    background: var(--color-grey-200) !important;
+}
+
+/* Непосредственно редактируемая область */
+.cke_editable,
+.cke_wysiwyg_div,
+.cke_source {
+    background: var(--color-grey-200) !important;
+    color: #fff !important;
+}
+
+/* Принудительное переопределение inline-стилей */
+.cke_editable.cke_show_borders,
+.cke_wysiwyg_div.cke_show_borders {
+    background: var(--color-grey-200) !important;
+    padding: 15px !important;
+}
+
+/* Для режима исходного кода */
+.cke_source {
+    background: var(--color-grey-300) !important;
+    color: #eee !important;
+}
+
+/* Жесткое переопределение ВСЕХ возможных элементов */
+.cke_wysiwyg_frame, 
+.cke_wysiwyg_frame body,
+.cke_wysiwyg_div,
+.cke_editable,
+.cke_contents,
+.cke_show_borders,
+.cke_source,
+.cke_panel_frame body {
+    background: var(--color-grey-200) !important;
+    color: #fff !important;
+    background-image: none !important;
+}
+
+/* Особое внимание для iframe */
+.cke_wysiwyg_frame {
+    background-color: transparent !important;
+}
+.cke_wysiwyg_frame body {
+    background: var(--color-grey-200) !important;
+    margin: 0 !important;
+    padding: 15px !important;
+}

@@ -56,3 +56,4 @@
 .env.test
 
 /public/assets
+/public/bundles

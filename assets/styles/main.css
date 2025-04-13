@@ -81,6 +81,16 @@ body {
     color: var(--color-font-bright);
 }
 
+.btn-main {
+    transition: 0.3s all;
+    background-color: var(--color-main);
+    color: var(--color-font-bright);
+}
+
+.btn-main:hover {
+    background-color: var(--color-grey-300) !important;
+}
+
 /* popup overlay */
 .overlay {
     position: fixed;
