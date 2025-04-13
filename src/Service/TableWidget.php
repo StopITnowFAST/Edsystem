@@ -8,7 +8,9 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class TableWidget
 {
-    function createPagination($page, $rep, $paginationSize) {
+    const PAGINATION_SIZE = 40;
+    
+    function createPagination($page, $rep, $paginationSize = self::PAGINATION_SIZE) {
         $pagination = [];
         $limit = $paginationSize; 
         $offset = $paginationSize * ($page - 1);
@@ -17,12 +19,13 @@ class TableWidget
 
         $pagination['data'] = $rep->getTableData($offset, $limit);
         $pagination['totalNotes'] = $totalNotes;
-        $pagination['row'] = $this->getPaginationRow($totalPages, $page, $paginationSize);
+        $pagination['row'] = $this->getPaginationRow($totalPages, $page);
+        $pagination['size'] = $paginationSize;
 
         return $pagination;
     }
 
-    function getPaginationRow($totalPages, $page, $paginationSize) {
+    function getPaginationRow($totalPages, $page) {
         $totalPages = ($totalPages == 0) ? 1 : $totalPages;        
         $elementsOnScreen = 5;
         $offset = ($page-($elementsOnScreen/2) < 0) ? 0 : $page-($elementsOnScreen/2);

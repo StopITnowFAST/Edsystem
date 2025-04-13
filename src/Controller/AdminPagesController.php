@@ -29,8 +29,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class AdminPagesController extends AbstractController {
 
-    const PAGINATION_SIZE = 40;
-
     function __construct(
         private EntityManagerInterface $em, 
         private TableWidget $table,
@@ -47,14 +45,14 @@ class AdminPagesController extends AbstractController {
             'Модераторы' => 'admin_moderators',
         ], $this->router);
 
-        $pagination = $this->table->createPagination($page, $this->em->getRepository(User::class), self::PAGINATION_SIZE);
+        $pagination = $this->table->createPagination($page, $this->em->getRepository(User::class));
         return $this->render('admin/moderators.html.twig', [
             'breadcrumbs' => $breadcrumbs,
             'notes' => $pagination['data'],
             'totalNotes' => $pagination['totalNotes'],
             'pagRow' => $pagination['row'],
             'currentPage' => $page,
-            'paginationSize' => self::PAGINATION_SIZE,
+            'paginationSize' => $pagination['size'],
             'formName' => 'admin_moderators',
         ]);
     }
@@ -65,14 +63,14 @@ class AdminPagesController extends AbstractController {
         $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
             'Группы' => 'admin_groups',
         ], $this->router);
-        $pagination = $this->table->createPagination($page, $this->em->getRepository(Group::class), self::PAGINATION_SIZE);
+        $pagination = $this->table->createPagination($page, $this->em->getRepository(Group::class));
         return $this->render('admin/groups.html.twig', [
             'breadcrumbs' => $breadcrumbs,
             'notes' => $pagination['data'],
             'totalNotes' => $pagination['totalNotes'],
             'pagRow' => $pagination['row'],
             'currentPage' => $page,
-            'paginationSize' => self::PAGINATION_SIZE,
+            'paginationSize' => $pagination['size'],
             'formName' => 'admin_groups',
         ]);
     }
@@ -96,14 +94,14 @@ class AdminPagesController extends AbstractController {
         $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
             'Файлы' => 'admin_files',
         ], $this->router);
-        $pagination = $this->table->createPagination($page, $this->em->getRepository(FileEntity::class), self::PAGINATION_SIZE);
+        $pagination = $this->table->createPagination($page, $this->em->getRepository(FileEntity::class));
         return $this->render('admin/files.html.twig', [
             'breadcrumbs' => $breadcrumbs,
             'notes' => $pagination['data'],
             'totalNotes' => $pagination['totalNotes'],
             'pagRow' => $pagination['row'],
             'currentPage' => $page,
-            'paginationSize' => self::PAGINATION_SIZE,
+            'paginationSize' => $pagination['size'],
             'formName' => 'admin_files',
         ]);
     }
@@ -114,14 +112,14 @@ class AdminPagesController extends AbstractController {
         $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
             'Студенты' => 'admin_students',
         ], $this->router);
-        $pagination = $this->table->createPagination($page, $this->em->getRepository(Student::class), self::PAGINATION_SIZE);
+        $pagination = $this->table->createPagination($page, $this->em->getRepository(Student::class));
         return $this->render('admin/students.html.twig', [
             'breadcrumbs' => $breadcrumbs,
             'notes' => $pagination['data'],
             'totalNotes' => $pagination['totalNotes'],
             'pagRow' => $pagination['row'],
             'currentPage' => $page,
-            'paginationSize' => self::PAGINATION_SIZE,
+            'paginationSize' => $pagination['size'],
             'formName' => 'admin_students',
         ]);
     }
@@ -132,14 +130,14 @@ class AdminPagesController extends AbstractController {
         $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
             'Преподаватели' => 'admin_teachers',
         ], $this->router);
-        $pagination = $this->table->createPagination($page, $this->em->getRepository(Teacher::class), self::PAGINATION_SIZE);
+        $pagination = $this->table->createPagination($page, $this->em->getRepository(Teacher::class));
         return $this->render('admin/teachers.html.twig', [
             'breadcrumbs' => $breadcrumbs,
             'notes' => $pagination['data'],
             'totalNotes' => $pagination['totalNotes'],
             'pagRow' => $pagination['row'],
             'currentPage' => $page,
-            'paginationSize' => self::PAGINATION_SIZE,
+            'paginationSize' => $pagination['size'],
             'formName' => 'admin_teachers',
         ]);
     }
@@ -150,14 +148,14 @@ class AdminPagesController extends AbstractController {
         $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
             'Тесты' => 'admin_tests',
         ], $this->router);
-        $pagination = $this->table->createPagination($page, $this->em->getRepository(Test::class), self::PAGINATION_SIZE);
+        $pagination = $this->table->createPagination($page, $this->em->getRepository(Test::class));
         return $this->render('admin/tests.html.twig', [
             'breadcrumbs' => $breadcrumbs,
             'notes' => $pagination['data'],
             'totalNotes' => $pagination['totalNotes'],
             'pagRow' => $pagination['row'],
             'currentPage' => $page,
-            'paginationSize' => self::PAGINATION_SIZE,
+            'paginationSize' => $pagination['size'],
             'formName' => 'admin_tests',
         ]);
     }

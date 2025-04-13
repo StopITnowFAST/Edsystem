@@ -30,8 +30,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class TestController extends AbstractController {
 
-    const PAGINATION_SIZE = 40;
-
     function __construct(
         private EntityManagerInterface $em, 
         private TableWidget $table,
@@ -49,16 +47,14 @@ class TestController extends AbstractController {
             'Добавить тест' => ['admin_update_note', ['id' => $testId, 'type' => 'tests']],
             'Назначить тест' => ['admin_tests_appoint', ['testId' => $testId]]
         ], $this->router);
-
-
-        $pagination = $this->table->createPagination($page, $this->em->getRepository(Group::class), self::PAGINATION_SIZE);
+        $pagination = $this->table->createPagination($page, $this->em->getRepository(Group::class));
         return $this->render('admin/groups.html.twig', [
             'breadcrumbs' => $breadcrumbs,
             'notes' => $pagination['data'],
             'totalNotes' => $pagination['totalNotes'],
             'pagRow' => $pagination['row'],
             'currentPage' => $page,
-            'paginationSize' => self::PAGINATION_SIZE,
+            'paginationSize' => $pagination['size'],
             'formName' => 'admin_groups',
         ]);
     }
