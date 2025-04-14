@@ -1,9 +1,9 @@
 {# templates/login/index.html.twig #}
 {% extends 'base.html.twig' %}
 
-{# ... #}
+{% set title = "Войти" %}
 
-{% block title %}Войти | KITEDU {% endblock %}
+{% block title %}{{ title }} | KITEDU {% endblock %}
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('/styles/login.css') }}">
@@ -12,23 +12,30 @@
 {% block body %}
     <div class="container">
         <div class="login__wrap">
-            <div class="login__inputs">
+            <div class="login__inputs">                
                 <form action="{{ path('app_login') }}" method="post">
-                    <label for="username">Email</label>
-                    <input type="email" id="username" name="_username"
-                        value="{{ last_username }}" placeholder="Ваш Email"
-                        pattern="^(.+)@(\S+)$" required>
-                    <label for="password">Пароль</label>
-                    <input type="password" id="password" name="_password" placeholder="Ваш пароль" required>
-                    {# <input type="hidden" name="_target_path" value="https://energomera.linkityan.ru/panel/reports"> #}
-                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-                    {% if error %}
-                        <p>Неверный логин или пароль. Попробуйте ещё раз.</p>
-                    {% endif %}
-                    {% if successReg %}
-                        <p>Вы успешно зарегистрировались. Теперь вы можете войти</p>
-                    {% endif %}
-                    <button type="submit" name="login-button" class="btn btn-primary">Войти</button>
+                    <h1>{{ title }}</h1>
+                    <div class="login__input-list">
+                        <label for="username">Email</label>
+                        <input class="login__input" type="email" id="username" name="_username"
+                            value="{{ last_username }}" placeholder="Ваш Email"
+                            pattern="^(.+)@(\S+)$" required>
+                        <label for="password">Пароль</label>
+                        <input class="login__input" type="password" id="password" name="_password" placeholder="Ваш пароль" required>
+                        {# <input type="hidden" name="_target_path" value="https://energomera.linkityan.ru/panel/reports"> #}
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                        {% if error %}  
+                            <p>Неверный логин или пароль. Попробуйте ещё раз.</p>
+                        {% endif %}                            
+                        {% if successReg %}
+                            <p>Вы успешно зарегистрировались. Теперь вы можете войти</p>
+                        {% endif %}
+                        <button type="submit" name="login-button" class="btn btn-primary login__button">Войти</button>
+
+                        <div class="form__bottom">     
+                            <a href="{{ path('app_register') }}" class="link">Создать аккаунт</a>
+                        </div>
+                    </div>
                 </form>
             </div>
         </div>

@@ -6,18 +6,71 @@
 }
 
 .login__inputs {
+    position: fixed;
+    top: 40%;          /* Сдвигаем вниз на 50% от высоты экрана */
+    left: 50%;         /* Сдвигаем вправо на 50% от ширины экрана */
+    transform: translate(-50%, -50%); /* Смещаем назад на 50% своей ширины/высоты */
     display: grid;
     grid-auto-flow: column;
+    gap: 10px;         /* Отступ между элементами */
+    background: var(--color-grey-400); /* Опционально: фон, чтобы перекрыть контент */
+    padding: 20px;     /* Внутренние отступы */
+    border-radius: 8px; /* Закруглённые углы */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Тень для выделения */
 }
 
 form {
     margin: 20px;
 }
 
-input {
-    width: 100%;
-    margin-bottom: 10px;
-    display: grid;
-    grid-auto-flow: column;
+.login__input {
     box-sizing: border-box;
+    height: 50px;
+    width: 100%;
+    border-radius: var(--offset-3xs);
+    border: 2px solid var(--color-grey-400);
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 150%;
+    letter-spacing: 0.01em;
+    background-color: var(--color-grey-100);
+    color: var(--color-font-bright);
+    padding: var(--offset-xxs) var(--offset-xs);
+    transition: 0.3s all;
+}
+
+.login__input:focus {
+    transition: 0.3s all;
+    border: 2px solid var(--color-main);
+}
+
+.login__input::placeholder {
+    appearance: none;
+    color: var(--color-grey-400);
+}
+.login__input::-webkit-input-placeholder {
+    -webkit-appearance: none;
+    color: var(--color-grey-400);
+}
+.login__input::-moz-placeholder {
+    -moz-appearance: none;
+    color: var(--color-grey-400);
+}
+
+.login__input-list {    
+    max-width: 400px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--offset-s);
+    margin: 20px 0px;
+    align-items: flex-end
+}
+
+.login__button:hover {
+    background-color: var(--color-main);
+}
+
+h1 {
+    justify-self: center;
 }
