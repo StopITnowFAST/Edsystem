@@ -79,4 +79,22 @@ class SecurityController extends AbstractController
             return new Response('Email error', 400);
         }
     }
+    
+    #[Route('/after-login/redirect', name: 'app_check_rights')]
+    public function routeToCheckRights() {
+        $user = $this->getUser();
+        
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        // Проверяем роли и перенаправляем
+        if ($this->isGranted('ROLE_MASTER')) {
+            return $this->redirectToRoute('admin_moderators');
+        }
+        
+        if ($this->isGranted('ROLE_USER')) {
+            return $this->redirectToRoute('user_schedule');
+        }
+    }
 }

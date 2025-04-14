@@ -31,6 +31,9 @@
                                     <p class="form__error">Пользователь с таким Email уже зарегистрирован. Попробуйте другой Email</p>
                                 {% endif %}
                                 <button type="submit" class="btn btn-primary form__button" name="login-button">{{ title }}</button>
+                                <div class="form__bottom">     
+                                    <a href="{{ path('app_login') }}" class="link">Войти</a>
+                                </div>
                             </div>
                         </form>
                     </div>

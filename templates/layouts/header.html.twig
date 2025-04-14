@@ -1,54 +1,56 @@
-<header>
-    <div class="container">
-        <div class="header__wrap">
-            {% if app.user %}
-                <div class="header__head">
-                    <img src="{{ asset('logo.svg') }}" alt="KITEDU" class="header__logo">
-                    {{ include('blocks/account_widget.html.twig') }}
-                </div>
-                <div class="header__menu">
-                    <div class="header__menu-groups">
-                        {# Перебор групп элементов header #}
-                        {% for menu_group in menu_items %}
-                            {% if menu_group.url is empty %}
-                                <button onclick="openHeaderMenu({{ menu_group.id }})" class="header__menu-group">{{ menu_group.name }}</button>                        
-                                <div id="header_sub_menu_{{ menu_group.id }}" class="header__sub-menu">
-                                    <div class="container">
-                                        <div class="header__menu-items">
-                                            {% if menu_group.children is defined%}
-                                                {# Перебор категорий групп элементов header #}
-                                                {% for category in menu_group.children %}
-                                                    <div class="header__sub-menu-category-block">
-                                                        {% if category.url is not empty%}                                                    
-                                                            <a href="{{ category.url }}" class="header__sub-menu-category">{{ category.name }}</a>
-                                                        {% else %}
-                                                            <a class="header__sub-menu-category">{{ category.name }}</a>
-                                                        {% endif %}                                                   
-                                                        {% if category.children is defined%}
-                                                            {# Перебор пунктов категории групп элементов #}
-                                                            {% for item in category.children %}
-                                                                <a href="{{ item.url }}">{{ item.name }}</a>
-                                                            {% endfor %}
-                                                        {% endif %}
-                                                    </div>
-                                                {% endfor %}
-                                            {% endif %}
+{% if app.request.attributes.get('_route') != 'app_login' and app.request.attributes.get('_route') != 'app_register' %}
+    <header>
+        <div class="container">
+            <div class="header__wrap">
+                {% if app.user %}
+                    <div class="header__head">
+                        <img src="{{ asset('logo.svg') }}" alt="KITEDU" class="header__logo">
+                        {{ include('blocks/account_widget.html.twig') }}
+                    </div>
+                    <div class="header__menu">
+                        <div class="header__menu-groups">
+                            {# Перебор групп элементов header #}
+                            {% for menu_group in menu_items %}
+                                {% if menu_group.url is empty %}
+                                    <button onclick="openHeaderMenu({{ menu_group.id }})" class="header__menu-group">{{ menu_group.name }}</button>                        
+                                    <div id="header_sub_menu_{{ menu_group.id }}" class="header__sub-menu">
+                                        <div class="container">
+                                            <div class="header__menu-items">
+                                                {% if menu_group.children is defined%}
+                                                    {# Перебор категорий групп элементов header #}
+                                                    {% for category in menu_group.children %}
+                                                        <div class="header__sub-menu-category-block">
+                                                            {% if category.url is not empty%}                                                    
+                                                                <a href="{{ category.url }}" class="header__sub-menu-category">{{ category.name }}</a>
+                                                            {% else %}
+                                                                <a class="header__sub-menu-category">{{ category.name }}</a>
+                                                            {% endif %}                                                   
+                                                            {% if category.children is defined%}
+                                                                {# Перебор пунктов категории групп элементов #}
+                                                                {% for item in category.children %}
+                                                                    <a href="{{ item.url }}">{{ item.name }}</a>
+                                                                {% endfor %}
+                                                            {% endif %}
+                                                        </div>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            {% else %}
-                                <a href="{{ menu_group.url }}" class="header__menu-group">{{ menu_group.name }}</a>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </div>       
-            {% endif %}     
+                                {% else %}
+                                    <a href="{{ menu_group.url }}" class="header__menu-group">{{ menu_group.name }}</a>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>       
+                {% endif %}     
+            </div>
         </div>
-    </div>
-</header>
+    </header>
 
-<div id="header_overlay" class="header__overlay"></div>
+    <div id="header_overlay" class="header__overlay"></div>
 
-{% block javascripts %}
-    <script src="{{ asset('/js/header.js') }}"></script>
-{% endblock %}
+    {% block javascripts %}
+        <script src="{{ asset('/js/header.js') }}"></script>
+    {% endblock %}  
+{% endif %}   
