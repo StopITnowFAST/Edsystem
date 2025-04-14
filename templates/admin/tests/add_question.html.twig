@@ -40,7 +40,7 @@
                             {% for answer in answers %} 
                                 <div class="admin-create__answer-item">
                                     <textarea rows="2" id="text_{{ i }}" 
-                                            class="textarea-input admin-create__input ckeditor" 
+                                            class="textarea-input admin-create__input" 
                                             name="answers_{{ i }}" required>{{ answer.text }}</textarea>
                                     <dib class="admin-create__question-controls">
                                         <button type="button" class="btn btn-main" onclick="this.parentNode.parentNode.parentNode.remove()">Удалить</button>
@@ -63,11 +63,11 @@
         </div>     
     </div>
     <div class="overlay"></div>
+    {{dump(i)}}
 {% endblock %}
 
 {% block javascripts %}
     <script>CKEDITOR_BASEPATH = "{{ asset('ckeditor/') }}";</script>
     <script src="{{ asset('ckeditor/ckeditor.js') }}"></script>
-    <script>let answerCounter = {{ i + 1 }}</script>
     <script src="{{ asset('/js/add_answers.js') }}"></script>
 {% endblock %}

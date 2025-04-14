@@ -116,13 +116,6 @@ class TestController extends AbstractController {
         $testId, 
         Request $request
     ) {
-        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
-            'Тесты' => 'admin_tests',
-            'Добавить тест' => ['admin_update_note', ['id' => $testId, 'type' => 'tests']],
-            'Редактировать вопросы' => ['admin_tests_redact', ['testId' => $testId]],
-            'Добавить вопрос' => ['admin_tests_redact_add', ['testId' => $testId]],
-        ], $this->router);
-        
         if ($request->isMethod('POST')) {
             // Обработка данных
             $answers = [];
@@ -145,7 +138,7 @@ class TestController extends AbstractController {
             $question->setCorrectAnswers($answers['correct_count']);
             $question->setText($answers['question']);
             $this->em->persist($question);
-            // $this->em->flush();
+            $this->em->flush();
 
             $questionId = $question->getId();
 
@@ -156,11 +149,16 @@ class TestController extends AbstractController {
                 $ans->setText($answer['text']);
                 $ans->setQuestionId($questionId);
                 $this->em->persist($ans);
-                // $this->em->flush();
-            }
-            
-            $this->redirectToRoute('admin_tests_redact', ['testId' => $testId]);
+                $this->em->flush();
+            }            
+            return $this->redirectToRoute('admin_tests_redact', ['testId' => $testId]);
         }
+        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
+            'Тесты' => 'admin_tests',
+            'Добавить тест' => ['admin_update_note', ['id' => $testId, 'type' => 'tests']],
+            'Редактировать вопросы' => ['admin_tests_redact', ['testId' => $testId]],
+            'Добавить вопрос' => ['admin_tests_redact_add', ['testId' => $testId]],
+        ], $this->router);       
         
         return $this->render('admin/tests/add_question.html.twig', [
             'breadcrumbs' => $breadcrumbs,
@@ -197,14 +195,14 @@ class TestController extends AbstractController {
             $question->setCorrectAnswers($answers['correct_count']);
             $question->setText($answers['question']);
             $this->em->persist($question);
-            // $this->em->flush();
+            $this->em->flush();
 
             $questionId = $question->getId();
             $oldAnswers = $this->em->getRepository(Answer::class)->findBy(['question_id' => $questionId]);
             foreach ($oldAnswers as $answer) {
                 $this->em->remove($answer);
             }
-            // $this->em->flush();
+            $this->em->flush();
 
             foreach ($answers['answers'] as $key => $answer) {
                 $ans = new Answer();
@@ -213,9 +211,9 @@ class TestController extends AbstractController {
                 $ans->setText($answer['text']);
                 $ans->setQuestionId($questionId);
                 $this->em->persist($ans);
-                // $this->em->flush();
+                $this->em->flush();
             }
-            $this->redirectToRoute('admin_tests_redact', ['testId' => $testId]);
+            return $this->redirectToRoute('admin_tests_redact', ['testId' => $testId]);
         }
         $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
             'Тесты' => 'admin_tests',

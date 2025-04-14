@@ -1,6 +1,9 @@
-console.log("Я нахуй работаю");
+answerCounter = 0;
 
 function addAnswerItem() {
+    
+
+
     // Увеличиваем счетчик
     answerCounter++;
     
@@ -30,43 +33,8 @@ function addAnswerItem() {
     document.getElementById('answersDiv').appendChild(newAnswerDiv);
     
     // Инициализируем CKEditor с отключенными уведомлениями
-    CKEDITOR.replace(`text_${answerCounter}`, {
-        height: '120px', // Фиксированная высота (~6 строк)
-        removePlugins: 'resize', // Отключаем плагин изменения размеров
-        bodyClass: 'dark-theme',
-        contentsCss: [
-            'body { background: var(--color-grey-200); color: #fff; }',
-            'a { color: var(--color-main); }'
-        ],
-        startupOutlineBlocks: false,
-        removePlugins: 'div,flash,forms,iframe,resize',
-        startupFocus: false,
-        disableNotifications: true,
-        on: {
-            instanceReady: function(ev) {
-                // 1. Безопасная проверка и скрытие уведомлений
-                try {
-                    var editor = ev.editor;
-                    if (editor._.notificationArea && editor._.notificationArea.hideAll) {
-                        editor._.notificationArea.hideAll();
-                    }
-                } catch (e) {
-                    console.warn('Could not hide notifications', e);
-                }
-        
-                // 2. Устанавливаем начальный стиль
-                editor.setData('<p style="color:#fff">&#8203;</p>');
-                
-                // 3. Принудительно применяем стили к iframe
-                var iframe = editor.window.getFrame();
-                if (iframe && iframe.$.contentDocument) {
-                    var body = iframe.$.contentDocument.body;
-                    body.style.backgroundColor = 'var(--color-grey-200)';
-                    body.style.color = '#fff';
-                }
-            }
-        }
-    });
+    textarea = document.getElementById(`text_${answerCounter}`);
+    init(textarea);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -74,10 +42,11 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('textarea').forEach(function(textarea) {
         init(textarea);
     });
+    answerCounter = findMaxId();
 });
 
 function init(textarea) {
-    console.log(textarea.id);
+    console.log("Инициализация " + textarea.id);
     const id = textarea.id;
     CKEDITOR.replace(id, {
         height: '120px', // Фиксированная высота (~6 строк)
@@ -92,27 +61,38 @@ function init(textarea) {
         disableNotifications: true,
         on: {
             instanceReady: function(ev) {
-                // 1. Безопасная проверка и скрытие уведомлений
-                try {
-                    var editor = ev.editor;
-                    if (editor._.notificationArea && editor._.notificationArea.hideAll) {
-                        editor._.notificationArea.hideAll();
-                    }
-                } catch (e) {
-                    console.warn('Could not hide notifications', e);
+                // 1. Убираем уведомления
+                var notifications = ev.editor._.notificationArea;
+                if (notifications) {
+                    notifications.hideAll();
                 }
-        
+                
                 // 2. Устанавливаем начальный стиль
-                editor.setData('<p style="color:#fff">&#8203;</p>');
+                ev.editor.setData('<p style="color:#fff">&#8203;</p>');
                 
                 // 3. Принудительно применяем стили к iframe
-                var iframe = editor.window.getFrame();
-                if (iframe && iframe.$.contentDocument) {
-                    var body = iframe.$.contentDocument.body;
-                    body.style.backgroundColor = 'var(--color-grey-200)';
-                    body.style.color = '#fff';
+                var iframe = ev.editor.window.getFrame();
+                if (iframe) {
+                    iframe.$.contentDocument.body.style.backgroundColor = 'var(--color-grey-200)';
+                    iframe.$.contentDocument.body.style.color = '#fff';
                 }
             }
         }
     });
+}
+
+function findMaxId() {
+    const elements = document.querySelectorAll('[id^="text_"]');
+    if (elements.length > 0) {
+        const ids = Array.from(elements).map(el => el.id);
+        const numbers = ids.map(id => {
+            const match = id.match(/^text_(\d+)$/);
+            return match ? parseInt(match[1], 10) : 0;
+        });
+        const maxId = Math.max(...numbers);
+        const nextId = maxId + 1;    
+        return nextId;
+    } else {
+        return 1;
+    }
 }
