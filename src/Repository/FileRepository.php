@@ -19,15 +19,7 @@ class FileRepository extends ServiceEntityRepository
     public function getTableData($offset, $limit) {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
-            SELECT 
-                `id`, 
-                `file_name`, 
-                `extension`, 
-                `size`, 
-                `url`,
-                `created_by`
-            FROM `file`
-            LIMIT $limit OFFSET $offset
+            SELECT * FROM `file` LIMIT $limit OFFSET $offset
         ";
         $resultSet = $conn->executeQuery($sql);        
         return $resultSet->fetchAllAssociative();

@@ -7,6 +7,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: FileRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class File
 {
     #[ORM\Id]
@@ -14,7 +15,7 @@ class File
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 40)]
+    #[ORM\Column(type: Types::TEXT)]
     private ?string $file_name = null;
 
     #[ORM\Column(length: 40)]
@@ -23,20 +24,17 @@ class File
     #[ORM\Column(length: 40)]
     private ?string $size = null;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $url = null;
-
-    #[ORM\Column]
-    private ?int $status = null;
-
     #[ORM\Column(length: 40)]
     private ?string $created_by = null;
 
     #[ORM\Column(length: 40)]
     private ?string $created_at = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $name = null;
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $for_groups = null;
+
+    #[ORM\Column(type: Types::TEXT)]
+    private ?string $real_file_name = null;
 
     public function getId(): ?int
     {
@@ -79,30 +77,6 @@ class File
         return $this;
     }
 
-    public function getUrl(): ?string
-    {
-        return $this->url;
-    }
-
-    public function setUrl(?string $url): static
-    {
-        $this->url = $url;
-
-        return $this;
-    }
-
-    public function getStatus(): ?int
-    {
-        return $this->status;
-    }
-
-    public function setStatus(int $status): static
-    {
-        $this->status = $status;
-
-        return $this;
-    }
-
     public function getCreatedBy(): ?string
     {
         return $this->created_by;
@@ -127,15 +101,35 @@ class File
         return $this;
     }
 
-    public function getName(): ?string
+    public function getForGroups(): ?string
     {
-        return $this->name;
+        return $this->for_groups;
     }
 
-    public function setName(?string $name): static
+    public function setForGroups(?string $for_groups): static
     {
-        $this->name = $name;
+        $this->for_groups = $for_groups;
 
         return $this;
+    }
+
+    public function getRealFileName(): ?string
+    {
+        return $this->real_file_name;
+    }
+
+    public function setRealFileName(string $real_file_name): static
+    {
+        $this->real_file_name = $real_file_name;
+
+        return $this;
+    }
+
+    #[ORM\PrePersist]
+    public function updateTimestamps()
+    {
+        if ($this->getCreatedAt() === null) {
+            $this->setCreatedAt(time());
+        }
     }
 }

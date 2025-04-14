@@ -280,17 +280,97 @@ class AdminPagesController extends AbstractController {
     }
     
     // Создание файла
-    #[Route(path: '/admin/create/file', name: 'admin_file')] 
-    function adminCreateFileCard() {        
-        return $this->render('admin/redact/file.html.twig', [
+    #[Route(path: '/admin/create/file', name: 'admin_create_file')] 
+    function adminCreateFile(Request $request, $element = null) {
+        if ($request->isMethod('POST')) {
+            $error = false;
+            $user = $this->getUser();
+            $file = (isset($_POST['isUpdate'])) ? $this->em->getRepository(FileEntity::class)->find($_POST['updateId']) : new FileEntity;
+            $fileInfo = $_FILES['file'];
 
+            $fileName = (!empty($_POST['name'])) ? $_POST['name'] : $fileInfo['name'];
+            $fileExtension = strtolower(pathinfo($fileInfo['name'], PATHINFO_EXTENSION));
+            $realFileName = uniqid('file_', true) . '.' . $fileExtension;
+
+            $uploadDirectory = $this->getParameter('kernel.project_dir').'/public/met_files';
+                
+            $uploadedFile = $request->files->get('file'); // Получаем файл из запроса
+
+            if ($uploadedFile) {
+                try {
+                    $uploadedFile->move(   
+                        $uploadDirectory,
+                        $realFileName
+                    );
+                    
+                    $this->addFlash('success', 'Файл успешно загружен!');
+                } catch (\Exception $e) {
+                    $error = true;
+                    $this->addFlash('error', 'Ошибка при загрузке файла: '.$e->getMessage());
+                }            
+            }
+            
+            if (!$error) {
+                if (isset($_POST['isUpdate'])) {
+                    $file->setFileName($fileName);
+                } else {
+                    $file->setFileName($fileName);
+                    $file->setSize($fileInfo['size']);
+                    $file->setRealFileName($realFileName);
+                    $file->setExtension($fileExtension);
+                    $file->setCreatedBy($user->getId());
+                }
+                $this->em->persist($file);
+                $this->em->flush();
+                $element = $file;
+            }
+        }
+        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
+            'Файлы' => 'admin_files',
+            'Добавить файл' => 'admin_create_file',
+        ], $this->router);
+
+        $fileId = (!empty($element)) ? $element->getId() : 0;
+        $AllGroups = $this->em->getRepository(Group::class)->findAll();
+        $groupsForThisTest = $this->em->getRepository(Group::class)->findFileGroups($fileId);
+
+        return $this->render('admin/redact/file.html.twig', [
+            'breadcrumbs' => $breadcrumbs,
+            'groups' => $AllGroups,
+            'notes' => $groupsForThisTest,
+            'updating_element' => $element,
         ]);
     }
+
+    // Добавление группы для файла
+    #[Route(path: '/admin/create/file/{fileId}/add-groups', name: 'admin_create_file_add_groups')] 
+    function adminCreateFileAddGroups($fileId) {
+        $groupId = $_POST['group'];
+        $file = $this->em->getRepository(FileEntity::class)->find($fileId);
+        $groups = $file->getForGroups();
+        $groups .= " $groupId,";
+        $file->setForGroups($groups);
+        $this->em->persist($file);
+        $this->em->flush();
+        return $this->redirectToRoute('admin_update_note', ['type' => 'files', 'id' => $fileId]);
+    }
+
+    // Удаление группы для файла
+    #[Route(path: '/admin/create/file/{fileId}/delete-groups/{groupId}', name: 'admin_create_file_delete_groups')] 
+    function adminCreateFileDeleteGroups($fileId, $groupId) {
+        $file = $this->em->getRepository(FileEntity::class)->find($fileId);
+        $groups = $file->getForGroups();
+        $groups = str_replace(" $groupId,", '', $groups);
+        $file->setForGroups($groups);
+        $this->em->persist($file);
+        $this->em->flush();
+        return $this->redirectToRoute('admin_update_note', ['type' => 'files', 'id' => $fileId]);
+    }
+    
 
     // Сохранение файлов
     #[Route(path: '/admin/create/file/save', name: 'file_save')] 
     function saveFile() {
-        var_dump($_POST); die;
         foreach ($_FILES as $index => $file) {
             $url = $_POST["url_$index"];
             $this->file->saveFile($file, $url);
@@ -398,7 +478,14 @@ class AdminPagesController extends AbstractController {
             'students' => $this->em->getRepository(Student::class)->find($id),
             'teachers' => $this->em->getRepository(Teacher::class)->find($id),
             'tests' => $this->em->getRepository(Test::class)->find($id),
-        };        
+            'files' => $this->em->getRepository(FileEntity::class)->find($id),
+        };
+        if ($type == 'files') {
+            $path = $this->getParameter('kernel.project_dir').'/public/met_files/' . $element->getRealFileName();
+            if (file_exists($path)) {
+                unlink($path);
+            }
+        }
         $this->em->remove($element);
         $this->em->flush();
         return $this->redirectToRoute("admin_$type");
@@ -426,6 +513,9 @@ class AdminPagesController extends AbstractController {
             case 'tests':
                 $element = $this->em->getRepository(Test::class)->find($id);
                 return $this->adminCreateTest($request, $element);
+            case 'files':
+                $element = $this->em->getRepository(FileEntity::class)->find($id);
+                return $this->adminCreateFile($request, $element);
             default:
                 return $this->redirectToRoute('admin_moderators');
         }

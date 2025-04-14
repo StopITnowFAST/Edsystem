@@ -26,6 +26,16 @@ class GroupRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
+    public function findFileGroups($fileId) {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
+            SELECT g.*
+            FROM `group` g
+            WHERE CONCAT(',', (SELECT REPLACE(for_groups, ' ', '') FROM file WHERE id = $fileId), ',') LIKE CONCAT('%,', g.id, ',%')";
+        $resultSet = $conn->executeQuery($sql);        
+        return $resultSet->fetchAllAssociative();
+    }
+
     public function getTableData($offset, $limit) {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "

@@ -1,41 +1,97 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Добавить файлы | {{ app_title }}{% endblock %}
+{% set title = "Добавить файл" %}
+{% if updating_element is not empty %} 
+    {% set fileId = updating_element.id %}
+{% endif %}
+
+{% block title %}{{ title }} | {{ app_title }}{% endblock %}
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('/styles/admin_tables.css') }}">
+    <link rel="stylesheet" href="{{ asset('/styles/admin_create.css') }}">
 {% endblock %}
  
 {% block body %}
     <div class="container">
         {{ include('blocks/breadcrumbs.html.twig') }}
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% endfor %}
+
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger">{{ message }}</div>
+        {% endfor %}
         <div class="admin-table__wrap">
             <div class="admin-table__head">
-                <h1>Добавить файлы</h1>
+                <h1>{{ title }}</h1>
                 <a href="{{ path('admin_files') }}", class="btn btn-primary">Отменить</a>
             </div>
             <div class="admin-table__body">
-                <form action="{{ path('file_save') }}", method="POST", enctype="multipart/form-data">
-
-                    <div class="admin-table__file-item">
-                        <input type="file" name="file">
-                        <input type="text" name="url">
-                        <button class="btn icon-button">
-                        <svg class="svg-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M1 1L15 15M15 1L1 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                        </button>
+                <div class="admin-create__area">
+                    <h2>Файл</h2>
+                    <form method="POST", enctype="multipart/form-data">
+                        {% if updating_element is not empty %}
+                            <input type="hidden" value="true" name="isUpdate">
+                            <input type="hidden" value="{{ updating_element.id }}" name="updateId">
+                        {% endif %}
+                            <div class="admin-create__input-list">            
+                                <div class="admin-create__field">
+                                    <label for="file">Файл</label>
+                                    <input type="file" id="file" class="admin-create__input" name="file">
+                                </div>    
+                                <div class="admin-create__field">
+                                    <label for="name">Изменить название файла</label>
+                                    <input id="name" class="admin-create__input" name="name"
+                                        value="{{ (updating_element is not empty) ? updating_element.fileName : "" }}">
+                                </div>
+                            </div>
+                            
+                        <button class="btn btn-primary" type="sumbit">Сохранить</button>
+                    </form>
+                </div>
+                {% if updating_element is not empty %}
+                    <div class="admin-create__area">
+                        <h2>Добавить группу для файла</h2>
+                        <form action="{{ path('admin_create_file_add_groups', {'fileId':fileId}) }}" method="POST">
+                            <div class="admin-create__input-list">     
+                                <div class="admin-create__field">
+                                    <label for="group">Группа</label>
+                                    <select id="group" name="group" class="admin-create__select" required>
+                                        {% for group in groups %}
+                                            <option value="{{ group.id }}">{{ group.name }}</option>
+                                        {% endfor %}
+                                    </select>                        
+                                </div>
+                                <button class="btn btn-primary" type="sumbit">Добавить</button>    
+                            </div>
+                        </form>
+                        <h2>Группы</h2>
+                        <div class="admin-table__body">
+                            <table class="admin-table__table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Название</th>
+                                        <th>Код</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for note in notes %}
+                                        <tr>
+                                            <td>{{ note.id }}</td>
+                                            <td>{{ note.name }}</td>
+                                            <td>{{ note.code }}</td>
+                                            {{ include('blocks/action_cell.html.twig', {
+                                                'delete_path': path('admin_create_file_delete_groups', {'fileId': fileId, 'groupId': note.id}),
+                                            }) }}
+                                    {% endfor %}
+                                </tbody>
+                            </table>    
+                        </div>
                     </div>
-
-                    <button class="btn icon-button">
-                        <svg class="svg-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M8 1V15M1 8H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                    </button>
-
-
-                    <button type="sumbit">Сохранить</button>
-                </form>
+                {% endif %}
             </div>
         </div>     
     </div>

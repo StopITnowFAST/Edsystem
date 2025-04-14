@@ -3,6 +3,7 @@
     flex-wrap: wrap;
     gap: var(--offset-s);
     margin: 20px 0px;
+    align-items: flex-end
 }
 
 .admin-create__field {
@@ -253,4 +254,11 @@
     background: var(--color-grey-200) !important;
     margin: 0 !important;
     padding: 15px !important;
+}
+
+.admin-create__area {
+    padding: var(--offset-s);
+    background-color: var(--color-grey-400);
+    border-radius: var(--offset-s);
+    margin: var(--offset-s) 0px;
 }
