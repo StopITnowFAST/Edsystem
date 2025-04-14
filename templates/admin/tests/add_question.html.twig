@@ -66,8 +66,8 @@
 {% endblock %}
 
 {% block javascripts %}
+    <script>CKEDITOR_BASEPATH = "{{ asset('ckeditor/') }}";</script>
+    <script src="{{ asset('ckeditor/ckeditor.js') }}"></script>
     <script>let answerCounter = {{ i + 1 }}</script>
-    {# <script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script> #}
     <script src="{{ asset('/js/add_answers.js') }}"></script>
-    <script src="{{ asset('/js/full_ckeditor.js') }}"></script>
 {% endblock %}

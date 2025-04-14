@@ -44,20 +44,25 @@ function addAnswerItem() {
         disableNotifications: true,
         on: {
             instanceReady: function(ev) {
-                // 1. Убираем уведомления
-                var notifications = ev.editor._.notificationArea;
-                if (notifications) {
-                    notifications.hideAll();
+                // 1. Безопасная проверка и скрытие уведомлений
+                try {
+                    var editor = ev.editor;
+                    if (editor._.notificationArea && editor._.notificationArea.hideAll) {
+                        editor._.notificationArea.hideAll();
+                    }
+                } catch (e) {
+                    console.warn('Could not hide notifications', e);
                 }
-                
+        
                 // 2. Устанавливаем начальный стиль
-                ev.editor.setData('<p style="color:#fff">&#8203;</p>');
+                editor.setData('<p style="color:#fff">&#8203;</p>');
                 
                 // 3. Принудительно применяем стили к iframe
-                var iframe = ev.editor.window.getFrame();
-                if (iframe) {
-                    iframe.$.contentDocument.body.style.backgroundColor = 'var(--color-grey-200)';
-                    iframe.$.contentDocument.body.style.color = '#fff';
+                var iframe = editor.window.getFrame();
+                if (iframe && iframe.$.contentDocument) {
+                    var body = iframe.$.contentDocument.body;
+                    body.style.backgroundColor = 'var(--color-grey-200)';
+                    body.style.color = '#fff';
                 }
             }
         }
@@ -87,20 +92,25 @@ function init(textarea) {
         disableNotifications: true,
         on: {
             instanceReady: function(ev) {
-                // 1. Убираем уведомления
-                var notifications = ev.editor._.notificationArea;
-                if (notifications) {
-                    notifications.hideAll();
+                // 1. Безопасная проверка и скрытие уведомлений
+                try {
+                    var editor = ev.editor;
+                    if (editor._.notificationArea && editor._.notificationArea.hideAll) {
+                        editor._.notificationArea.hideAll();
+                    }
+                } catch (e) {
+                    console.warn('Could not hide notifications', e);
                 }
-                
+        
                 // 2. Устанавливаем начальный стиль
-                ev.editor.setData('<p style="color:#fff">&#8203;</p>');
+                editor.setData('<p style="color:#fff">&#8203;</p>');
                 
                 // 3. Принудительно применяем стили к iframe
-                var iframe = ev.editor.window.getFrame();
-                if (iframe) {
-                    iframe.$.contentDocument.body.style.backgroundColor = 'var(--color-grey-200)';
-                    iframe.$.contentDocument.body.style.color = '#fff';
+                var iframe = editor.window.getFrame();
+                if (iframe && iframe.$.contentDocument) {
+                    var body = iframe.$.contentDocument.body;
+                    body.style.backgroundColor = 'var(--color-grey-200)';
+                    body.style.color = '#fff';
                 }
             }
         }
