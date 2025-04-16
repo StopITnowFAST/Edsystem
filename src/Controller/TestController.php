@@ -231,5 +231,21 @@ class TestController extends AbstractController {
             'answers' => $answers,
         ]);
     }
+    
+    // Прохождение теста
+    #[Route('/tests/pass/{testId}', name: 'user_test_main')]
+    function testMain() {
+        // $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
+        //     'Тесты' => 'admin_tests',
+        //     'Добавить тест' => ['admin_update_note', ['id' => $testId, 'type' => 'tests']],
+        //     'Редактировать вопросы' => ['admin_tests_redact', ['testId' => $testId]],
+        //     'Изменить вопрос' => ['admin_tests_redact_update', ['testId' => $testId, 'questionId' => $questionId]],
+        // ], $this->router);
 
+        
+        
+        return $this->render('user/test_main.html.twig', [
+            // 'breadcrumbs' => $breadcrumbs,
+        ]);        
+    }
 }

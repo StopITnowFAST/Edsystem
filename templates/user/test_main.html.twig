@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Прохождение теста{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('/styles/test.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="test-wrapper">
+        <div class="header-container">
+            <h1 class="test-title">Тест по основам Symfony</h1>
+            <div class="test-timer">⏱️ 15:30</div>
+        </div>
+        
+        <div class="main-test-block">
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+            </div>
+            
+            <div class="question-block">
+                <div class="question-text">
+                    Какой метод используется в Symfony для перенаправления на другой маршрут?
+                </div>
+                
+                <div class="options-list">
+                    <div class="answer-option">
+                        $this->redirect()
+                    </div>
+                    <div class="answer-option selected">
+                        $this->redirectToRoute()
+                    </div>
+                    <div class="answer-option">
+                        $this->forward()
+                    </div>
+                    <div class="answer-option">
+                        $response->redirect()
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bottom-navigation">
+            <div class="questions-counter">
+                Вопрос 3 из 10
+            </div>
+            
+            <div class="nav-buttons">
+                <a href="#" class="nav-btn all-questions-btn">
+                    Все вопросы
+                </a>
+                <button class="nav-btn next-btn">
+                    Следующий вопрос
+                </button>
+            </div>
+            
+            <div class="question-links">
+                <a href="#" class="prev-question-link">
+                    Предыдущий вопрос
+                </a>
+                <a href="#" class="next-question-link">
+                    следующий вопрос
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}
