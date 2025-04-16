@@ -13,9 +13,6 @@
     <section class="login-site">
         <div class="container">
             <div class="login__wrap">
-                <div class="login__photo">
-                    <img src="{{ asset('/img/login.png') }}" alt="" class="login__bg" loading="lazy">
-                </div>
                 <div class="login__body">
                     <div class="login__inputs"> 
                         <form action="{{ path('app_register') }}" method="post" class="login__form">
@@ -34,6 +31,7 @@
                                 <div class="form__bottom">     
                                     <a href="{{ path('app_login') }}" class="link">Войти</a>
                                 </div>
+                                {{ include('security/vk_login.html.twig') }}
                             </div>
                         </form>
                     </div>

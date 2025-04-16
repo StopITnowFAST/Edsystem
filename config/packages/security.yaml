@@ -39,9 +39,16 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
+        # Сначала открываем login и register для всех
+        - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/register, roles: PUBLIC_ACCESS }
+
+        # Затем защищаем админ-зоны
         - { path: ^/admin, roles: ROLE_MASTER }
         - { path: ^/panel, roles: ROLE_TEACHER }
-        - { path: ^/account, roles: ROLE_STUDENT }
+
+        # ВСЕ остальные страницы требуют ROLE_USER
+        - { path: ^/, roles: ROLE_USER }
 
 when@test:
     security:

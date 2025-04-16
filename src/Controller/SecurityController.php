@@ -97,4 +97,62 @@ class SecurityController extends AbstractController
             return $this->redirectToRoute('user_schedule');
         }
     }
+    
+    
+    #[Route('/login/vk', name: 'app_login_vk')]
+    public function loginVk(Request $request) {
+        if($request->isMethod('POST')) {
+            $vk_id = $_POST['vk_id'];
+            $vkUser = $this->em->getRepository(VkUser::class)->findOneBy(['vk_id']);
+            if ($vkUser) {
+                // Обновляю данные пользователя ВК
+                $vkUser = $this->setVkData($vkUser, $_POST);
+                $user = $this->em->getRepository(User::class)->find($vkUser->getUserId);
+            } else {
+                // Создаю новый профиль пользователя
+                $vkUser = new VkUser;
+                $user = new User();
+                $hashedPassword = $passwordHasher->hashPassword($user, $this->generateRandomString());
+                $roles[] = 'ROLE_USER';           
+                $user->setEmail($_POST['vk_id']);
+                $user->setPassword($hashedPassword);
+                $user->setRoles($roles);
+                $this->em->persist($user);
+                $this->em->flush();
+                $vkUser = $this->setVkData($vkUser, $_POST);
+            }
+            $request = $this->requestStack->getCurrentRequest();
+            $this->userAuthenticator->authenticateUser(
+                $user,
+                $this->authenticator,
+                $request
+            );
+            $this->redirectToRoute('app_check_rights');
+        }        
+    }
+
+    function setVkData($vkUser, $post, $user_id = null) {
+        $vkUser->setVkId($_POST['vk_id']);
+        $vkUser->setFirstName($_POST['first_name']);
+        $vkUser->setLastName($_POST['last_name']);
+        $vkUser->setAvatar($_POST['avatar']);
+        $vkUser->setBirthday($_POST['birthday']);
+        $vkUser->setGender($_POST['gender']);
+        $vkUser->setVerified($_POST['verified']);
+        if ($user_id != null) {
+            $vkUser->setUserId($user_id);
+        }
+        $this->em->persist($vkUser);
+        $this->em->flush();
+        return $vkUser;
+    }
+
+    function generateRandomString(int $length = 10): string {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $result = '';        
+        for ($i = 0; $i < $length; $i++) {
+            $result .= $characters[random_int(0, strlen($characters) - 1)];
+        }        
+        return $result;
+    }
 }
