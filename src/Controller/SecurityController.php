@@ -8,18 +8,22 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use App\Entity\User;
+use App\Entity\VkUser;
 use App\Entity\UserCard;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
+use Symfony\Component\Security\Core\Security;
+    
+// use Symfony\Component\Security\Core\User\UserInterface;
+
 class SecurityController extends AbstractController
 {
-    private $em;
+    
     public function __construct(
-        EntityManagerInterface $em, 
-    ) {
-        $this->em = $em;
-    }    
+        private EntityManagerInterface $em,
+        private Security $security,
+    ) {}
 
     #[Route('/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils, Request $request): Response
@@ -100,14 +104,14 @@ class SecurityController extends AbstractController
     
     
     #[Route('/login/vk', name: 'app_login_vk')]
-    public function loginVk(Request $request) {
+    public function loginVk(UserPasswordHasherInterface $passwordHasher, Request $request) {
         if($request->isMethod('POST')) {
             $vk_id = $_POST['vk_id'];
-            $vkUser = $this->em->getRepository(VkUser::class)->findOneBy(['vk_id']);
+            $vkUser = $this->em->getRepository(VkUser::class)->findOneBy(['vk_id' => $vk_id]);
             if ($vkUser) {
                 // Обновляю данные пользователя ВК
                 $vkUser = $this->setVkData($vkUser, $_POST);
-                $user = $this->em->getRepository(User::class)->find($vkUser->getUserId);
+                $user = $this->em->getRepository(User::class)->find($vkUser->getUserId());
             } else {
                 // Создаю новый профиль пользователя
                 $vkUser = new VkUser;
@@ -119,15 +123,10 @@ class SecurityController extends AbstractController
                 $user->setRoles($roles);
                 $this->em->persist($user);
                 $this->em->flush();
-                $vkUser = $this->setVkData($vkUser, $_POST);
+                $vkUser = $this->setVkData($vkUser, $_POST, $user->getId());
             }
-            $request = $this->requestStack->getCurrentRequest();
-            $this->userAuthenticator->authenticateUser(
-                $user,
-                $this->authenticator,
-                $request
-            );
-            $this->redirectToRoute('app_check_rights');
+            $this->security->login($user);
+            return $this->redirectToRoute('app_check_rights');
         }        
     }
 

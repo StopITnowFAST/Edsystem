@@ -4,12 +4,23 @@ namespace App\Service;
 
 use App\Entity\HeaderMenu;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 
 class Header
 {
     public function __construct(
-        private EntityManagerInterface $em
+        private EntityManagerInterface $em,
+        private Security $security,
     ) {        
+    }
+
+    public function getProfilePhoto(): string {
+        $user = $this->security->getUser();
+        if (!$user) {
+            return "";
+        }
+        $vkUser = $this->em->getRepository(VkUser::class)->findOneBy(['user_id' => $user->getId()]);
+        return $vkUser?->getAvatar() ?? "";
     }
     
     public function getHeaderMenu() {

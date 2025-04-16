@@ -1,13 +1,17 @@
 {% set colors = ['#4a6fa5', '#5cb85c', '#5bc0de', '#f0ad4e', '#d9534f'] %}
 {% set color = colors[app.user.id % colors|length] %}
+{% set avatar_url = profile_photo() %}
 
 <div class="header__account__widget">
     <button class="account-avatar" style="background-color: {{ color }}" onclick="toggleAccountMenu()">
-        {{ app.user.email|slice(0, 2)|upper }}
+        {% if avatar_url %}
+            <img src="{{ avatar_url }}" alt="Profile photo" class="avatar-image">
+        {% else %}
+            {{ app.user.email|slice(0, 2)|upper }}
+        {% endif %}
     </button>
     
     <div class="account-menu" id="accountMenu">
-        {# <a href="{{ path('app_account') }}">Профиль</a> #}
         <a href="{{ path('app_logout') }}">Выйти</a>
     </div>
 </div>
