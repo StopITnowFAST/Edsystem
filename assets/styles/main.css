@@ -33,7 +33,7 @@ body {
 
 
 .container {
-    width: 100%;
+    /* width: 100%; */
     max-width: var(--break-xl);
     margin: 0 auto;
     padding: 0 var(--offset-l);
