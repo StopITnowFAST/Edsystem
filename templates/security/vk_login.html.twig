@@ -62,8 +62,42 @@
 
 function vkidOnError(error) {
     console.error("Ошибка авторизации:", error);
-    // Здесь можно показать сообщение об ошибке пользователю
+    
+    // Показываем сообщение пользователю
     alert("Произошла ошибка при авторизации. Пожалуйста, попробуйте еще раз.");
+    
+    // Подготовка данных об ошибке
+    const errorData = {
+        type: 'VK ID Auth Error',
+        error: error.message || String(error),
+        errorDetails: {
+            name: error.name || 'UnknownError',
+            stack: error.stack || null,
+            code: error.code || null
+        },
+        pageUrl: window.location.href,
+        userAgent: navigator.userAgent,
+        timestamp: new Date().toISOString()
+    };
+    
+    // Отправка ошибки на сервер
+    fetch('/request/log-error', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify(errorData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            console.error('Ошибка при отправке лога:', response.status);
+        }
+        return response.json();
+    })
+    .catch(e => {
+        console.error('Не удалось отправить лог ошибки:', e);
+    });
 }
 
 function doLogin(user) {

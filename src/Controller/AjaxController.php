@@ -9,6 +9,7 @@ use App\Entity\Day;
 use App\Entity\Group;
 use App\Entity\Subject;
 use App\Entity\Grades;
+use App\Service\TgApi;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
@@ -19,15 +20,15 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\SecurityBundle\Security;
 
 class AjaxController extends AbstractController {
 
-    private $em;
     function __construct(
-        EntityManagerInterface $em,
+        private EntityManagerInterface $em,
+        private TgApi $api,
     ) {
-        $this->em = $em;
     }
 
     #[Route(path: '/request/change/role', name: 'request_change_role')] 
@@ -49,5 +50,20 @@ class AjaxController extends AbstractController {
         return $this->json([
             'ok' => true,
         ]);
+    }
+
+    #[Route('/request/log-error', name: 'request_log_error', methods: ['POST'])]
+    public function logError(Request $request): JsonResponse {
+        $data = json_decode($request->getContent(), true);
+        
+        // Получаем данные об ошибке
+        $errorMessage = $data['error'] ?? 'Unknown error';
+        $url = $data['url'] ?? null;
+        $line = $data['line'] ?? null;
+        
+        // Отправляем в Telegram (реализацию см. ниже)
+        $this->api->sendErrorToTelegram($errorMessage, $url, $line);
+        
+        return $this->json(['status' => 'success']);
     }
 }
