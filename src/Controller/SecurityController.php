@@ -99,6 +99,8 @@ class SecurityController extends AbstractController
         
         if ($this->isGranted('ROLE_USER')) {
             return $this->redirectToRoute('user_schedule');
+        } else {
+            return $this->redirectToRoute('app_login');
         }
     }
     
@@ -127,7 +129,8 @@ class SecurityController extends AbstractController
             }
             $this->security->login($user);
             return $this->redirectToRoute('app_check_rights');
-        }        
+        }
+        return $this->redirectToRoute('app_check_rights');
     }
 
     function setVkData($vkUser, $post, $user_id = null) {

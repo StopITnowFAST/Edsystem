@@ -42,6 +42,7 @@ security:
         # Сначала открываем login и register для всех
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }
+        - { path: ^/request, roles: PUBLIC_ACCESS }
 
         # Затем защищаем админ-зоны
         - { path: ^/admin, roles: ROLE_MASTER }

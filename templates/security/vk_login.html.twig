@@ -1,145 +1,131 @@
 <div class="login__vk-login">
-  <script src="https://unpkg.com/@vkid/sdk@<3.0.0/dist-sdk/umd/index.js"></script>
-  <script type="text/javascript">
-    if ('VKIDSDK' in window) {
-      const VKID = window.VKIDSDK;
+	<script src="https://unpkg.com/@vkid/sdk@<3.0.0/dist-sdk/umd/index.js"></script>
+  	<script type="text/javascript">
+		if ('VKIDSDK' in window) {
+			const VKID = window.VKIDSDK;
 
-      VKID.Config.init({
-        app: 53447153,
-        redirectUrl: 'https://port26.ru/login/vk',
-        responseMode: VKID.ConfigResponseMode.Callback,
-        source: VKID.ConfigSource.LOWCODE,
-        scope: '', // Заполните нужными доступами по необходимости
-      });
+			VKID.Config.init({
+				app: 53447153,
+				redirectUrl: 'https://port26.ru/login/vk',
+				responseMode: VKID.ConfigResponseMode.Callback,
+				source: VKID.ConfigSource.LOWCODE,
+				scope: '', // Заполните нужными доступами по необходимости
+			});
 
-      const oneTap = new VKID.OneTap();
+			const oneTap = new VKID.OneTap();
 
-      oneTap.render({
-        container: document.currentScript.parentElement,
-        scheme: 'dark',
-        showAlternativeLogin: true,
-        oauthList: [
-          'mail_ru',
-          'ok_ru'
-        ]
-      })
-      .on(VKID.WidgetEvents.ERROR, vkidOnError)
-      .on(VKID.OneTapInternalEvents.LOGIN_SUCCESS, function (payload) {
-        const code = payload.code;
-        const deviceId = payload.device_id;
+			oneTap.render({
+				container: document.currentScript.parentElement,
+				scheme: 'dark',
+				showAlternativeLogin: true,
+				oauthList: [
+				'mail_ru',
+				'ok_ru'
+				]
+			})
+			.on(VKID.WidgetEvents.ERROR, vkidOnError)
+			.on(VKID.OneTapInternalEvents.LOGIN_SUCCESS, function (payload) {
+				const code = payload.code;
+				const deviceId = payload.device_id;
 
-        VKID.Auth.exchangeCode(code, deviceId)
-          .then(vkidOnSuccess)
-          .catch(vkidOnError);
-      });
-    
-      async function vkidOnSuccess(data) {
-    try {
-        console.log("Получаем данные пользователя...");
-        
-        // Получаем информацию о пользователе
-        const userInfo = await VKID.Auth.userInfo(data['access_token']);
-        console.log("Полные данные от VKID:", JSON.stringify(userInfo, null, 2));
-        
-        // Форматируем данные в нужную структуру
-        const userData = {
-            uid: userInfo.user.user_id,
-            first_name: userInfo.user.first_name,
-            last_name: userInfo.user.last_name,
-            avatar: userInfo.user.avatar,
-            bdate: userInfo.user.birthday,
-            sex: userInfo.user.sex,
-            verified: userInfo.user.verified || false
-        };
+				VKID.Auth.exchangeCode(code, deviceId)
+				.then(vkidOnSuccess)
+				.catch(vkidOnError);
+			});
+			
+			async function vkidOnSuccess(data) {
+				try {
+					console.log("Получаем данные пользователя...");
+					
+					// Получаем информацию о пользователе
+					const userInfo = await VKID.Auth.userInfo(data['access_token']);
+					console.log("Полные данные от VKID:", JSON.stringify(userInfo, null, 2));
+					
+					// Форматируем данные в нужную структуру
+					const userData = {
+						uid: userInfo.user.user_id,
+						first_name: userInfo.user.first_name,
+						last_name: userInfo.user.last_name,
+						avatar: userInfo.user.avatar,
+						bdate: userInfo.user.birthday,
+						sex: userInfo.user.sex,
+						verified: userInfo.user.verified || false
+					};
 
-        console.log("Форматированные данные:", userData);
-        doLogin(userData);
-    } catch (error) {
-        console.error("Ошибка получения данных:", error);
-        vkidOnError(error);
-    }
-}
+					console.log("Форматированные данные:", userData);
+					doLogin(userData);
+				} catch (error) {
+					console.error("Ошибка получения данных:", error);
+					alert("Произошла ошибка при авторизации. Пожалуйста, попробуйте еще раз.");
+				}
+			}
 
-function vkidOnError(error) {
-    console.error("Ошибка авторизации:", error);
-    
-    // Показываем сообщение пользователю
-    alert("Произошла ошибка при авторизации. Пожалуйста, попробуйте еще раз.");
-    
-    // Подготовка данных об ошибке
-    const errorData = {
-        type: 'VK ID Auth Error',
-        error: error.message || String(error),
-        errorDetails: {
-            name: error.name || 'UnknownError',
-            stack: error.stack || null,
-            code: error.code || null
-        },
-        pageUrl: window.location.href,
-        userAgent: navigator.userAgent,
-        timestamp: new Date().toISOString()
-    };
-    
-    // Отправка ошибки на сервер
-    fetch('/request/log-error', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: JSON.stringify(errorData)
-    })
-    .then(response => {
-        if (!response.ok) {
-            console.error('Ошибка при отправке лога:', response.status);
-        }
-        return response.json();
-    })
-    .catch(e => {
-        console.error('Не удалось отправить лог ошибки:', e);
-    });
-}
+			async function vkidOnError(error) {
+				try {
+					console.log("Получаем данные пользователя...");
+					
+					// Получаем информацию о пользователе
+					const userInfo = await VKID.Auth.userInfo(data['access_token']);
+					console.log("Полные данные от VKID:", JSON.stringify(userInfo, null, 2));
+					
+					// Форматируем данные в нужную структуру
+					const userData = {
+						uid: userInfo.user.user_id,
+						first_name: userInfo.user.first_name,
+						last_name: userInfo.user.last_name,
+						avatar: userInfo.user.avatar,
+						bdate: userInfo.user.birthday,
+						sex: userInfo.user.sex,
+						verified: userInfo.user.verified || false
+					};
 
-function doLogin(user) {
-    console.log("Отправка данных на сервер:", user);
-    
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = '/login/vk';
-    
-    // Добавляем CSRF-токен для защиты
-    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
-    if (csrfToken) {
-        addHiddenInput(form, '_token', csrfToken);
-    }
-    
-    // Добавляем данные с проверкой на undefined
-    const fields = {
-        'vk_id': user.uid,
-        'first_name': user.first_name || '',
-        'last_name': user.last_name || '',
-        'avatar': user.avatar || '',
-        'birthday': user.bdate || '',
-        'gender': (user.sex === 1) ? 'female' : (user.sex === 2) ? 'male' : '',
-        'verified': user.verified ? '1' : '0',
-    };
-    
-    // Добавляем все поля в форму
-    Object.entries(fields).forEach(([name, value]) => {
-        addHiddenInput(form, name, value !== undefined ? value : '');
-    });
-    
-    document.body.appendChild(form);
-    form.submit();
-}
+					console.log("Форматированные данные:", userData);
+					// doLogin(userData);
+				} catch (error) {
+					
+				}
+			}
 
-function addHiddenInput(form, name, value) {
-    const input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = name;
-    input.value = value;
-    form.appendChild(input);
-}
-    }
+			function doLogin(user) {
+				console.log("Отправка данных на сервер:", user);
+				
+				const form = document.createElement('form');
+				form.method = 'POST';
+				form.action = '/login/vk';
+				
+				// Добавляем CSRF-токен для защиты
+				const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+				if (csrfToken) {
+					addHiddenInput(form, '_token', csrfToken);
+				}
+				
+				// Добавляем данные с проверкой на undefined
+				const fields = {
+					'vk_id': user.uid,
+					'first_name': user.first_name || '',
+					'last_name': user.last_name || '',
+					'avatar': user.avatar || '',
+					'birthday': user.bdate || '',
+					'gender': (user.sex === 1) ? 'female' : (user.sex === 2) ? 'male' : '',
+					'verified': user.verified ? '1' : '0',
+				};
+				
+				// Добавляем все поля в форму
+				Object.entries(fields).forEach(([name, value]) => {
+					addHiddenInput(form, name, value !== undefined ? value : '');
+				});
+				
+				document.body.appendChild(form);
+				form.submit();
+			}
+
+			function addHiddenInput(form, name, value) {
+				const input = document.createElement('input');
+				input.type = 'hidden';
+				input.name = name;
+				input.value = value;
+				form.appendChild(input);
+			}
+		}
   </script>
 </div>
