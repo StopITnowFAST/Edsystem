@@ -9,65 +9,59 @@
 {% block body %}
     <div class="test-wrapper">
         <div class="header-container">
-            <h1 class="test-title">Тест по основам Symfony</h1>
+            <h1 class="test-title">{{ testTitle }}</h1>
             <div class="test-timer">⏱️ 15:30</div>
         </div>
         
         <div class="main-test-block">
             <div class="progress-container">
                 <div class="progress-bar">
-                    <div class="progress-fill"></div>
+                    <div style="width: {{ (questionPosition / totalQuestions * 100)|round(2) }}%" class="progress-fill"></div>
                 </div>
             </div>
             
             <div class="question-block">
                 <div class="question-text">
-                    Какой метод используется в Symfony для перенаправления на другой маршрут?
+                    {{ question.text|raw }}
                 </div>
                 
                 <div class="options-list">
-                    <div class="answer-option">
-                        $this->redirect()
-                    </div>
-                    <div class="answer-option selected">
-                        $this->redirectToRoute()
-                    </div>
-                    <div class="answer-option">
-                        $this->forward()
-                    </div>
-                    <div class="answer-option">
-                        $response->redirect()
-                    </div>
+                    <form action="{{ path('user_test_pass', {'testId':testId, 'questionPosition':questionPosition + 1}) }}" method="POST">
+                        {% for answer in answers %}
+                            <div class="answer-option">
+                                {{ answer.text|raw }}
+                            </div>
+                        {% endfor %}
+                    </form>
                 </div>
             </div>
         </div>
         
         <div class="bottom-navigation">
             <div class="questions-counter">
-                Вопрос 3 из 10
+                Вопрос {{ questionPosition }} из {{ totalQuestions }}
             </div>
-            
+
             <div class="nav-buttons">
-                <a href="#" class="nav-btn all-questions-btn">
-                    Все вопросы
-                </a>
-                <button class="nav-btn next-btn">
-                    Следующий вопрос
-                </button>
-            </div>
-            
-            <div class="question-links">
-                <a href="#" class="prev-question-link">
+                <a href="{{ path('user_test_pass', {'testId':testId, 'questionPosition':questionPosition - 1}) }}" class="btn btn-primary">
                     Предыдущий вопрос
                 </a>
-                <a href="#" class="next-question-link">
-                    следующий вопрос
-                </a>
+                {% if questionPosition + 1 != totalQuestions %}
+                    <a href="{{ path('user_test_pass', {'testId':testId, 'questionPosition':questionPosition + 1}) }}" class="btn btn-primary">
+                        Следующий вопрос
+                    </a>
+                {% else %}
+                    <a href="{{ path('user_test_pass', {'testId':testId, 'questionPosition':questionPosition + 1}) }}" class="btn btn-secondary">
+                        Завершить тест
+                    </a>
+                {% endif %}
             </div>
         </div>
     </div>
 {% endblock %}
 
 {% block javascripts %}
-    {{ parent() }}
+    <script>
+
+    </script
 {% endblock %}

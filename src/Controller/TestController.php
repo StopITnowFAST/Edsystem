@@ -12,8 +12,9 @@ use App\Entity\File as FileEntity;
 use App\Entity\Group;
 use App\Entity\Teacher;
 use App\Service\TableWidget;
-use App\Entity\Redirect;
-use App\Entity\HeaderMenu;
+use App\Service\Help;
+use App\Entity\Shuffle;
+use App\Entity\TestShuffle;
 use App\Entity\Question;
 use App\Entity\Test;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -232,20 +233,99 @@ class TestController extends AbstractController {
         ]);
     }
     
-    // Прохождение теста
-    #[Route('/tests/pass/{testId}', name: 'user_test_main')]
-    function testMain() {
+    // Превью теста
+    #[Route('/tests/preview/{testId}', name: 'user_test_preview')]
+    function testPreview($testId) {
         // $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
         //     'Тесты' => 'admin_tests',
         //     'Добавить тест' => ['admin_update_note', ['id' => $testId, 'type' => 'tests']],
         //     'Редактировать вопросы' => ['admin_tests_redact', ['testId' => $testId]],
         //     'Изменить вопрос' => ['admin_tests_redact_update', ['testId' => $testId, 'questionId' => $questionId]],
         // ], $this->router);
+        $test = $this->em->getRepository(Test::class)->find($testId);
+        if (!$test) {
+            return new Response('Тест не найден', 404);
+        } 
 
+        $testData = $this->em->getRepository(Test::class)->getTestData($testId);        
+        $totalQuestions = $this->em->getRepository(Test::class)->getQuestinsCount($testId);
         
-        
-        return $this->render('user/test_main.html.twig', [
+        return $this->render('user/test_preview.html.twig', [
             // 'breadcrumbs' => $breadcrumbs,
+            'testData' => $testData,
+            'totalQuestions' => $totalQuestions,
+            'test' => $test,
         ]);        
+    }
+    
+    // Начать тест
+    #[Route('/tests/start/{testId}', name: 'user_test_main')]
+    function testMain($testId, Help $help, Security $security) {
+        $test = $this->em->getRepository(Test::class)->find($testId);
+        if (!$test) {
+            return new Response('Тест не найден', 404);
+        } 
+
+        // Проверить идет ли тест сейчас или он вообще доступен
+        // Получить seed
+        // Получить полный список вопросов
+        // Перемешать вопросы на основе seed
+        // Взять вопрос по индексу        
+
+
+        $seed = $help->generateRandomString();
+        $shuffle = new TestShuffle();
+        $shuffle->setUserId($security->getUser()->getId());
+        $shuffle->setShuffleSeed($seed);
+        $shuffle->setTimeStart(time());
+        $parts = explode(':', $test->getTime());
+        $shuffle->setTimeEnd(($parts[0] * 3600) + ($parts[1] * 60) + time());
+        $this->em->persist($shuffle); $this->em->flush();
+        
+        return $this->redirectToRoute('user_test_pass', [
+            'testId' => $testId,
+            'questionPosition' => 0,
+        ]);
+    }
+
+    #[Route('/tests/{testId}/question/{questionPosition}', name: 'user_test_pass')]
+    function question($testId, $questionPosition, Security $security) {
+        $testRep = $this->em->getRepository(Test::class);
+        $test = $testRep->find($testId);
+        $shuffle = $this->em->getRepository(TestShuffle::class)->findOneBy(['user_id' => $security->getUser()->getId()]);
+        $questions = $testRep->getQuestionIds($testId);
+        $totalQuestions = $testRep->getQuestinsCount($testId);
+        $neededQuestion = $this->deterministicShuffle($questions, $shuffle->getShuffleSeed())[$questionPosition];
+        $question = $this->em->getRepository(Question::class)->find($neededQuestion);
+        $answers = $this->em->getRepository(Answer::class)->findBy(['question_id' => $neededQuestion]);
+        $maxQuestions = $test->getMaxQuestions ?? $totalQuestions;
+
+        return $this->render('user/test_main.html.twig', [
+            'testTitle' => $test->getName(),
+            'maxQuestions' => $maxQuestions,
+            'testId' => $testId,
+            'question' => $question,
+            'answers' => $answers,
+            'questionPosition' => $questionPosition,
+            'totalQuestions' => $totalQuestions,
+            'timeStart' => $shuffle->getTimeStart(),
+            'timeEnd' => $shuffle->getTimeEnd(),
+        ]);  
+    }   
+
+    #[Route('/tests/{testId}/answer/{answeringQuestion}', name: 'user_test_answer')]
+    function answer($testId, $questionPosition, Security $security) {
+        return $this->redirectToRoute('user_test_pass');
+    }   
+
+
+
+    function deterministicShuffle(array $array, string|int $key): array {
+        $seed = crc32($key); 
+        mt_srand($seed);
+        usort($array, function() {
+            return mt_rand() - mt_rand(); 
+        });        
+        return $array;
     }
 }

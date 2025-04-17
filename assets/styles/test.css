@@ -16,7 +16,7 @@
 .test-title {
     font-size: 1.75rem; /* 28px */
     font-weight: 700;
-    color: var(--color-font-dark);
+    color: var(--color-font-bright);
 }
 
 .test-timer {
@@ -52,7 +52,6 @@
 .progress-fill {
     height: 100%;
     background: var(--color-main);
-    width: 30%;
     transition: width 0.3s ease;
 }
 
@@ -165,4 +164,10 @@
 .next-question-link:hover {
     color: var(--color-main);
     text-decoration: underline;
+}
+
+.test-description {
+    color: var(--color-font-bright);
+    font-size: 26px;
+    line-height: 1.6;
 }
