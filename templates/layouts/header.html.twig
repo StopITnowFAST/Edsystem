@@ -7,7 +7,7 @@
                         <img src="{{ asset('logo.svg') }}" alt="KITEDU" class="header__logo">
                         {{ include('blocks/account_widget.html.twig') }}
                     </div>
-                    {% if is_granted('ROLE_MODERATO1R') %}
+                    {% if is_granted('ROLE_MODERATOR') %}
                         <div class="header__menu">
                             <div class="header__menu-groups">
                                 {# Перебор групп элементов header #}

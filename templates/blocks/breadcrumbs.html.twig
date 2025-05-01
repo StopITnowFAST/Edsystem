@@ -2,7 +2,7 @@
     <ol class="breadcrumb">
         {% for item in breadcrumbs %}
             <li class="breadcrumb-item {% if loop.last %}active{% endif %}">
-                {% if item.url %}
+                {% if item.url and not loop.last %}
                     <a href="{{ item.url }}">{{ item.title }}</a>
                 {% else %}
                     <span>{{ item.title }}</span>

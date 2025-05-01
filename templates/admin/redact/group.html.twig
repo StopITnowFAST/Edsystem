@@ -12,9 +12,14 @@
     <div class="container">
         {{ include('blocks/breadcrumbs.html.twig') }}
         <div class="admin-table__wrap">
+            <h1>{{ title }}</h1>
             <div class="admin-table__head">
-                <h1>{{ title }}</h1>
-                <a href="{{ path('admin_groups') }}", class="btn btn-primary">Отменить</a>
+                <div class="admin-create__head-buttons">
+                    <a href="{{ path('admin_groups') }}", class="btn btn-primary">Отменить</a>
+                    {% if updating_element is not empty %}
+                        <a href="{{ path('admin_groups_students', {'groupId':updating_element.id}) }}", class="btn btn-primary">Студенты группы</a>
+                    {% endif %}
+                </div>
             </div>
             <div class="admin-table__body">
                 <form method="POST", enctype="multipart/form-data">
@@ -68,7 +73,14 @@
                                 >{{ (updating_element is not empty) ? updating_element.description : "" }}</textarea>
                         </div>
                     </div>
-                    <button class="btn btn-primary" type="sumbit">Сохранить</button>
+                    <div class="admin-create__field">
+                        <label for="isFull">Набор завершен?</label>
+                        <select id="isFull" name="isFull" class="admin-create__select" required>
+                            <option value="1" {{ (updating_element is not empty and updating_element.isFull == true) ? "selected" : "" }} >Да</option>
+                            <option value="0" {{ (updating_element is not empty and updating_element.isFull == false) ? "selected" : "" }} >Нет</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary admin-create_button" type="sumbit">Сохранить</button>
                 </form>
             </div>
         </div>     

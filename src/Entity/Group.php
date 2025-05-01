@@ -43,6 +43,12 @@ class Group
     #[ORM\Column(nullable: true)]
     private ?int $year = null;
 
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $group_token = null;
+
+    #[ORM\Column]
+    private ?bool $isFull = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -162,6 +168,30 @@ class Group
     public function setYear(?int $year): static
     {
         $this->year = $year;
+
+        return $this;
+    }
+
+    public function getGroupToken(): ?string
+    {
+        return $this->group_token;
+    }
+
+    public function setGroupToken(?string $group_token): static
+    {
+        $this->group_token = $group_token;
+
+        return $this;
+    }
+
+    public function isFull(): ?bool
+    {
+        return $this->isFull;
+    }
+
+    public function setFull(bool $isFull): static
+    {
+        $this->isFull = $isFull;
 
         return $this;
     }

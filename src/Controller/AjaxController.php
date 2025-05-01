@@ -65,5 +65,5 @@ class AjaxController extends AbstractController {
         $this->api->sendErrorToTelegram($errorMessage, $url, $line);
         
         return $this->json(['status' => 'success']);
-    }
+    }    
 }

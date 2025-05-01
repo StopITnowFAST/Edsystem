@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Entity\Status;
 use App\Entity\Student;
 use App\Service\File;
+use App\Service\Help;
 use App\Entity\File as FileEntity;
 use App\Entity\Group;
 use App\Entity\Teacher;
@@ -35,6 +36,7 @@ class AdminPagesController extends AbstractController {
         private File $file,
         private BreadcrumbsGenerator $breadcrumbs,
         private UrlGeneratorInterface $router,
+        private Help $helper,
     ) {
     }
     
@@ -72,6 +74,24 @@ class AdminPagesController extends AbstractController {
             'currentPage' => $page,
             'paginationSize' => $pagination['size'],
             'formName' => 'admin_groups',
+        ]);
+    }
+
+    // Таблица студенты группы
+    #[Route('/admin/update/groups/{groupId}/students', 'admin_groups_students')] 
+    function adminGroupStudents($groupId) {
+        $group = $this->em->getRepository(Group::class)->find($groupId);
+        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
+            'Группы' => 'admin_groups',
+            'Добавить группу' => ['admin_update_note', ['type' => 'groups', 'id' => $groupId]],
+            'Студенты группы' => ['admin_groups_students', ['groupId' => $groupId]],
+        ], $this->router);
+        $notes = $this->em->getRepository(Student::class)->findBy(['group_id' => $groupId]);
+        $link = $_ENV['HOSTNAME'] . "connect-with-group/" .  $group->getGroupToken();
+        return $this->render('admin/group_students.html.twig', [
+            'breadcrumbs' => $breadcrumbs,
+            'notes' => $notes,
+            'link' => ($group->isFull()) ? null : $link,
         ]);
     }
 
@@ -417,6 +437,8 @@ class AdminPagesController extends AbstractController {
             $group->setYear($_POST['year']);
             $group->setSemester($_POST['semester']);
             $group->setCourse($_POST['course']);
+            $group->setGroupToken($this->helper->generateRandomString(50));
+            $group->setFull($_POST['isFull']);
             $group->setDescription($_POST['description']);
             $group->setStatus($_POST['status']);
             $this->em->persist($group);
@@ -425,7 +447,7 @@ class AdminPagesController extends AbstractController {
         }
         $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
             'Группы' => 'admin_groups',
-            'Добавить группу' => 'admin_create_group',
+            'Добавить группу' => ($element != null) ? ['admin_update_note', ['type' => 'groups', 'id' => $element->getId()]] : 'admin_create_group',
         ], $this->router);
         $statuses = $this->em->getRepository(Status::class)->findAll();
         return $this->render('admin/redact/group.html.twig', [
@@ -490,6 +512,19 @@ class AdminPagesController extends AbstractController {
         $this->em->flush();
         return $this->redirectToRoute("admin_$type");
     }
+
+    // Убрать студента их группы
+    #[Route(path: '/admin/delete-student-from-group/{studentId}', name: 'admin_delete_student_from_group')] 
+    function adminStudentFromGroup($studentId) {
+        $student = $this->em->getRepository(Student::class)->find($studentId);
+        $currentGroup = $student->getGroupId();
+        $student->setGroupId(null);
+        $this->em->persist($student);
+        $this->em->flush();
+        return $this->redirectToRoute("admin_groups_students", [
+            'groupId' => $currentGroup,
+        ]);
+    }
     
     // Редактирование элемента
     #[Route(path: '/admin/update/{type}/{id}', name: 'admin_update_note')] 
@@ -523,4 +558,11 @@ class AdminPagesController extends AbstractController {
 
     // Далее идут вспомогательные функции
 
+    // Присоединение аккаунта к группе
+    // #[Route('/connect-with-group/{groupToken}', name: 'connect_with_group')]
+    // public function connectWithGroup($groupToken) {
+    //     $group = $this->em->getRepository(Group::class)->findOneBy(['group_token' => $groupToken]);
+    //     $user = $this->getUser();
+    //     $account = 
+    // }
 }

@@ -262,3 +262,7 @@
     border-radius: var(--offset-s);
     margin: var(--offset-s) 0px;
 }
+
+.admin-create_button {
+    margin: 20px 0px;
+}
