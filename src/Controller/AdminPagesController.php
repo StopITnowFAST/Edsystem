@@ -465,6 +465,10 @@ class AdminPagesController extends AbstractController {
             $test->setName($_POST['name']);
             $test->setShuffle($_POST['shuffle']);
             $test->setTime($_POST['time']);
+            $test->setAttempts($_POST['attempts']);
+            $test->setPointsFor3($_POST['points_for_3']);
+            $test->setPointsFor4($_POST['points_for_4']);
+            $test->setPointsFor5($_POST['points_for_5']);
             $test->setStatus($_POST['status']);
             $this->em->persist($test);
             $this->em->flush();
@@ -481,10 +485,12 @@ class AdminPagesController extends AbstractController {
             'Добавить тест' => 'admin_create_test',
         ], $this->router);
         $statuses = $this->em->getRepository(Status::class)->findAll();
+        $totalPoints = ($element) ? $this->em->getRepository(Test::class)->countTotalPoints($element->getId()) : 0;
         return $this->render('admin/redact/test.html.twig', [
             'breadcrumbs' => $breadcrumbs,
             'statuses' => $statuses,
             'updating_element' => $element,
+            'totalPoints' => $totalPoints,
         ]);
     }  
 
@@ -567,5 +573,27 @@ class AdminPagesController extends AbstractController {
         $this->em->persist($student);
         $this->em->flush();
         return $this->redirectToRoute('account');
+    }
+
+    // Смена ролей для страницы модераторов
+    #[Route(path: '/request/change/role', name: 'request_change_role')] 
+    function changeRole() {    
+        $postJsonArray = json_decode(file_get_contents("php://input"), true);
+        $user = $this->em->getRepository(User::class)->find($postJsonArray['id']);
+        $roles = $user->getRoles();
+        $key = array_search("ROLE_MODERATOR", $roles);        
+        if ($key !== false) {
+            unset($roles[$key]);
+            $roles = array_values($roles);
+        } 
+        else {
+            array_push($roles, "ROLE_MODERATOR");
+        }
+        $user->setRoles($roles);
+        $this->em->persist($user);
+        $this->em->flush();
+        return $this->json([
+            'ok' => true,
+        ]);
     }
 }

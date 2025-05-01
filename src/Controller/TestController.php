@@ -236,12 +236,6 @@ class TestController extends AbstractController {
     // Превью теста
     #[Route('/tests/preview/{testId}', name: 'user_test_preview')]
     function testPreview($testId) {
-        // $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
-        //     'Тесты' => 'admin_tests',
-        //     'Добавить тест' => ['admin_update_note', ['id' => $testId, 'type' => 'tests']],
-        //     'Редактировать вопросы' => ['admin_tests_redact', ['testId' => $testId]],
-        //     'Изменить вопрос' => ['admin_tests_redact_update', ['testId' => $testId, 'questionId' => $questionId]],
-        // ], $this->router);
         $test = $this->em->getRepository(Test::class)->find($testId);
         if (!$test) {
             return new Response('Тест не найден', 404);
@@ -249,11 +243,12 @@ class TestController extends AbstractController {
 
         $testData = $this->em->getRepository(Test::class)->getTestData($testId);        
         $totalQuestions = $this->em->getRepository(Test::class)->getQuestinsCount($testId);
+        $totalPoints = $this->em->getRepository(Test::class)->getTotalPoints($testId);
         
         return $this->render('user/test_preview.html.twig', [
-            // 'breadcrumbs' => $breadcrumbs,
             'testData' => $testData,
             'totalQuestions' => $totalQuestions,
+            'totalPoints' => $totalPoints,
             'test' => $test,
         ]);        
     }

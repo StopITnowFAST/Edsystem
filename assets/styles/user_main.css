@@ -107,3 +107,225 @@
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+/* Основные стили контейнера */
+.tests-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+.tests-title {
+    color: var(--color-main);
+    margin-bottom: 30px;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+/* Список тестов */
+.tests-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 25px;
+}
+
+/* Карточка теста */
+.test-card {
+    background: var(--color-grey-300);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.test-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Заголовок карточки */
+.test-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--color-grey-400);
+}
+
+.test-title {
+    margin: 0;
+    color: var(--color-font-bright);
+    font-size: 1.3rem;
+    font-weight: 500;
+}
+
+/* Статус теста */
+.test-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.test-status.completed {
+    color: #4caf50;
+}
+
+.test-status.not-completed {
+    color: #f44336;
+}
+
+/* Тело карточки */
+.test-body {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.test-info, .test-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.info-item, .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+}
+
+.info-item i {
+    color: var(--color-main);
+    width: 20px;
+    text-align: center;
+}
+
+.info-item .fa-clock {
+    color: #ff9800;
+}
+
+/* Блок статистики */
+.test-stats {
+    background: var(--color-grey-400);
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 10px;
+}
+
+.stat-item {
+    flex: 1;
+    min-width: 100px;
+}
+
+.stat-label {
+    color: var(--color-grey-0);
+    font-size: 0.9rem;
+}
+
+.stat-value {
+    font-weight: 600;
+    color: var(--color-font-bright);
+}
+
+.stat-value.no-grade {
+    color: var(--color-grey-0);
+}
+
+.stat-value.no-attempts {
+    color: #f44336;
+}
+
+/* Футер карточки */
+.test-footer {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Кнопки */
+.btn {
+    padding: 10px 24px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.start-btn {
+    background: var(--color-main);
+    color: white;
+}
+
+.start-btn:hover {
+    background: var(--color-main-dark);
+    box-shadow: 0 2px 8px rgba(114, 137, 218, 0.4);
+}
+
+.completed-btn {
+    background: #e0e0e0;
+    color: #616161;
+    cursor: default;
+}
+
+.disabled-btn {
+    background: #424242;
+    color: #bdbdbd;
+    cursor: not-allowed;
+}
+
+/* Сообщение об отсутствии тестов */
+.no-tests-message {
+    text-align: center;
+    padding: 40px;
+    color: var(--color-grey-0);
+    background: var(--color-grey-300);
+    border-radius: 10px;
+    margin: 20px;
+}
+
+.no-tests-message i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: var(--color-main);
+}
+
+.no-tests-message p {
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.tests-list {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .tests-list {
+        grid-template-columns: 1fr;
+    }
+    
+    .test-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .btn {
+        padding: 8px 16px;
+        font-size: 0.85rem;
+    }
+}

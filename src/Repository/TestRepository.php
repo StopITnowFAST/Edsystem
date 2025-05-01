@@ -43,7 +43,7 @@ class TestRepository extends ServiceEntityRepository
     public function getTestData($testId) {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
-            SELECT * FROM `test` t            
+            SELECT * FROM `test` t
             JOIN `question` q on q.test_id = t.id
             JOIN `answer` a on a.question_id = q.id
             WHERE t.id = $testId
@@ -68,5 +68,18 @@ class TestRepository extends ServiceEntityRepository
         ";
         $resultSet = $conn->executeQuery($sql);        
         return $resultSet->fetchAllAssociative();
+    }
+
+    public function countTotalPoints($testId) {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
+            SELECT SUM(a.points) as total_points
+            FROM question q
+            JOIN answer a ON q.id = a.question_id
+            WHERE q.test_id = :testId
+        ";
+        $resultSet = $conn->executeQuery($sql, ['testId' => $testId]);
+        $result = $resultSet->fetchAssociative();
+        return $result['total_points'] ?? 0;
     }
 }

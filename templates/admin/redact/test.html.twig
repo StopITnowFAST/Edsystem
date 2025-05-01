@@ -21,6 +21,9 @@
                 </div>
             </div>
             <div class="admin-table__body">
+                {% if totalPoints != 0 %}
+                    Максимальное количество баллов в тесте: {{ totalPoints }}
+                {% endif %}
                 <form id="test" method="POST", enctype="multipart/form-data">
                     {% if updating_element is not empty %}
                         <input type="hidden" value="true" name="isUpdate">
@@ -32,6 +35,11 @@
                             <label for="name">Название теста</label>
                             <input id="name" class="admin-create__input" name="name" required
                                 value="{{ (updating_element is not empty) ? updating_element.name : "" }}">
+                        </div>   
+                        <div class="admin-create__field">
+                            <label for="points_for_3">Количество баллов на 3</label>
+                            <input id="points_for_3" class="admin-create__input" name="points_for_3" required
+                                value="{{ (updating_element is not empty) ? updating_element.pointsFor3 : "" }}">
                         </div>
                         <div class="admin-create__field">
                             <label for="shuffle">Перемешать вопросы</label>
@@ -39,12 +47,22 @@
                                 <option value="0" {{ (updating_element is not empty and updating_element.shuffle == 0) ? "selected" : "" }}>Нет</option>
                                 <option value="1" {{ (updating_element is not empty and updating_element.shuffle == 1) ? "selected" : "" }}>Да</option>
                             </select>
-                        </div>     
+                        </div>        
+                        <div class="admin-create__field">
+                            <label for="points_for_4">Количество баллов на 4</label>
+                            <input id="points_for_4" class="admin-create__input" name="points_for_4" required
+                                value="{{ (updating_element is not empty) ? updating_element.pointsFor4 : "" }}">
+                        </div>
                         <div class="admin-create__field">
                             <label for="time">Время на прохождение теста</label>
                             <input type="time" id="time" class="admin-create__input" name="time" required
                                 value="{{ (updating_element is not empty) ? updating_element.time : '' }}" min="00:01" max="23:59" step="60">
-                        </div>                   
+                        </div>              
+                        <div class="admin-create__field">
+                            <label for="points_for_5">Количество баллов на 5</label>
+                            <input id="points_for_5" class="admin-create__input" name="points_for_5" required
+                                value="{{ (updating_element is not empty) ? updating_element.pointsFor5 : "" }}">
+                        </div>        
                         <div class="admin-create__field">
                             <label for="status">Статус</label>
                             <select id="status" name="status" class="admin-create__select" required>
@@ -52,6 +70,11 @@
                                     <option value="{{ status.id }}" {{ (updating_element is not empty and updating_element.status == status.id) ? "selected" : "" }}>{{ status.name }}</option>
                                 {% endfor %}
                             </select>
+                        </div>
+                        <div class="admin-create__field">
+                            <label for="attempts">Количество попыток</label>
+                            <input id="attempts" class="admin-create__input" name="attempts" required
+                                value="{{ (updating_element is not empty) ? updating_element.attempts : "" }}">
                         </div>
                     </div>
                     <button class="btn btn-primary" type="sumbit">Сохранить</button>

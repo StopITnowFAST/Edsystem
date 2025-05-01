@@ -30,8 +30,6 @@ body {
     font-family: 'Roboto', sans-serif;
 }
 
-
-
 .container {
     /* width: 100%; */
     max-width: var(--break-xl);
@@ -73,6 +71,7 @@ body {
     transition: 0.3s all;
     background-color: var(--color-grey-200);
     color: var(--color-font-bright);
+    margin-bottom: 16px;
 }
 
 .btn-secondary {

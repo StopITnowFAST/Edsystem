@@ -28,15 +28,12 @@
             </div>
         </div>
         
-        <div class="content" id="content">
-            <h1>Добро пожаловать!</h1>
-            <p>Выберите раздел в боковом меню</p>
-            <div id="ajax-content"></div>
-        </div>
+        <div class="content" id="content"></div>
     </div>
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
     <script src="{{ asset('js/user_main.js') }}"></script>
+    <script>const USER_ID = {{ userId }}</script>
 {% endblock %}

@@ -25,18 +25,6 @@ class ChatController extends AbstractController
     ) {        
     }
 
-    // Просмотр истории сообщений
-    #[Route(path: '/panel/users/history', name:'user_history')]
-    public function userHistory() {
-        $history = $this->chat->getTotalHistory();
-        $chats = $this->em->getRepository(Message::class)->getChats();
-
-        return $this->render('message_history.html.twig', [
-            'history' =>$history,
-            'chats' => $chats,
-        ]);
-    }
-
     // Получение обновления для диалогов
     #[Route(path: '/api/poll-messages', name:'poll_messages')]
     public function pollMessages() {

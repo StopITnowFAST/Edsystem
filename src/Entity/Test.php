@@ -32,6 +32,18 @@ class Test
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $attempts = null;
+
+    #[ORM\Column]
+    private ?int $points_for_3 = null;
+
+    #[ORM\Column]
+    private ?int $points_for_4 = null;
+
+    #[ORM\Column]
+    private ?int $points_for_5 = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -105,6 +117,54 @@ class Test
     public function setDescription(?string $description): static
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getAttempts(): ?int
+    {
+        return $this->attempts;
+    }
+
+    public function setAttempts(?int $attempts): static
+    {
+        $this->attempts = $attempts;
+
+        return $this;
+    }
+
+    public function getPointsFor3(): ?int
+    {
+        return $this->points_for_3;
+    }
+
+    public function setPointsFor3(int $points_for_3): static
+    {
+        $this->points_for_3 = $points_for_3;
+
+        return $this;
+    }
+
+    public function getPointsFor4(): ?int
+    {
+        return $this->points_for_4;
+    }
+
+    public function setPointsFor4(int $points_for_4): static
+    {
+        $this->points_for_4 = $points_for_4;
+
+        return $this;
+    }
+
+    public function getPointsFor5(): ?int
+    {
+        return $this->points_for_5;
+    }
+
+    public function setPointsFor5(int $points_for_5): static
+    {
+        $this->points_for_5 = $points_for_5;
 
         return $this;
     }
