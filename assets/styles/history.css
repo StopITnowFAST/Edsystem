@@ -1,0 +1,153 @@
+.history__wrap {
+    display: grid;
+    grid-auto-flow: row;
+    width: 100%;
+    justify-self: center;
+    overflow: hidden;
+    min-width: 0;
+}
+
+.history__messages {
+    overflow-y: scroll;
+    width: 100%;
+    max-height: 70vh;
+    min-height: 70vh;
+    padding: 10px;
+}
+
+.history__bot-message {
+    max-width: 90%;
+    margin-bottom: 10px;
+    padding: inherit;
+    border-radius: inherit;
+    height: auto;
+    width: auto;
+    background-color: var(--base-1000);
+    justify-self: right;
+}
+
+.history__user-message {
+    max-width: 90%;
+    margin-bottom: 10px;
+    padding: inherit;
+    border-radius: inherit;
+    height: auto;
+    width: auto;
+    background-color: var(--accent-500);
+    justify-self: left;
+}
+
+.history__text-field {    
+    display: flex;
+    width: auto;
+    max-width: 100%;
+    background-color: var(--accent-1000);
+    padding: 20px;
+}
+
+.history__message-field {
+    flex: 0 0 65%;
+}
+
+.history__message-send {
+    flex: 0 0 15%;
+}
+
+.history__message-file {
+    flex: 0 0 20%;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+p {    
+    max-width: 100%;
+    word-break: break-word;
+    height: auto;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+.history__chat {
+    margin-bottom:10px;
+}
+
+.message-window--no-dialog .history__text-field {
+    display: none; 
+}
+
+.history__messenger {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    overflow: hidden;
+    justify-content: center;
+}
+
+.history__message_window {
+    height: 100%;
+    color: white;
+    background-color: var(--base-400);
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.history__chats {
+    height: 100%;
+    color: white;
+    background-color: var(--base-500);
+    overflow: hidden;
+    min-width: 0;
+    flex: 0 0 30%;
+}
+
+.history__platforms {
+    height: 100%;
+    color: white;
+    background-color: var(--base-1000);
+    flex: 0 0 10%;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.history__chat-item {
+    background-color: var(--base-2000);
+    margin-bottom: 10px;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    overflow: hidden;
+    min-width: 0;
+}
+
+.history__platform-item {
+    text-align: center;
+    background-color: var(--base-2000);
+    margin-bottom: 10px;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.history__user-nickname {
+    font-weight: bold;
+}
+
+.history__last-message {
+    color: var(--base-400);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    display: block;
+    max-width: 100%;
+    box-sizing: border-box;
+}

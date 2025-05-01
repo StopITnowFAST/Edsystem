@@ -1,0 +1,40 @@
+<section class="chat">
+    <div class="history__wrap">
+        <div class="history__messenger">   
+
+            {# Блок с платформами #}
+            <div id="platfrom_box" class="history__platforms">
+                {% for platformName, chats in chats %}
+                    <div class="history__platform-item" onclick="changePlatform('{{ platformName }}')">
+                        {{ platformName | upper }}
+                    </div>
+                {% endfor %}
+            </div>
+
+            {# Блок с чатами #}
+            <div id="chat_box" class="history__chats">
+                {% for chat in chats['tg'] %}
+                    <div class="history__chat-item" onclick="changeDialog({{ chat.user_id }})">
+                        <div class="history__user-nickname">
+                            {{ (chat.first_name is not empty) ? chat.first_name ~ " " ~ chat.last_name : chat.tg_nickname }}
+                        </div>
+                        <div class="history__last-message">
+                            {{ chat.text }}
+                        </div>                        
+                    </div>
+                {% endfor %}
+            </div>
+
+            {# Блок с сообщением #}
+            <div id="messageWindow" class="history__message_window message-window--no-dialog">
+                <div id="messageBox" class="history__messages"></div>
+                <div class="history__text-field">
+                    <button class="history__message-file" onclick="setFileToMessage()">Прикрепить</button>
+                    <input type="file" name="file" id="fileField" multiple hidden>
+                    <textarea id="messageInput" class="history__message-field"></textarea>
+                    <button id="sendButton" class="history__message-send" onclick="send()">></button>
+                </div>
+            </div>
+        </div>        
+    </div>
+</section>

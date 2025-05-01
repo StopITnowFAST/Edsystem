@@ -1,0 +1,109 @@
+.user__page {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+    flex: 1;
+    margin: 0;
+    background-color: var(--color-grey-200);
+}
+
+.sidebar {
+    width: 120px;
+    min-height: 100vh;
+    background-color: var(--color-grey-400);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-button {
+    width: 80px;
+    height: 80px;
+    margin: 15px 0;
+    border-radius: 50%;
+    background-color: var(--color-grey-300);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    color: var(--color-grey-0);
+    font-size: 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+.sidebar-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--color-main);
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: -1;
+}
+
+.sidebar-button:hover {
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(114, 137, 218, 0.3);
+}
+
+.sidebar-button:hover::before {
+    opacity: 1;
+}
+
+.sidebar-button.active {
+    background-color: var(--color-main);
+    color: white;
+    box-shadow: 0 4px 12px rgba(114, 137, 218, 0.4);
+    transform: scale(1.05);
+}
+
+.content {
+    flex: 1;
+    padding: 40px;
+    background-color: var(--color-grey-200);
+}
+
+.content h1 {
+    color: white;
+    font-size: 2.2rem;
+    margin-bottom: 20px;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.content h1::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: var(--color-main);
+    border-radius: 3px;
+}
+
+.content p {
+    color: var(--color-grey-0);
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+}
+
+#ajax-content {
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

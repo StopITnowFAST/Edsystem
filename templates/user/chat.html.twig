@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}История сообщений | Интеллектуальный чат Энергомера{% endblock %}
+{% block description %}Интеллектуальный чат бот Энергомера{% endblock %}
+
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('/styles/history.css') }}">
+{% endblock %}
+
+{% block body %}
+    <section class="history">
+        <div class="container">
+            {{ include('blocks/chat.html.twig') }}
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        let totalMessages = {{ history|json_encode|raw }};
+        let totalChats = {{ chats|json_encode|raw }};
+    </script>
+    <script src="{{ asset('/js/longpoll_chat.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Личный кабинет{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('styles/user_main.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="user__page">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-button active" title="Расписание" data-section="schedule">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+            <div class="sidebar-button" title="Чат" data-section="chat">
+                <i class="fas fa-comments"></i>
+            </div>
+            <div class="sidebar-button" title="Предметы" data-section="subjects">
+                <i class="fas fa-book"></i>
+            </div>
+            <div class="sidebar-button" title="Профиль" data-section="profile">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="sidebar-button" title="Тесты" data-section="tests">
+                <i class="fas fa-tasks"></i>
+            </div>
+        </div>
+        
+        <div class="content" id="content">
+            <h1>Добро пожаловать!</h1>
+            <p>Выберите раздел в боковом меню</p>
+            <div id="ajax-content"></div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/user_main.js') }}"></script>
+{% endblock %}

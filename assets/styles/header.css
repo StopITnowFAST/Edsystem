@@ -1,12 +1,12 @@
 header {
-    background-color: var(--color-grey-200);
+    background-color: var(--color-grey-400);
 }
 
 .header__wrap {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    /* margin: 20px; */
+    margin-bottom: var(--offset-xs);
 }
 
 .header__paths {
