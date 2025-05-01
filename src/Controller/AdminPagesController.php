@@ -559,10 +559,13 @@ class AdminPagesController extends AbstractController {
     // Далее идут вспомогательные функции
 
     // Присоединение аккаунта к группе
-    // #[Route('/connect-with-group/{groupToken}', name: 'connect_with_group')]
-    // public function connectWithGroup($groupToken) {
-    //     $group = $this->em->getRepository(Group::class)->findOneBy(['group_token' => $groupToken]);
-    //     $user = $this->getUser();
-    //     $account = 
-    // }
+    #[Route('/connect-with-group/{groupToken}', name: 'connect_with_group')]
+    public function connectWithGroup($groupToken) {
+        $group = $this->em->getRepository(Group::class)->findOneBy(['group_token' => $groupToken]);
+        $student = $this->em->getRepository(Student::class)->findOneBy(['user_id' => $this->getUser()->getId()]);
+        $student->setGroupId($group->getId());
+        $this->em->persist($student);
+        $this->em->flush();
+        return $this->redirectToRoute('account');
+    }
 }

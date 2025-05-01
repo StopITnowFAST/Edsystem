@@ -25,7 +25,7 @@ class UserPageController extends AbstractController
     }
 
     // Отображение самой страницы
-    #[Route(path: '/account', name:'user_account')]
+    #[Route(path: '/account', name:'account')]
     public function account() {
         return $this->render('user/main.html.twig', [
 
