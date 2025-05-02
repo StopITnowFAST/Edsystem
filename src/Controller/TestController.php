@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Answer;
+use App\Entity\TestAnswer;
 use App\Entity\UserCard;
 use App\Entity\User;
 use App\Entity\Status;
@@ -14,8 +14,8 @@ use App\Entity\Teacher;
 use App\Service\TableWidget;
 use App\Service\Help;
 use App\Entity\Shuffle;
-use App\Entity\TestShuffle;
-use App\Entity\Question;
+use App\Entity\TestParams;
+use App\Entity\TestQuestion;
 use App\Entity\Test;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -87,8 +87,8 @@ class TestController extends AbstractController {
     // Удаление вопроса
     #[Route('/admin/tests/{testId}/redact/delete/{questionId}', name: 'admin_tests_redact_delete')]
     function adminTestsRedactDelete($testId, $questionId) {
-        $question = $this->em->getRepository(Question::class)->find($questionId);
-        $answers = $this->em->getRepository(Answer::class)->findBy(['question_id' => $questionId]);
+        $question = $this->em->getRepository(TestQuestion::class)->find($questionId);
+        $answers = $this->em->getRepository(TestAnswer::class)->findBy(['question_id' => $questionId]);
         foreach ($answers as $answer) {
             $this->em->remove($answer);
         }
@@ -105,7 +105,7 @@ class TestController extends AbstractController {
             'Добавить тест' => ['admin_update_note', ['id' => $testId, 'type' => 'tests']],
             'Редактировать вопросы' => ['admin_tests_redact', ['testId' => $testId]]
         ], $this->router);        
-        $notes = $this->em->getRepository(Question::class)->findBy(['test_id' => $testId]);
+        $notes = $this->em->getRepository(TestQuestion::class)->findBy(['test_id' => $testId]);
         return $this->render('admin/tests/redact.html.twig', [
             'notes' => $notes,
             'breadcrumbs' => $breadcrumbs,
@@ -136,7 +136,7 @@ class TestController extends AbstractController {
                 }
             }
             // Сохранение данных
-            $question = new Question();
+            $question = new TestQuestion();
             $question->setTestId($_POST['testId']);
             $question->setCorrectAnswers($answers['correct_count']);
             $question->setText($answers['question']);
@@ -146,7 +146,7 @@ class TestController extends AbstractController {
             $questionId = $question->getId();
 
             foreach ($answers['answers'] as $key => $answer) {
-                $ans = new Answer();
+                $ans = new TestAnswer();
                 $ans->setCorrect($answer['is_correct']);
                 $ans->setPoints($answer['points']);
                 $ans->setText($answer['text']);
@@ -193,7 +193,7 @@ class TestController extends AbstractController {
                 }
             }
             // Сохранение данных
-            $question = $this->em->getRepository(Question::class)->find($questionId);
+            $question = $this->em->getRepository(TestQuestion::class)->find($questionId);
             $question->setTestId($_POST['testId']);
             $question->setCorrectAnswers($answers['correct_count']);
             $question->setText($answers['question']);
@@ -201,14 +201,14 @@ class TestController extends AbstractController {
             $this->em->flush();
 
             $questionId = $question->getId();
-            $oldAnswers = $this->em->getRepository(Answer::class)->findBy(['question_id' => $questionId]);
+            $oldAnswers = $this->em->getRepository(TestAnswer::class)->findBy(['question_id' => $questionId]);
             foreach ($oldAnswers as $answer) {
                 $this->em->remove($answer);
             }
             $this->em->flush();
 
             foreach ($answers['answers'] as $key => $answer) {
-                $ans = new Answer();
+                $ans = new TestAnswer();
                 $ans->setCorrect($answer['is_correct']);
                 $ans->setPoints($answer['points']);
                 $ans->setText($answer['text']);
@@ -225,8 +225,8 @@ class TestController extends AbstractController {
             'Изменить вопрос' => ['admin_tests_redact_update', ['testId' => $testId, 'questionId' => $questionId]],
         ], $this->router);
 
-        $question = $this->em->getRepository(Question::class)->find($questionId);
-        $answers = $this->em->getRepository(Answer::class)->findBy(['question_id' => $questionId]);
+        $question = $this->em->getRepository(TestQuestion::class)->find($questionId);
+        $answers = $this->em->getRepository(TestAnswer::class)->findBy(['question_id' => $questionId]);
         
         return $this->render('admin/tests/add_question.html.twig', [
             'breadcrumbs' => $breadcrumbs,
@@ -263,17 +263,10 @@ class TestController extends AbstractController {
         $test = $this->em->getRepository(Test::class)->find($testId);
         if (!$test) {
             return new Response('Тест не найден', 404);
-        } 
-
-        // Проверить идет ли тест сейчас или он вообще доступен
-        // Получить seed
-        // Получить полный список вопросов
-        // Перемешать вопросы на основе seed
-        // Взять вопрос по индексу        
-
+        }
 
         $seed = $help->generateRandomString();
-        $shuffle = new TestShuffle();
+        $shuffle = new TestParams();
         $shuffle->setUserId($security->getUser()->getId());
         $shuffle->setShuffleSeed($seed);
         $shuffle->setTimeStart(time());
@@ -291,12 +284,12 @@ class TestController extends AbstractController {
     function question($testId, $questionPosition, Security $security) {
         $testRep = $this->em->getRepository(Test::class);
         $test = $testRep->find($testId);
-        $shuffle = $this->em->getRepository(TestShuffle::class)->findOneBy(['user_id' => $security->getUser()->getId()]);
+        $shuffle = $this->em->getRepository(TestParams::class)->findOneBy(['user_id' => $security->getUser()->getId()]);
         $questions = $testRep->getQuestionIds($testId);
         $totalQuestions = $testRep->getQuestinsCount($testId);
         $neededQuestion = $this->deterministicShuffle($questions, $shuffle->getShuffleSeed())[$questionPosition];
-        $question = $this->em->getRepository(Question::class)->find($neededQuestion);
-        $answers = $this->em->getRepository(Answer::class)->findBy(['question_id' => $neededQuestion]);
+        $question = $this->em->getRepository(TestQuestion::class)->find($neededQuestion);
+        $answers = $this->em->getRepository(TestAnswer::class)->findBy(['question_id' => $neededQuestion]);
         $maxQuestions = $test->getMaxQuestions ?? $totalQuestions;
 
         return $this->render('user/test_main.html.twig', [

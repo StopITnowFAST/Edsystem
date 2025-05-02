@@ -2,12 +2,12 @@
 
 namespace App\Entity;
 
-use App\Repository\TestShuffleRepository;
+use App\Repository\TestParamsRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: TestShuffleRepository::class)]
-class TestShuffle
+#[ORM\Entity(repositoryClass: TestParamsRepository::class)]
+class TestParams
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -23,8 +23,8 @@ class TestShuffle
     #[ORM\Column]
     private ?int $time_start = null;
 
-    #[ORM\Column(length: 40)]
-    private ?string $time_end = null;
+    #[ORM\Column]
+    private ?int $time_end = null;
 
     public function getId(): ?int
     {
@@ -67,12 +67,12 @@ class TestShuffle
         return $this;
     }
 
-    public function getTimeEnd(): ?string
+    public function getTimeEnd(): ?int
     {
         return $this->time_end;
     }
 
-    public function setTimeEnd(string $time_end): static
+    public function setTimeEnd(int $time_end): static
     {
         $this->time_end = $time_end;
 

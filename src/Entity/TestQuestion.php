@@ -21,13 +21,7 @@ class TestQuestion
     private ?string $text = null;
 
     #[ORM\Column]
-    private ?int $status = null;
-
-    #[ORM\Column]
-    private ?int $created_at = null;
-
-    #[ORM\Column]
-    private ?int $updated_at = null;
+    private ?int $correct_answers = null;
 
     public function getId(): ?int
     {
@@ -58,38 +52,14 @@ class TestQuestion
         return $this;
     }
 
-    public function getStatus(): ?int
+    public function getCorrectAnswers(): ?int
     {
-        return $this->status;
+        return $this->correct_answers;
     }
 
-    public function setStatus(int $status): static
+    public function setCorrectAnswers(int $correct_answers): static
     {
-        $this->status = $status;
-
-        return $this;
-    }
-
-    public function getCreatedAt(): ?int
-    {
-        return $this->created_at;
-    }
-
-    public function setCreatedAt(int $created_at): static
-    {
-        $this->created_at = $created_at;
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?int
-    {
-        return $this->updated_at;
-    }
-
-    public function setUpdatedAt(int $updated_at): static
-    {
-        $this->updated_at = $updated_at;
+        $this->correct_answers = $correct_answers;
 
         return $this;
     }

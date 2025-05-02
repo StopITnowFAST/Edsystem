@@ -44,8 +44,8 @@ class TestRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
             SELECT * FROM `test` t
-            JOIN `question` q on q.test_id = t.id
-            JOIN `answer` a on a.question_id = q.id
+            JOIN `test_question` q on q.test_id = t.id
+            JOIN `test_answer` a on a.question_id = q.id
             WHERE t.id = $testId
         ";
         $resultSet = $conn->executeQuery($sql);        
@@ -55,7 +55,7 @@ class TestRepository extends ServiceEntityRepository
     public function getQuestinsCount($testId) {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
-            SELECT count(q.id) as total_questions FROM `question` q WHERE q.test_id = $testId
+            SELECT count(q.id) as total_questions FROM `test_question` q WHERE q.test_id = $testId
         ";
         $resultSet = $conn->executeQuery($sql);        
         return $resultSet->fetchOne();
@@ -64,7 +64,7 @@ class TestRepository extends ServiceEntityRepository
     public function getQuestionIds($testId) {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
-            SELECT id FROM `question` WHERE test_id = $testId
+            SELECT id FROM `test_question` WHERE test_id = $testId
         ";
         $resultSet = $conn->executeQuery($sql);        
         return $resultSet->fetchAllAssociative();
@@ -74,8 +74,8 @@ class TestRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
             SELECT SUM(a.points) as total_points
-            FROM question q
-            JOIN answer a ON q.id = a.question_id
+            FROM test_question q
+            JOIN test_answer a ON q.id = a.question_id
             WHERE q.test_id = :testId
         ";
         $resultSet = $conn->executeQuery($sql, ['testId' => $testId]);
