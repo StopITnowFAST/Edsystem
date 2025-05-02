@@ -33,10 +33,11 @@ class UserPageController extends AbstractController
     }
 
     // Отображение самой страницы
-    #[Route(path: '/account', name:'account')]
-    public function account() {
+    #[Route(path: '/account/{section}', name:'account')]
+    public function account($section = 'schedule') {
         return $this->render('user/main.html.twig', [
             'userId' => $this->getUser()->getId(),
+            'section' => $section,
         ]);
     }
 

@@ -10,7 +10,7 @@
     <div class="test-wrapper">
         <div class="header-container">
             <h1 class="test-title">{{ test.name }}</h1>
-            <div class="test-timer">⏱️ {{ test.time }}</div>
+            <div class="test-timer">⏱️ {{ test.time }}:00</div>
         </div>
         
         <div class="main-test-block">
@@ -26,7 +26,9 @@
         
         <div class="bottom-navigation">            
             <div class="nav-buttons">
-                <a href="{{ path('user_test_main', {'testId':test.id}) }}" class="btn btn-primary">Начать тест</a>
+                {% if attemptsLeft > 0 %}
+                    <a href="{{ path('user_test_main', {'testId':test.id}) }}" class="btn btn-primary">Начать тест</a>
+                {% endif %}
             </div>
         </div>
     </div>

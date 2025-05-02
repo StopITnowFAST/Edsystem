@@ -25,6 +25,15 @@ class TestUserResult
     #[ORM\Column]
     private ?int $attempt = null;
 
+    #[ORM\Column]
+    private ?int $right_answers = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $total_points = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $completed_at = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -74,6 +83,42 @@ class TestUserResult
     public function setAttempt(int $attempt): static
     {
         $this->attempt = $attempt;
+
+        return $this;
+    }
+
+    public function getRightAnswers(): ?int
+    {
+        return $this->right_answers;
+    }
+
+    public function setRightAnswers(int $right_answers): static
+    {
+        $this->right_answers = $right_answers;
+
+        return $this;
+    }
+
+    public function getTotalPoints(): ?int
+    {
+        return $this->total_points;
+    }
+
+    public function setTotalPoints(?int $total_points): static
+    {
+        $this->total_points = $total_points;
+
+        return $this;
+    }
+
+    public function getCompletedAt(): ?int
+    {
+        return $this->completed_at;
+    }
+
+    public function setCompletedAt(?int $completed_at): static
+    {
+        $this->completed_at = $completed_at;
 
         return $this;
     }

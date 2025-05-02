@@ -26,6 +26,12 @@ class TestParams
     #[ORM\Column]
     private ?int $time_end = null;
 
+    #[ORM\Column]
+    private ?int $attempt = null;
+
+    #[ORM\Column]
+    private ?int $test_id = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -75,6 +81,30 @@ class TestParams
     public function setTimeEnd(int $time_end): static
     {
         $this->time_end = $time_end;
+
+        return $this;
+    }
+
+    public function getAttempt(): ?int
+    {
+        return $this->attempt;
+    }
+
+    public function setAttempt(int $attempt): static
+    {
+        $this->attempt = $attempt;
+
+        return $this;
+    }
+
+    public function getTestId(): ?int
+    {
+        return $this->test_id;
+    }
+
+    public function setTestId(int $test_id): static
+    {
+        $this->test_id = $test_id;
 
         return $this;
     }

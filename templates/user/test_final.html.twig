@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Результаты теста{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('/styles/test.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="test-wrapper">
+        <div class="results-container">
+            <div class="result-header">
+                <h1 class="result-title">Результаты теста: {{ testTitle }}</h1>
+                <div class="result-score">{{ userScore }} из {{ maxScore }} баллов</div>
+            </div>
+            
+            <div class="result-details">
+                <div class="result-stat">
+                    <span class="result-stat-label">Правильных ответов:</span>
+                    <span class="result-stat-value">{{ correctAnswersCount }} из {{ totalQuestions }}</span>
+                </div>
+                <div class="result-stat">
+                    <span class="result-stat-label">Процент выполнения:</span>
+                    <span class="result-stat-value">{{ (correctAnswersCount / totalQuestions * 100)|round(2) }}%</span>
+                </div>
+                <div class="result-stat">
+                    <span class="result-stat-label">Время прохождения:</span>
+                    <span class="result-stat-value">{{ timeSpent|date('H:i:s') }}</span>
+                </div>
+                <div class="result-stat">
+                    <span class="result-stat-label">Оценка:</span>
+                    <span class="result-stat-value">{{ grade }}</span>
+                </div>
+            </div>
+            
+            <div class="questions-list">
+                <h2>Детализация по вопросам:</h2>
+                
+                {% set counter = 0 %}
+                {% for question in questions %}
+                    {% if userAnswers|length > counter %}
+                        {% set counter = counter + 1 %}
+                        <div class="question-item">
+                            <div class="question-text">{{ question.text|raw }}</div>
+                            
+                            <div class="answers-list">
+                                {% for answer in question.answers %}
+                                    <div class="answer-item 
+                                        {% if answer.isCorrect %}correct-answer{% endif %}
+                                        {% if answer.id in userAnswers %}user-answer{% endif %}
+                                        {% if answer.id in userAnswers and not answer.isCorrect %}wrong-answer{% endif %}">
+                                        
+                                        <div class="answer-status 
+                                            {% if answer.isCorrect and answer.id in userAnswers %}correct-icon{% endif %}
+                                            {% if not answer.isCorrect and answer.id in userAnswers %}wrong-icon{% endif %}">
+                                            {% if answer.isCorrect and answer.id in userAnswers %}✓
+                                            {% elseif not answer.isCorrect and answer.id in userAnswers %}✗
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div>
+                                            {{ answer.text|raw }}
+                                            {% if answer.isCorrect and answer.id in userAnswers %}
+                                                <div class="answer-points">+{{ answer.points }} баллов</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            
+            <div class="action-buttons">
+                <a href="{{ path('account', {'section':'tests'}) }}" class="btn-back">Вернуться к списку тестов</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

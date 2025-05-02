@@ -47,4 +47,27 @@ class Study
         $attemtps = $resultSet->rowCount();
         return $totalAttempts - $attemtps;
     }
+
+    // Получить текущую попытку для теста
+    public function getCurrentAttemptForParams($userId, $testId) {
+        $conn = $this->em->getConnection();
+        $sql = "
+            SELECT DISTINCT tur.*
+            FROM `test_user_result` tur
+            WHERE tur.user_id = $userId
+        ";
+        $resultSet = $conn->executeQuery($sql);
+        return  $resultSet->rowCount();
+    }    
+
+    // Получить текущую попытку для теста
+    public function getCurrentAttempt($userId, $testId) {
+        $conn = $this->em->getConnection();
+        $sql = "
+            SELECT tp.* FROM `test_params` tp
+            WHERE tp.user_id = $userId AND tp.test_id = $testId
+        ";
+        $resultSet = $conn->executeQuery($sql);
+        return $resultSet->rowCount() - 1;
+    }    
 }

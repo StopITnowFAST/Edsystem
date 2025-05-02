@@ -1,8 +1,8 @@
-const SCHEDULE_SECTION = 'расписание';
-const CHAT_SECTION = 'чат';
-const SUBJECT_SECTION = 'предметы';
-const PROFILE_SECTION = 'профиль';
-const TEST_SECTION = 'тесты';
+const SCHEDULE_SECTION = 'schedule';
+const CHAT_SECTION = 'chat';
+const SUBJECT_SECTION = 'subjects';
+const PROFILE_SECTION = 'profile';
+const TEST_SECTION = 'tests';
 
 const SCHEDULE_SECTION_URL = '';
 const CHAT_SECTION_URL = '';
@@ -23,7 +23,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    loadContent(SCHEDULE_SECTION);
+    button = document.getElementById(STARTING_SECTION);
+    button.classList.add('active');
+    loadContent(STARTING_SECTION);
 });
 
 async function loadContent(section) {
@@ -111,7 +113,7 @@ function renderTestsPage(testsData) {
 
 function renderTestCard(test) {
     // Упрощенный статус: только пройдено/не пройдено
-    const isCompleted = test.status === 'completed';
+    const isCompleted = test.grade > 2;
     const statusClass = isCompleted ? 'completed' : 'not-completed';
     const statusIcon = isCompleted ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-circle"></i>';
 
@@ -119,7 +121,7 @@ function renderTestCard(test) {
     const timeInfo = !isCompleted && test.timeLimit ? `
         <div class="info-item">
             <i class="fas fa-clock"></i>
-            <span style="color: var(--color-font-bright);">Время на тест: ${test.timeLimit} ч.</span>
+            <span style="color: var(--color-font-bright);">Время на тест: ${test.timeLimit}:00</span>
         </div>
     ` : '';
 
@@ -140,7 +142,7 @@ function renderTestCard(test) {
                 
                 <div class="test-stats">
                     <div class="stat-item">
-                        <span class="stat-label">Оценка:</span>
+                        <span class="stat-label">Лучшая оценка:</span>
                         <span class="stat-value ${test.grade ? '' : 'no-grade'}">
                             ${test.grade || '---'}
                         </span>

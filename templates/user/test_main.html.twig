@@ -10,7 +10,7 @@
     <div class="test-wrapper">
         <div class="header-container">
             <h1 class="test-title">{{ testTitle }}</h1>
-            <div class="test-timer">⏱️ 15:30</div>
+            <div id="timer" class="test-timer"></div>
         </div>
         
         <div class="main-test-block">
@@ -26,13 +26,11 @@
                 </div>
                 
                 <div class="options-list">
-                    <form action="{{ path('user_test_pass', {'testId':testId, 'questionPosition':questionPosition + 1}) }}" method="POST">
-                        {% for answer in answers %}
-                            <div class="answer-option">
-                                {{ answer.text|raw }}
-                            </div>
-                        {% endfor %}
-                    </form>
+                    {% for answer in answers %}
+                        <div id="answer-{{ answer.id }}" class="answer-option" onclick="selectAnswer({{ answer.id }})">
+                            {{ answer.text|raw }}
+                        </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -42,22 +40,26 @@
                 Вопрос {{ questionPosition }} из {{ totalQuestions }}
             </div>
 
-            <div class="nav-buttons">
-                <a href="{{ path('user_test_pass', {'testId':testId, 'questionPosition':questionPosition - 1}) }}" class="btn btn-primary">
+            <div class="nav-buttons"> 
+                <a href="{{ (questionPosition != 0) ? path('user_test_pass', {'testId':testId, 'questionPosition':questionPosition - 1}) : "" }}" class="btn btn-primary">
                     Предыдущий вопрос
                 </a>
                 {% if questionPosition + 1 != totalQuestions %}
-                    <a href="{{ path('user_test_pass', {'testId':testId, 'questionPosition':questionPosition + 1}) }}" class="btn btn-primary">
-                        Следующий вопрос
-                    </a>
+                    <button onclick="submitSelectedAnswers()" class="btn btn-primary">Следующий вопрос</button>
                 {% else %}
-                    <a href="{{ path('user_test_pass', {'testId':testId, 'questionPosition':questionPosition + 1}) }}" class="btn btn-secondary">
-                        Завершить тест
-                    </a>
+                    <button onclick="submitSelectedAnswers()" class="btn btn-primary">Завершить тест</button>
                 {% endif %}
             </div>
         </div>
     </div>
 {% endblock %}
 
-{% block javascripts %}{% endblock %}
+{% block javascripts %}
+    <script>
+        const TEST_ID = "{{ testId }}";
+        const QUESTION_TYPE = "{{ questionType }}";
+        const CURRENT_QUESTION = "{{ questionPosition }}";
+        let leftTime = {{ leftTime }};
+    </script>
+    <script src="{{ asset('js/test.js') }}"></script>
+{% endblock %}

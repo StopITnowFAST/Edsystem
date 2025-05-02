@@ -11,19 +11,19 @@
 {% block body %}
     <div class="user__page">
         <div class="sidebar" id="sidebar">
-            <div class="sidebar-button active" title="Расписание" data-section="schedule">
+            <div id="schedule" class="sidebar-button" title="Schedule" data-section="schedule">
                 <i class="fas fa-calendar-alt"></i>
             </div>
-            <div class="sidebar-button" title="Чат" data-section="chat">
+            <div id="chat" class="sidebar-button" title="Chat" data-section="chat">
                 <i class="fas fa-comments"></i>
             </div>
-            <div class="sidebar-button" title="Предметы" data-section="subjects">
+            <div id="subjects" class="sidebar-button" title="Subjects" data-section="subjects">
                 <i class="fas fa-book"></i>
             </div>
-            <div class="sidebar-button" title="Профиль" data-section="profile">
+            <div id="profile" class="sidebar-button" title="Profile" data-section="profile">
                 <i class="fas fa-user"></i>
             </div>
-            <div class="sidebar-button" title="Тесты" data-section="tests">
+            <div id="tests" class="sidebar-button" title="Tests" data-section="tests">
                 <i class="fas fa-tasks"></i>
             </div>
         </div>
@@ -35,5 +35,8 @@
 {% block javascripts %}
     {{ parent() }}
     <script src="{{ asset('js/user_main.js') }}"></script>
-    <script>const USER_ID = {{ userId }}</script>
+    <script>
+        const USER_ID = {{ userId }};
+        const STARTING_SECTION = "{{ section }}";
+    </script>
 {% endblock %}
