@@ -59,6 +59,7 @@
         const TEST_ID = "{{ testId }}";
         const QUESTION_TYPE = "{{ questionType }}";
         const CURRENT_QUESTION = "{{ questionPosition }}";
+        const LAST_ANSWERS = JSON.parse('{{ lastUserAnswerIds|json_encode|raw }}');
         let leftTime = {{ leftTime }};
     </script>
     <script src="{{ asset('js/test.js') }}"></script>

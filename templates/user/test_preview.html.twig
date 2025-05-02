@@ -27,7 +27,13 @@
         <div class="bottom-navigation">            
             <div class="nav-buttons">
                 {% if attemptsLeft > 0 %}
-                    <a href="{{ path('user_test_main', {'testId':test.id}) }}" class="btn btn-primary">Начать тест</a>
+                    <a href="{{ path('user_test_main', {'testId':test.id}) }}" class="btn btn-primary">
+                        {% if testAlreadyStarted %}
+                            Продолжить тест
+                        {% else %}
+                            Начать тест
+                        {% endif %}
+                    </a>
                 {% endif %}
             </div>
         </div>

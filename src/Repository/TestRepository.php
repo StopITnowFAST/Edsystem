@@ -159,4 +159,15 @@ class TestRepository extends ServiceEntityRepository
         $results = $resultSet->fetchFirstColumn();
         return $results;
     }
+
+    public function getLastAnsweredQuestion($userId, $testId, $attempt) {
+        $conn = $this->getEntityManager()->getConnection();        
+        $sql = "
+            SELECT count(*) FROM `test_user_answer` tua
+            JOIN `test_question` tq ON tua.question_id = tq.id
+            WHERE tq.test_id = $testId AND tua.user_id = $userId AND tua.attempt = $attempt
+        ";        
+        $resultSet = $conn->executeQuery($sql);
+        return $resultSet->fetchOne();
+    }
 }

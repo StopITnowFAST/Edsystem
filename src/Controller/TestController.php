@@ -247,6 +247,7 @@ class TestController extends AbstractController {
         $totalQuestions = $this->em->getRepository(Test::class)->getQuestinsCount($testId);
         $totalPoints = $this->em->getRepository(Test::class)->countTotalPoints($testId);
         $attemptsLeft = $this->study->getAttemptsForTest($userId, $testId);
+        $testAlreadyStarted = $this->isTestStarted($userId, $testId);
         
         return $this->render('user/test_preview.html.twig', [
             'testData' => $testData,
@@ -254,6 +255,7 @@ class TestController extends AbstractController {
             'totalPoints' => $totalPoints,
             'attemptsLeft' => $attemptsLeft,
             'test' => $test,
+            'testAlreadyStarted' => $testAlreadyStarted,
         ]);        
     }
     
@@ -276,9 +278,9 @@ class TestController extends AbstractController {
             'test_id' => $testId,
         ]);
         if (!$params) {
-            $seed = $help->generateRandomString();
             $params = new TestParams();
             $params->setUserId($userId);
+            $seed = ($test->getShuffle() == 0) ? 'none' : $help->generateRandomString();
             $params->setShuffleSeed($seed);
             $params->setTimeStart(time());
             $params->setTestId($testId);
@@ -288,10 +290,14 @@ class TestController extends AbstractController {
             $this->em->persist($params); 
             $this->em->flush();
         }
+        $questionPosition = 0;
+        if ($this->isTestStarted($userId, $testId)) {
+            $questionPosition = $this->em->getRepository(Test::class)->getLastAnsweredQuestion($userId, $testId, $params->getAttempt());
+        }
         
         return $this->redirectToRoute('user_test_pass', [
             'testId' => $testId,
-            'questionPosition' => 0,
+            'questionPosition' => $questionPosition,
         ]);
     }
 
@@ -307,18 +313,16 @@ class TestController extends AbstractController {
             'attempt' => $currentAttempt,
         ]);
         $questions = $this->em->getRepository(Test::class)->getQuestionIds($testId);
-
-        // Всего вопросов в тесте
         $totalQuestions = $this->em->getRepository(Test::class)->getQuestinsCount($testId); 
-
-        // Нужный перемешанный вопрос
-        $neededQuestion = $this->deterministicShuffle($questions, $params->getShuffleSeed())[$questionPosition]; 
-
-        // Вопрос
+        if ($test->getShuffle() == 1) {
+            $neededQuestion = $this->deterministicShuffle($questions, $params->getShuffleSeed())[$questionPosition]; 
+        } else {
+            $neededQuestion = $questions[$questionPosition];
+        }        
         $question = $this->em->getRepository(TestQuestion::class)->find($neededQuestion); 
-
-        // Ответы для вопроса
         $answers = $this->em->getRepository(TestAnswer::class)->findBy(['question_id' => $neededQuestion]); 
+
+        $lastUserAnswerIds = $this->em->getRepository(Test::class)->getUserAnswerIds($userId, $testId, $params->getAttempt());
 
         return $this->render('user/test_main.html.twig', [
             'testTitle' => $test->getName(),
@@ -329,6 +333,7 @@ class TestController extends AbstractController {
             'totalQuestions' => $totalQuestions,
             'leftTime' => $params->getTimeEnd() - time(),
             'questionType' => ($question->getCorrectAnswers() > 1) ? 'more' : 'one',
+            'lastUserAnswerIds' => $lastUserAnswerIds,
         ]);  
     }
 
@@ -458,6 +463,7 @@ class TestController extends AbstractController {
         ]);  
     }
     
+    // Показывает уже сделанный отчет
     private function showExistingResult($testId, TestUserResult $result) {
         $test = $this->em->getRepository(Test::class)->find($testId);
         $params = $this->em->getRepository(TestParams::class)->findOneBy([
@@ -481,6 +487,21 @@ class TestController extends AbstractController {
             ),
             'grade' => $result->getGrade(),
         ]);
+    }
+
+    function isTestStarted($userId, $testId) {
+        $params = $this->em->getRepository(TestParams::class)->findOneBy(['test_id' => $testId, 'user_id' => $userId], ['id' => 'DESC']);
+        if ($params) {
+            $results = $this->em->getRepository(TestUserResult::class)->findOneBy([
+                'user_id' => $userId,
+                'test_id' => $testId,
+                'attempt' => $params->getAttempt(),
+            ]);
+            if (!$results) {
+                return true;
+            }
+        } 
+        return false;
     }
 
     function deterministicShuffle(array $array, string|int $key): array {

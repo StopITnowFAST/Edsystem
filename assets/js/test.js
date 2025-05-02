@@ -3,6 +3,9 @@ const timer = document.getElementById("timer");
 // Запускаем таймер
 updateTimer();
 
+// Проставляем ответы
+setLastUserAnswer();
+
 // Функция для отправки ответов
 function submitSelectedAnswers() {
     const selectedAnswers = document.querySelectorAll('.answer-option.selected');
@@ -69,5 +72,17 @@ function updateTimer() {
         window.location.href = `/tests/${TEST_ID}/final`;
         clearTimeout(timer);
     }
+}
+
+function setLastUserAnswer() {
+    console.log(typeof(LAST_ANSWERS));
+    LAST_ANSWERS.forEach(id => {
+        const elementId = 'answer-' + id;
+        const answerElement = document.getElementById(elementId);
+        
+        if (answerElement) {
+            answerElement.classList.add('selected');
+        }
+    });
 }
   
