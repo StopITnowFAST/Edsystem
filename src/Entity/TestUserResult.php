@@ -2,25 +2,25 @@
 
 namespace App\Entity;
 
-use App\Repository\TestUserAnswerRepository;
+use App\Repository\TestUserResultRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: TestUserAnswerRepository::class)]
-class TestUserAnswer
+#[ORM\Entity(repositoryClass: TestUserResultRepository::class)]
+class TestUserResult
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 30)]
-    private ?string $user_id = null;
+    #[ORM\Column]
+    private ?int $user_id = null;
 
     #[ORM\Column]
-    private ?int $question_id = null;
+    private ?int $test_id = null;
 
     #[ORM\Column]
-    private ?int $answer_id = null;
+    private ?int $grade = null;
 
     #[ORM\Column]
     private ?int $attempt = null;
@@ -30,38 +30,38 @@ class TestUserAnswer
         return $this->id;
     }
 
-    public function getUserId(): ?string
+    public function getUserId(): ?int
     {
         return $this->user_id;
     }
 
-    public function setUserId(string $user_id): static
+    public function setUserId(int $user_id): static
     {
         $this->user_id = $user_id;
 
         return $this;
     }
 
-    public function getQuestionId(): ?int
+    public function getTestId(): ?int
     {
-        return $this->question_id;
+        return $this->test_id;
     }
 
-    public function setQuestionId(int $question_id): static
+    public function setTestId(int $test_id): static
     {
-        $this->question_id = $question_id;
+        $this->test_id = $test_id;
 
         return $this;
     }
 
-    public function getAnswerId(): ?int
+    public function getGrade(): ?int
     {
-        return $this->answer_id;
+        return $this->grade;
     }
 
-    public function setAnswerId(int $answer_id): static
+    public function setGrade(int $grade): static
     {
-        $this->answer_id = $answer_id;
+        $this->grade = $grade;
 
         return $this;
     }

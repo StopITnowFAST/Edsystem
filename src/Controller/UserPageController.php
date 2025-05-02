@@ -11,6 +11,7 @@ use App\Service\Study;
 use App\Service\ApiTg;
 use App\Service\UserService;
 use App\Entity\Test;
+use App\Entity\TestUserResult;
 use App\Entity\UserCard;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -34,10 +35,8 @@ class UserPageController extends AbstractController
     // Отображение самой страницы
     #[Route(path: '/account', name:'account')]
     public function account() {
-        $userId = $this->getUser()->getId();
-        
         return $this->render('user/main.html.twig', [
-            'userId' => $userId,
+            'userId' => $this->getUser()->getId(),
         ]);
     }
 
@@ -50,11 +49,12 @@ class UserPageController extends AbstractController
         $tests = $this->study->getTestsForStudent($userId);
         $formattedTests = [];
         foreach ($tests as $key => $test) {
+            $bestGrade = $this->em->getRepository(TestUserResult::class)->getBestGrade($userId, $test['id']);
             $formattedTests[$key]['id'] = $test['id'];
             $formattedTests[$key]['title'] = $test['name'];
             $formattedTests[$key]['status'] = "Не разработан";
-            $formattedTests[$key]['grade'] = "Не разработан";
-            $formattedTests[$key]['attemptsLeft'] = $test['attempts'];
+            $formattedTests[$key]['grade'] = $bestGrade[0]['grade'] ?? '-';
+            $formattedTests[$key]['attemptsLeft'] = $this->study->getAttemptsForTest($userId, $test['id']);
             $formattedTests[$key]['questionsCount'] = $this->em->getRepository(Test::class)->getQuestinsCount($test['id']);
             $formattedTests[$key]['timeLimit'] = $test['time'];
         }
@@ -67,6 +67,6 @@ class UserPageController extends AbstractController
     // Для тестов
     #[Route('/testss', name: 'test')]
     public function test() {
-        var_dump($this->em->getRepository(Test::class)->countTotalPoints(3)); die;
+        var_dump($this->study->getAttemptsForTest(2, 3)); die;
     }    
 }

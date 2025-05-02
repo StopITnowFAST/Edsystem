@@ -31,6 +31,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use App\Service\BreadcrumbsGenerator;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
+use App\Service\Study;
 
 class TestController extends AbstractController {
 
@@ -40,6 +41,7 @@ class TestController extends AbstractController {
         private File $file,
         private BreadcrumbsGenerator $breadcrumbs,
         private UrlGeneratorInterface $router,
+        private Study $study,
     ) {
     }  
 
@@ -240,15 +242,17 @@ class TestController extends AbstractController {
         if (!$test) {
             return new Response('Тест не найден', 404);
         } 
-
+        $userId = $this->getUser()->getId();
         $testData = $this->em->getRepository(Test::class)->getTestData($testId);        
         $totalQuestions = $this->em->getRepository(Test::class)->getQuestinsCount($testId);
-        $totalPoints = $this->em->getRepository(Test::class)->getTotalPoints($testId);
+        $totalPoints = $this->em->getRepository(Test::class)->countTotalPoints($testId);
+        $attemptsLeft = $this->study->getAttemptsForTest($userId, $testId);
         
         return $this->render('user/test_preview.html.twig', [
             'testData' => $testData,
             'totalQuestions' => $totalQuestions,
             'totalPoints' => $totalPoints,
+            'attemptsLeft' => $attemptsLeft,
             'test' => $test,
         ]);        
     }
@@ -314,6 +318,14 @@ class TestController extends AbstractController {
     }   
 
 
+
+
+
+
+
+
+
+    
 
     function deterministicShuffle(array $array, string|int $key): array {
         $seed = crc32($key); 

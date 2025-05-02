@@ -15,9 +15,12 @@
         
         <div class="main-test-block">
             <p class="test-description">
-                Время на прохождение теста: {{ test.time }} <br>
-                Количество вопросов в тесте: {{ totalQuestions }} <br>
-                Количество оставшихся попыток: <br>
+                Вопросов в тесте: {{ totalQuestions }} <br>
+                Осталось попыток: {{ attemptsLeft }}  <br><br>
+                Количество баллов на 3: {{ test.pointsFor3 }}  <br>
+                Количество баллов на 4: {{ test.pointsFor4 }}  <br>
+                Количество баллов на 5: {{ test.pointsFor5 }}  <br><br>
+                Всего возможно баллов: {{ totalPoints }}  <br>
             </p>
         </div>
         
