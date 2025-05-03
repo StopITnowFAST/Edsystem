@@ -18,7 +18,6 @@ const POLL_DELAY = 1000;
 
 let isPolling = false;
 let isDialogActive = false;
-let globalChatArray = [];
 let currentGroup = 'student';
 let currentDialog = 0;
 
@@ -50,8 +49,7 @@ async function loadContent(section) {
         case CHAT_SECTION:
             json = await getDataFromServer(CHAT_SECTION_URL);
             globalChatArray = json.data;
-            content = getChatPage(json.data);
-            console.log(json.data);
+            content = getChatPage(globalChatArray);
             break;
         case SUBJECT_SECTION:
             // pageData = getDataFromServer(SUBJECT_SECTION_URL);
@@ -314,7 +312,6 @@ function getInitials(firstName, lastName, id) {
 
 // Функция для начала получения обновлений
 function startPolling() {
-    console.log("startPolling");
     if (isPolling) return;    
     isPolling = true;
     poll();
@@ -436,7 +433,6 @@ async function sendMessage() {
 
 // Функция для получения обновлений
 async function poll() {    
-    console.log("Начинаю посылать запросы");
     try {
         let userUpdates = formUpdateQueryArray();
         const response = await fetch(GET_UPDATES_URL + USER_ID, {
@@ -471,7 +467,9 @@ async function poll() {
 function formUpdateQueryArray() {
     let update = new FormData();
     for (chatId in globalChatArray) {
-        update[chatId] = 0;
+        for (user in globalChatArray[chatId]) {
+            update[user] = 0;
+        }
     }
     for (chatId in globalMessageArray) {
         update[chatId] = globalMessageArray[chatId][globalMessageArray[chatId].length - 1].id
@@ -484,6 +482,9 @@ async function updateTotalMessages(newMessages) {
     for (userId in newMessages) {
         let messages = newMessages[userId];
         messages.forEach(message => {
+            if(!(userId in globalMessageArray)) {
+                globalMessageArray[userId] = [];
+            }
             globalMessageArray[userId].push(message);
         });
     }

@@ -39,11 +39,13 @@ class UserPageController extends AbstractController
     public function account($section = 'schedule') {
         $userId = $this->getUser()->getId();
         $globalMessageArray = $this->chat->getAllMessages($userId);
+        $globalChatArray = $this->chat->getAvailableChats($userId);
 
         return $this->render('user/main.html.twig', [
             'userId' => $userId,
             'section' => $section,
             'globalMessageArray' => $globalMessageArray,
+            'globalChatArray' => $globalChatArray,
         ]);
     }
 

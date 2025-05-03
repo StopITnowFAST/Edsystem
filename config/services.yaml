@@ -9,7 +9,7 @@ parameters:
     
 services:
     
-    App\Twig\AppExtension:
+    App\Twig\TwigExtension:
         tags: ['twig.extension']
     
     App\Twig\ProfilePhotoRuntime:

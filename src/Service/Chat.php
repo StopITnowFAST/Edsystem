@@ -34,12 +34,14 @@ class Chat {
     public function getAvailableChatIds($userId, $groupId) {
         $conn = $this->em->getConnection();
         $sql = "
-            SELECT st.user_id FROM `student` st WHERE st.group_id = $groupId
+            SELECT st.user_id FROM `student` st INNER JOIN `user` u on st.user_id = u.id WHERE st.group_id = $groupId
             UNION
-            SELECT sb.user_id FROM `subject` sb WHERE sb.group_id = $groupId
+            SELECT sb.user_id FROM `subject` sb INNER JOIN `user` u on sb.user_id = u.id WHERE sb.group_id = $groupId
         ";
         $resultSet = $conn->executeQuery($sql);
         $results = $resultSet->fetchFirstColumn();
+
+        
         $inString = '(' . implode(',', $results) . ')';
         return $inString;
     }

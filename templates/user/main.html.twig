@@ -37,6 +37,7 @@
         const USER_ID = {{ userId }};
         const STARTING_SECTION = "{{ section }}";
         let globalMessageArray = JSON.parse('{{ globalMessageArray|json_encode|raw }}');
+        let globalChatArray = JSON.parse('{{ globalChatArray|json_encode|raw }}');
     </script>
     <script src="{{ asset('js/user_main.js') }}"></script>
 {% endblock %}
