@@ -29,6 +29,9 @@ class Message
     #[ORM\Column]
     private ?int $date = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $isRead = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -90,6 +93,18 @@ class Message
     public function setDate(int $date): static
     {
         $this->date = $date;
+
+        return $this;
+    }
+
+    public function isRead(): ?bool
+    {
+        return $this->isRead;
+    }
+
+    public function setRead(?bool $isRead): static
+    {
+        $this->isRead = $isRead;
 
         return $this;
     }
