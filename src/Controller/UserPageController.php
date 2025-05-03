@@ -9,14 +9,20 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use App\Service\Study;
 use App\Service\Chat;
+use App\Service\File;
 use App\Entity\Message;
 use App\Entity\Test;
+use App\Entity\File as FileEntity;
 use App\Entity\TestUserResult;
 use App\Entity\UserCard;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class UserPageController extends AbstractController
 {
@@ -25,6 +31,7 @@ class UserPageController extends AbstractController
         private LoggerInterface $logger,
         private Study $study,
         private Chat $chat,
+        private File $fileService,
     ) {
     }
     
@@ -40,6 +47,8 @@ class UserPageController extends AbstractController
         $userId = $this->getUser()->getId();
         $globalMessageArray = $this->chat->getAllMessages($userId);
         $globalChatArray = $this->chat->getAvailableChats($userId);
+
+        // var_dump($globalChatArray); die;
 
         return $this->render('user/main.html.twig', [
             'userId' => $userId,
@@ -101,24 +110,69 @@ class UserPageController extends AbstractController
 
     // Отправление сообщения
     #[Route(path: '/request/send/user/message/chat/{userId}', name:'send_message')]
-    public function sendMessage($userId) {
+    public function sendMessage(
+        $userId,
+        Request $request,
+        EntityManagerInterface $em,
+    ): Response {
+        // Проверка авторизации
         if ($this->getUser()->getId() != $userId) {
-            return new Response('Permission Error', 403);
+            return new JsonResponse(['error' => 'Permission denied'], 403);
         }
-        $postJsonArray = json_decode(file_get_contents("php://input"), true);
-
-        $message = new Message();
-        $message->setFromUserId($userId);
-        $message->setToUserId($postJsonArray['to_id']);
-        $message->setText($postJsonArray['text']);
-        $message->setDate(time());
-
-        $this->em->persist($message);
-        $this->em->flush($message);
-
-        return new Response('ok', 200);
+    
+        // Обработка multipart/form-data (с файлами)
+        if (str_starts_with($request->headers->get('Content-Type'), 'multipart/form-data')) {
+            return $this->handleMultipartRequest($request, $userId, $em, $this->fileService);
+        }
+    
+        // Обработка JSON (для обратной совместимости)
+        return $this->handleJsonRequest($request, $userId, $em);
     }
 
+    private function handleMultipartRequest(
+        Request $request,
+        int $userId,
+        EntityManagerInterface $em,
+    ): Response {
+        $message = new Message();
+        $message->setFromUserId($userId);
+        $message->setToUserId($request->request->get('to_id'));
+        $message->setText($request->request->get('text', ''));
+        $message->setDate(time());
+        $message->setRead(0);
+    
+        // Обработка файлов
+        $uploadedFiles = $request->files->get('files', []);
+        if (count($uploadedFiles) > 0) {
+            $firstFile = is_array($uploadedFiles) ? $uploadedFiles[0] : $uploadedFiles;
+            $fileEntity = $this->fileService->handleUploadedFile($firstFile, $userId);
+            $message->setFileId($fileEntity->getId());
+        }
+    
+        $em->persist($message);
+        $em->flush();
+    
+        return new JsonResponse(['status' => 'success', 'message_id' => $message->getId()]);
+    }
+
+    private function handleJsonRequest(Request $request, int $userId, EntityManagerInterface $em): Response 
+    {
+        $data = json_decode($request->getContent(), true);
+        
+        $message = new Message();
+        $message->setFromUserId($userId);
+        $message->setToUserId($data['to_id']);
+        $message->setText($data['text']);
+        $message->setDate(time());
+        $message->setRead(0);
+    
+        $em->persist($message);
+        $em->flush();
+    
+        return new JsonResponse(['status' => 'success', 'message_id' => $message->getId()]);
+    }
+
+    // Получение обновлений
     #[Route(path: '/request/get/user/updates/chat/{userId}', name:'get_updates')]
     public function getUpdates($userId) {
         $ids = json_decode(file_get_contents("php://input"), true);        
@@ -142,6 +196,45 @@ class UserPageController extends AbstractController
             'newMessages' => [],
         ]);
     }
+
+    // Пометка всех сообщений диалога прочитанными
+    #[Route(path: '/request/mark-messages-read/chat/{userId}', name: 'mark_messages_read')]
+    public function markMessagesAsRead($userId): Response {
+        
+        if (!$this->getUser()) {
+            return new Response('Unauthorized', 401);
+        }
+
+        $this->em->getRepository(Message::class)->markMessagesAsRead(
+            $userId,
+            $this->getUser()->getId()
+        );
+
+        return new Response('OK', 200);
+    }
+
+    #[Route(path: '/download/user-file/{realFileName}', name: 'download_user_file')]
+    public function downloadUserFile($realFileName) {
+        $fileEntity = $this->em->getRepository(FileEntity::class)->findOneBy(['real_file_name' => $realFileName]);
+
+        if (!$fileEntity) {
+            throw $this->createNotFoundException('Файл не найден');
+        }
+
+        $filePath = $_ENV['USER_FILE_PATH'] . '/' . $realFileName;
+
+        if (!file_exists($filePath)) {
+            throw $this->createNotFoundException('Файл не найден на сервере');
+        }
+
+        $response = new BinaryFileResponse($filePath);
+        $response->setContentDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            $fileEntity->getFileName().'.'.$fileEntity->getExtension()
+        );
+
+        return $response;
+    }
     
     // Для тестов
     #[Route('/testss', name: 'test')]
@@ -151,6 +244,6 @@ class UserPageController extends AbstractController
             2 => 3,
             6 => 4,
         ];
-        var_dump($this->chat->getNewMessages($ids, $userId)); die;
-    }    
+        var_dump($this->chat->getAllMessages(7)); die;
+    }
 }

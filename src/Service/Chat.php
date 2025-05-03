@@ -54,7 +54,8 @@ class Chat {
 
         // Достаю данные для первичной загрузки 
         $sql = "
-            SELECT u.user_id, u.last_name, u.first_name, u.type,last_msg.text AS last_message_text,last_msg.date AS last_message_date
+            SELECT 
+                u.user_id, u.last_name, u.first_name, u.type, last_msg.text AS last_message_text, last_msg.date AS last_message_date
             FROM (
                 SELECT st.user_id, st.last_name, st.first_name, 'student' as type
                 FROM `student` st WHERE st.user_id IN $ids
@@ -65,22 +66,31 @@ class Chat {
                 WHERE sb.user_id IN $ids
             ) u
             LEFT JOIN (
-                SELECT 
-                    CASE 
-                        WHEN m1.from_user_id = $userId THEN m1.to_user_id
-                        ELSE m1.from_user_id
-                    END AS partner_id,
-                    m1.text,
-                    m1.date
-                FROM `message` m1
-                WHERE (m1.from_user_id = $userId OR m1.to_user_id = $userId)
-                AND m1.date = (
-                    SELECT MAX(m2.date)
-                    FROM `message` m2
-                    WHERE (m2.from_user_id = m1.from_user_id AND m2.to_user_id = m1.to_user_id)
-                    OR (m2.from_user_id = m1.to_user_id AND m2.to_user_id = m1.from_user_id)
-                )
+                SELECT partner_id, text, date
+                FROM (
+                    SELECT 
+                        CASE 
+                            WHEN from_user_id = $userId THEN to_user_id
+                            ELSE from_user_id
+                        END AS partner_id,
+                        text,
+                        date,
+                        ROW_NUMBER() OVER (PARTITION BY 
+                            CASE 
+                                WHEN from_user_id = $userId THEN to_user_id
+                                ELSE from_user_id
+                            END 
+                            ORDER BY date DESC
+                        ) AS rn
+                    FROM `message`
+                    WHERE (from_user_id = $userId OR to_user_id = $userId)
+                ) ranked
+                WHERE rn = 1
             ) last_msg ON last_msg.partner_id = u.user_id
+            ORDER BY 
+                last_msg.date DESC,
+                u.last_name ASC, 
+                u.first_name ASC
         ";
         $resultSet = $conn->executeQuery($sql);
         $results = $resultSet->fetchAllAssociative();
@@ -94,15 +104,19 @@ class Chat {
     public function getAllMessages($userId) {
         $groupId = $this->study->getStudentGroup($userId);        
         $conn = $this->em->getConnection();
-        $ids = $this->getAvailableChatIds($userId, $groupId);
         $sql = "
-            SELECT m.* FROM `message` m WHERE m.from_user_id IN $ids OR m.to_user_id IN $ids
+            SELECT m.*, f.real_file_name, f.file_name FROM `message` m 
+            LEFT JOIN `file` f on f.id = m.file_id
+            WHERE m.from_user_id = $userId OR m.to_user_id = $userId
         ";
         $resultSet = $conn->executeQuery($sql);
         $results = $resultSet->fetchAllAssociative();
         $messages = [];
         foreach ($results as $message) {
             $message['type'] = ($message['to_user_id'] == $userId) ? 'incoming' : 'outcoming';
+            if ($message['file_id'] != null) {
+                $message['filelink'] = '/download/user-file/' . $message['real_file_name'];
+            }
             if($message['from_user_id'] != $userId) {
                 $messages[$message['from_user_id']][] = $message;
             } else {
@@ -110,16 +124,6 @@ class Chat {
             }
         }
         return $messages;
-    }
-
-
-    public function getTotalHistory() {
-        $messages = $this->em->getRepository(Message::class)->getLastHistory(self::LAST_MESSAGE_COUNT);
-        $redactedMessages = [];
-        foreach (array_reverse($messages) as $message) {
-            $redactedMessages[$message['user_id']][] = $message;
-        }
-        return $redactedMessages;
     }
     
     public function getNewMessages(array $lastMessages, int $userId) 
@@ -150,8 +154,9 @@ class Chat {
         
         // 2. Формируем SQL
         $sql = "
-            SELECT m.*
+            SELECT m.*, f.real_file_name, f.file_name
             FROM `message` m
+            LEFT JOIN `file` f on f.id = m.file_id
             WHERE ($whereClause)
             ORDER BY m.date ASC
         ";
@@ -162,6 +167,9 @@ class Chat {
         $messages = [];
         foreach ($results as $message) {
             $message['type'] = ($message['to_user_id'] == $userId) ? 'incoming' : 'outcoming';
+            if ($message['file_id'] != null) {
+                $message['filelink'] = '/download/user-file/' . $message['real_file_name'];
+            }
             if($message['from_user_id'] != $userId) {
                 $messages[$message['from_user_id']][] = $message;
             } else {
@@ -169,99 +177,5 @@ class Chat {
             }
         }
         return $messages;
-    }
-
-    public function handleSmartMeterMessage($text) {
-        // $this->addPureMessage('outcoming', 80,  $text, 'gpt');
-        // if (self::TEST) {
-        //     // $this->addPureMessage('incoming', 80,  'Шмяк', 'gpt');
-        //     return 1;
-        // }
-        try {
-            $this->logger->info("Запрос к яндекс гпт для текста {text}", ['text' => $text]);
-            $prompt = $this->getPrompt($text);
-            $ch = curl_init($_ENV['YANDEX_GPT_API_DOMEN']);
-            curl_setopt_array($ch, [
-                CURLOPT_POST => true,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_HTTPHEADER => [
-                    'Content-Type:application/json',
-                    'Authorization: Api-Key ' . $_ENV['YANDEX_API_KEY']  
-                ],
-                CURLOPT_POSTFIELDS => $prompt,
-                CURLOPT_VERBOSE => false, 
-            ]);
-            $response = curl_exec($ch);
-            curl_close($ch);
-            $json = json_decode($response, true);
-            if (isset($json['result'])) {
-                // $this->addPureMessage('incoming', 80,  $json['result']['alternatives'][0]['message']['text'], 'gpt');
-            }
-        } catch (\Throwable $e) {            
-            $this->logger->info("Ошибка во время генерации ответа GPT - {error}", ['error' => $e]);
-            // $this->addPureMessage('incoming', 80,  'Ошибка во время генерации ответа', 'gpt');
-        }
-    }
-
-    public function getPrompt($text): bool|string {
-        $prompt = [
-            'modelUri' => $_ENV['YANDEX_GPT_MODEL_DOMEN'],
-            'completionOptions' => [
-                'stream' => false,
-                'temperature' => 1,
-                'maxTokens' => '2000',
-                'reasoningOptions' => [
-                    'mode' => 'DISABLED'
-                ]
-            ],
-            'messages' => [
-                [
-                    'role' => 'system',
-                    'text' => 'Ответь на сообщение как чат бот'
-                ],
-                [
-                    'role' => 'user',
-                    'text' => $text
-                ]
-            ]
-        ];
-        return json_encode($prompt, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
-    }
-    public function getLastMessages($groupId, $amount) {
-        $messages = $this->em->getRepository(Message::class)->getLastMessages($groupId, $amount);
-        return $messages;
     }    
-
-    public function getSynthesizeSpeech(string $text) {
-        try {
-            $this->logger->info("Запрос к яндекс озвучки для текста {text}", ['text' => $text]);
-            $ch = curl_init($_ENV['YANDEX_VOICE_DOMEN']);
-            curl_setopt_array($ch, [
-                CURLOPT_POST => true,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_HTTPHEADER => ['Content-Type:text/plain'],
-                CURLOPT_POSTFIELDS => json_encode(['text' => $text]),
-                CURLOPT_VERBOSE => true, 
-            ]);
-            $response = curl_exec($ch);
-            curl_close($ch);
-            $json = json_decode($response, true);
-            $this->logger->info("Получены данные от озвучки - {json}", ['json' => $json]);
-            $audioData = '';
-            if (is_array($json['data'])) {
-                $this->logger->info("массив");
-                foreach ($json['data'] as $chunk) {
-                    $audioData .= base64_decode($chunk);
-                }
-            } else {
-                $this->logger->info("не массив");
-                $audioData = base64_decode($json['data']);
-            }
-            $this->logger->info("ААААА, деньги уходят");
-            return base64_encode($audioData);
-        } catch(\Throwable $e)  {
-            $this->logger->info("Ошибка во время озвучки - {error}", ['error' => $e]);
-            return null;
-        }
-    }
 }

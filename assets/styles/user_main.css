@@ -563,21 +563,78 @@
     text-align: end;
 }
 
-/* Время в сообщениях */
+.outcoming-message a {
+    color: #3f3f3f;
+}
+
+.file-upload-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.file-upload-button {
+    cursor: pointer;
+    padding: 8px 12px;
+    background-color: var(--color-grey-400);
+    border-radius: 50%;
+    color: #555;
+    transition: all 0.2s;
+}
+
+.file-upload-button:hover {
+    background-color: var(--color-main);
+    color: #333;
+}
+
+.file-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    max-width: 200px;
+}
+
+.file-preview-item {
+    background-color: #e3f2fd;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.file-preview-item button {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 0;
+    font-size: 10px;
+}
+
+/* Время и файлы */
+
 .message-time {
-    display: block;
     font-size: 0.75rem;
-    opacity: 0.7;
-    text-align: right;
-    margin-top: var(--offset-3xs);
+    color: rgb(177, 177, 177);
+    margin-top: 4px;
+    clear: both; /* Важно для правильного позиционирования после float-элементов */
 }
 
-/* Для входящих - серый текст времени */
 .incoming-message .message-time {
-    color: var(--color-grey-0);
+    text-align: right;
 }
 
-/* Для исходящих - светлый текст времени */
 .outcoming-message .message-time {
-    color: rgba(255, 255, 255, 0.8);
+    text-align: left;
+}
+
+/* Сохраняем ваши существующие стили */
+.message-text {
+    word-break: break-word;
+}
+
+.message-file {
+    margin-top: 5px;
 }

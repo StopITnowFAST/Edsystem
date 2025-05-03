@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Message;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @extends ServiceEntityRepository<Message>
@@ -16,28 +17,22 @@ class MessageRepository extends ServiceEntityRepository
         parent::__construct($registry, Message::class);
     }
 
-    //    /**
-    //     * @return Message[] Returns an array of Message objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('m')
-    //            ->andWhere('m.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('m.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Message
-    //    {
-    //        return $this->createQueryBuilder('m')
-    //            ->andWhere('m.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function markMessagesAsRead(int $fromUserId, int $toUserId): void
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        
+        $sql = '
+            UPDATE message 
+            SET is_read = true 
+            WHERE from_user_id = :fromUserId 
+            AND to_user_id = :toUserId 
+            AND is_read = false
+        ';
+        
+        $stmt = $conn->prepare($sql);
+        $stmt->executeQuery([
+            'fromUserId' => $fromUserId,
+            'toUserId' => $toUserId
+        ]);
+    }
 }

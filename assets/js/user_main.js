@@ -22,6 +22,7 @@ let currentGroup = 'student';
 let currentDialog = 0;
 
 startPolling();
+console.log(globalMessageArray);
 
 document.addEventListener('DOMContentLoaded', function() {
     const buttons = document.querySelectorAll('.sidebar-button');
@@ -31,6 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.classList.add('active');
             const section = this.getAttribute('title').toLowerCase();
             loadContent(section);
+            isDialogActive = false;
         });
     });
 
@@ -200,7 +202,7 @@ function renderTestButton(test) {
 // --------------
 
 function getChatPage(chatData) {
-
+    
     // Генерируем HTML для списка чатов студентов
     const studentsChats = generateChatListHTML(chatData.student, 'student');
     
@@ -267,8 +269,16 @@ function getChatPage(chatData) {
 // Вспомогательная функция для генерации списка чатов
 function generateChatListHTML(users, type) {
     if (!users || Object.keys(users).length === 0) return null;
-    
-    return Object.values(users).map(user => {
+
+    // Преобразуем в массив и сортируем по дате (новые → выше)
+    const sortedUsers = Object.values(users).sort((a, b) => {
+        // Если у одного нет даты, помещаем его в конец
+        if (!a.last_message_date) return 1;
+        if (!b.last_message_date) return -1;
+        return b.last_message_date - a.last_message_date;
+    });
+
+    return sortedUsers.map(user => {
         const lastMessage = user.last_message_text 
             ? `<p class="last-message">${truncateText(user.last_message_text, 30)}</p>`
             : '<p class="last-message no-messages">Нет сообщений</p>';
@@ -277,7 +287,7 @@ function generateChatListHTML(users, type) {
             ? `<span class="last-message-date">${formatDate(user.last_message_date)}</span>`
             : '';
         
-        let userName = (user.user_id == USER_ID) ? 'Избранное' : user.last_name + " " + user.first_name;
+        let userName = (user.user_id == USER_ID) ? 'Избранное' : `${user.last_name} ${user.first_name}`;
             
         return `
             <div class="chat-item" onclick="renderDialog(${user.user_id})" data-user-id="${user.user_id}" data-user-type="${type}">
@@ -322,7 +332,6 @@ function stopPolling() {
     isPolling = false;
 }
 
-
 // Функция для смены платформы с чатом
 function changePlatform(id) {
     currentGroup = id;
@@ -343,24 +352,36 @@ function changePlatform(id) {
         teachers_group.classList.add("active");
         students_group.classList.remove("active");
     }
-
 }
 
 // Функция отображает выбранный пользователем диалог
 async function renderDialog(userId) {
     currentDialog = userId;
+    
+    // 1. Помечаем сообщения как прочитанные
+    try {
+        await fetch(`/request/mark-messages-read/chat/${userId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+    } catch (e) {
+        console.error('Ошибка пометки сообщений как прочитанных:', e);
+    }
+    
+    // 2. Продолжаем стандартную логику отображения
     document.getElementById("chat-messages").innerHTML = '';
+    
     if (!isDialogActive) {
         document.getElementById("message-panel").insertAdjacentHTML('beforeend', getInputElement());
-        // Обработчик нажатия Enter
         document.getElementById("text-input").addEventListener("keydown", (e) => {
             if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();  // Отменяем перенос строки
-                sendMessage();       // Отправляем сообщение
+                e.preventDefault();
+                sendMessage();
             }
         });
         isDialogActive = true;
     }
+    
     let dialogName = (userId == USER_ID) ? 'Избранное' : globalChatArray[currentGroup][userId].last_name + " " + globalChatArray[currentGroup][userId].first_name;
     document.getElementById("current-chat-name").textContent = dialogName;
     processMessages(globalMessageArray[userId]);
@@ -384,7 +405,7 @@ function processMessages(messages) {
         messageBox = document.getElementById("chat-messages");
         
         messages.forEach(message => {
-            const msgElement = makeMessageElement(message['text'], message['type'], message['id']);
+            const msgElement = makeMessageElement(message);
             messageBox.insertAdjacentHTML('beforeend', msgElement);
             messageBox.scrollTop = messageBox.scrollHeight;
             // lastId = message['id']        
@@ -392,37 +413,97 @@ function processMessages(messages) {
     }
 }
 
-// Функция для создания элемента сообщения
-function makeMessageElement(text, type, message_id) {
-    let divClass = (type == 'incoming') ? "incoming-message" : "outcoming-message";
-    let content = text;
-    content = content.replace('<', "&lt;");
-    content = content.replace('>', "&gt;");    
-    let element = '<div message_id=' + message_id + ' class=' + divClass + '>' + content + '</div>';
-    return element;
+// Функция для создания элемента сообщения с временем
+function makeMessageElement(message) {
+    const divClass = message['type'] === 'incoming' ? "incoming-message" : "outcoming-message";
+    let contentParts = [];
+    let hasText = false;
+    
+    // Добавляем текст, если он есть
+    if (message['text'] && message['text'].trim() !== '') {
+        hasText = true;
+        const safeText = message['text'].replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        contentParts.push(`<div class="message-text">${safeText}</div>`);
+    }
+    
+    // Добавляем файл, если он есть
+    if (message['filelink']) {
+        if (hasText) {
+            contentParts.push('<br>');
+        }
+        const fileName = message['file_name'] || 'Файл';
+        contentParts.push(`
+            <div class="message-file">
+                <a href="${message['filelink']}" class="file-message" download>
+                    <i class="fas fa-file-download"></i>
+                    ${fileName}
+                </a>
+            </div>
+        `);
+    }
+    
+    // Добавляем время отправки (если есть)
+    if (message['date']) {
+        const formattedTime = formatMessageTime(message['date']);
+        contentParts.push(`<div class="message-time">${formattedTime}</div>`);
+    }
+    
+    // Объединяем все части
+    const content = contentParts.join('');
+    
+    return `
+        <div message_id="${message['id']}" class="${divClass}">
+            ${content}
+        </div>
+    `;
 }
 
-// Функция для отправки сообщения
+// Вспомогательная функция для форматирования времени
+function formatMessageTime(timestamp) {
+    try {
+        // Пробуем разные форматы timestamp
+        const date = new Date(isNaN(timestamp) ? timestamp : timestamp * 1000);
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } catch (e) {
+        console.error('Ошибка форматирования времени:', e);
+        return '';
+    }
+}
+
+// Функция для отправки сообщения с поддержкой файлов
 async function sendMessage() {
     const messageInput = document.getElementById("text-input");
+    const fileInput = document.getElementById("file-upload");
     const text = messageInput.value.trim();
+    const files = fileInput.files;
     
-    if (!text) return; // Не отправляем пустые сообщения
-    
+    // Не отправляем если нет ни текста ни файлов
+    if (!text && files.length === 0) return;
+
     try {
+        // Создаем FormData вместо JSON
+        const formData = new FormData();
+        formData.append('text', text);
+        formData.append('from_id', USER_ID);
+        formData.append('to_id', currentDialog);
+        
+        // Добавляем все выбранные файлы
+        for (let i = 0; i < files.length; i++) {
+            formData.append('files[]', files[i]);
+        }
+
         const response = await fetch(`${SEND_MESSAGE_URL}${USER_ID}`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                text: text,
-                from_id: USER_ID,
-                to_id: currentDialog
-            })
+            body: formData
+            // Не устанавливаем Content-Type вручную - браузер сам установит с boundary
         });
         
         if (!response.ok) throw new Error("Ошибка HTTP: " + response.status);
         
+        // Очищаем поля ввода после успешной отправки
         messageInput.value = '';
+        fileInput.value = '';
+        document.getElementById('file-preview').innerHTML = ''; // Очищаем превью файлов
         messageInput.focus();
         
     } catch (error) {
@@ -461,8 +542,6 @@ async function poll() {
     }    
 }
 
-
-
 // Функция формирует массив с id последних сообщения для всех чатов
 function formUpdateQueryArray() {
     let update = new FormData();
@@ -479,6 +558,7 @@ function formUpdateQueryArray() {
 
 // Функция обновляет массив с сообщениями
 async function updateTotalMessages(newMessages) {
+    console.log(newMessages);
     for (userId in newMessages) {
         let messages = newMessages[userId];
         messages.forEach(message => {
@@ -486,15 +566,45 @@ async function updateTotalMessages(newMessages) {
                 globalMessageArray[userId] = [];
             }
             globalMessageArray[userId].push(message);
+            updateChats(userId, message);
         });
     }
+}
+
+function updateChats(id, message) {
+    // Сначала двигаем элемент в чатах, а потом перемещаем его в globalChatArray
+    console.log('Передвигаю чат');
+    let chatContainer = 0;
+    if (id in globalChatArray['student']) {
+        chatContainer = document.getElementById('chat_list_students');
+    } else if (id in globalChatArray['teacher']) {
+        chatContainer = document.getElementById('chat_list_teachers');
+    }
+
+    let chatWithNewMessage = document.querySelector('.chat-item[data-user-id="' + id + '"]');    
+    
+    chatWithNewMessage.querySelector('.last-message').textContent = message.text;
+    chatWithNewMessage.remove();
+    chatContainer.insertBefore(chatWithNewMessage, chatContainer.firstChild);
+    console.log(message);
 }
 
 function getInputElement() {
     return `
         <div class="chat-input">
+            <div class="file-upload-container">
+                <label for="file-upload" class="file-upload-button">
+                    <i class="fas fa-paperclip"></i>
+                    <input type="file" id="file-upload" 
+                        accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.zip,.rar"
+                        style="display: none;">
+                </label>
+                <div class="file-preview" id="file-preview"></div>
+            </div>
             <textarea id="text-input" placeholder="Введите сообщение..."></textarea>
-            <button class="send-button" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+            <button class="send-button" onclick="sendMessage()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
         </div>
     `;
 }
