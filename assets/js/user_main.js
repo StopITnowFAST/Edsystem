@@ -37,8 +37,8 @@ async function loadContent(section) {
             content = '';
             break;
         case CHAT_SECTION:
-            // pageData = getDataFromServer(CHAT_SECTION_URL);
-            content = '';
+            json = await getDataFromServer(CHAT_SECTION_URL);
+            content = getChatPage(json.data);
             break;
         case SUBJECT_SECTION:
             // pageData = getDataFromServer(SUBJECT_SECTION_URL);
@@ -50,8 +50,7 @@ async function loadContent(section) {
             break;
         case TEST_SECTION:
             json = await getDataFromServer(TEST_SECTION_ULR);
-            console.log(typeof(json.data));
-            content = renderTestsPage(json.data);
+            content = getTestsPage(json.data);
             break;
     }
     renderContent(content);    
@@ -91,7 +90,52 @@ function getDataFromServer(url) {
         });
 }
 
-function renderTestsPage(testsData) {
+function getChatPage(chatData) {
+    return `
+        <div class="chat-container">
+            <!-- 1. Панель групп (студенты/преподаватели) -->
+            <div class="chat-group-panel">
+                <div class="chat-group active" data-group="students">
+                    <i class="fas fa-user-graduate"></i>
+                    <span>Студенты</span>
+                </div>
+                <div class="chat-group" data-group="teachers">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span>Преподаватели</span>
+                </div>
+            </div>
+
+            <!-- 2. Панель списка чатов -->
+            <div class="chat-list-panel">
+                <div class="chat-list" id="chat-list">
+                    <!-- Сюда будут загружаться чаты через AJAX -->
+                    <div class="chat-list-placeholder">
+                        <i class="fas fa-comment-dots"></i>
+                        <p>Выберите группу</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Панель сообщений -->
+            <div class="chat-messages-panel">
+                <div class="chat-header">
+                </div>
+                <div class="chat-messages" id="chat-messages">
+                    <div class="empty-chat">
+                        <i class="fas fa-comments"></i>
+                        <p>Выберите чат, чтобы начать общение</p>
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <textarea placeholder="Введите сообщение..." disabled></textarea>
+                    <button class="send-button" disabled><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function getTestsPage(testsData) {
     if (!testsData || !testsData.length) {
         return `
             <div class="no-tests-message">

@@ -1,15 +1,14 @@
 .user__page {
     display: flex;
-    min-height: 100vh;
     width: 100%;
-    flex: 1;
+    min-height: 70vh;
     margin: 0;
     background-color: var(--color-grey-200);
 }
 
 .sidebar {
     width: 120px;
-    min-height: 100vh;
+    height: auto;
     background-color: var(--color-grey-400);
     display: flex;
     flex-direction: column;
@@ -328,4 +327,135 @@
         padding: 8px 16px;
         font-size: 0.85rem;
     }
+}
+
+/* Основа чата */
+.chat-container {
+    display: flex;
+    height: 80vh;
+    background: var(--color-grey-200);
+    border-radius: var(--offset-xxs);
+    overflow: hidden;
+    margin: 0px 100px;
+}
+
+/* 1. Панель групп */
+.chat-group-panel {
+    width: 120px;
+    background: var(--color-grey-400);
+    padding: var(--offset-s) 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--offset-m);
+}
+
+.chat-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    padding: var(--offset-xs);
+    border-radius: var(--offset-xxs);
+    color: var(--color-font-bright);
+    opacity: 0.7;
+    transition: all 0.2s;
+}
+
+.chat-group.active {
+    opacity: 1;
+    background: var(--color-grey-400);
+}
+
+.chat-group i {
+    font-size: 1.5rem;
+    margin-bottom: var(--offset-3xs);
+}
+
+.chat-group span {
+    font-size: 0.8rem;
+}
+
+/* 2. Панель списка чатов */
+.chat-list-panel {
+    width: 300px;
+    background: var(--color-grey-300);
+    border-right: 1px solid var(--color-grey-300);
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-search {
+    padding: var(--offset-xs);
+    border-bottom: 1px solid var(--color-grey-300);
+}
+
+.chat-search input {
+    width: 100%;
+    padding: var(--offset-3xs) var(--offset-xs);
+    border-radius: var(--offset-3xs);
+    border: none;
+    background: var(--color-grey-300);
+    color: var(--color-font-bright);
+}
+
+.chat-list {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.chat-list-placeholder,
+.empty-chat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--color-grey-0);
+}
+
+/* 3. Панель сообщений */
+.chat-messages-panel {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-grey-100);
+}
+
+.chat-header {
+    padding: var(--offset-xs) var(--offset-s);
+    border-bottom: 1px solid var(--color-grey-300);
+}
+
+.chat-messages {
+    flex-grow: 1;
+    padding: var(--offset-s);
+    overflow-y: auto;
+}
+
+.chat-input {
+    padding: var(--offset-xs);
+    display: flex;
+    gap: var(--offset-xs);
+    border-top: 1px solid var(--color-grey-300);
+}
+
+.chat-input textarea {
+    flex-grow: 1;
+    padding: var(--offset-xs);
+    border-radius: var(--offset-3xs);
+    border: none;
+    background: var(--color-grey-300);
+    color: var(--color-font-bright);
+    resize: none;
+    height: 50px;
+}
+
+.send-button {
+    background: var(--color-main);
+    color: white;
+    border: none;
+    border-radius: var(--offset-3xs);
+    width: 50px;
+    cursor: pointer;
 }
