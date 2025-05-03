@@ -638,3 +638,18 @@
 .message-file {
     margin-top: 5px;
 }
+
+.file-preview {
+    margin-left: 10px;
+    display: inline-block;
+}
+
+.file-name-only {
+    font-size: 14px;
+    color: var(--color-main);
+    padding: 4px 0;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

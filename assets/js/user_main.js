@@ -268,6 +268,9 @@ function getChatPage(chatData) {
 
 // Вспомогательная функция для генерации списка чатов
 function generateChatListHTML(users, type) {
+
+    console.log(users);
+
     if (!users || Object.keys(users).length === 0) return null;
 
     // Преобразуем в массив и сортируем по дате (новые → выше)
@@ -279,12 +282,12 @@ function generateChatListHTML(users, type) {
     });
 
     return sortedUsers.map(user => {
-        const lastMessage = user.last_message_text 
-            ? `<p class="last-message">${truncateText(user.last_message_text, 30)}</p>`
+        const lastMessage = (user.last_message_text || user.file_name)
+            ? `<p class="last-message">${truncateText((user.file_name) ? user.file_name : user.last_message_text, 30)}</p>`
             : '<p class="last-message no-messages">Нет сообщений</p>';
             
         const lastDate = user.last_message_date 
-            ? `<span class="last-message-date">${formatDate(user.last_message_date)}</span>`
+            ? `<span class="last-message-date">${formatMessageTime(user.last_message_date)}</span>`
             : '';
         
         let userName = (user.user_id == USER_ID) ? 'Избранное' : `${user.last_name} ${user.first_name}`;
@@ -373,6 +376,17 @@ async function renderDialog(userId) {
     
     if (!isDialogActive) {
         document.getElementById("message-panel").insertAdjacentHTML('beforeend', getInputElement());
+        document.getElementById('file-upload').addEventListener('change', function(e) {
+            const previewContainer = document.getElementById('file-preview');
+            previewContainer.innerHTML = '';
+            if (this.files.length > 0) {
+                const fileName = this.files[0].name;
+                const fileNameElement = document.createElement('div');
+                fileNameElement.className = 'file-name-only';
+                fileNameElement.textContent = fileName;
+                previewContainer.appendChild(fileNameElement);
+            }
+        });
         document.getElementById("text-input").addEventListener("keydown", (e) => {
             if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
@@ -583,7 +597,7 @@ function updateChats(id, message) {
 
     let chatWithNewMessage = document.querySelector('.chat-item[data-user-id="' + id + '"]');    
     
-    chatWithNewMessage.querySelector('.last-message').textContent = message.text;
+    chatWithNewMessage.querySelector('.last-message').textContent = (message.filelink) ? message.file_name : message.text;
     chatWithNewMessage.remove();
     chatContainer.insertBefore(chatWithNewMessage, chatContainer.firstChild);
     console.log(message);
@@ -591,6 +605,7 @@ function updateChats(id, message) {
 
 function getInputElement() {
     return `
+        <div class="file-preview" id="file-preview"></div>
         <div class="chat-input">
             <div class="file-upload-container">
                 <label for="file-upload" class="file-upload-button">
@@ -599,7 +614,6 @@ function getInputElement() {
                         accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.zip,.rar"
                         style="display: none;">
                 </label>
-                <div class="file-preview" id="file-preview"></div>
             </div>
             <textarea id="text-input" placeholder="Введите сообщение..."></textarea>
             <button class="send-button" onclick="sendMessage()">

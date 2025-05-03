@@ -244,6 +244,6 @@ class UserPageController extends AbstractController
             2 => 3,
             6 => 4,
         ];
-        var_dump($this->chat->getAllMessages(7)); die;
+        var_dump($this->chat->getAvailableChats($userId)); die;
     }
 }

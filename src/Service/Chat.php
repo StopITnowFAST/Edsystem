@@ -55,7 +55,14 @@ class Chat {
         // Достаю данные для первичной загрузки 
         $sql = "
             SELECT 
-                u.user_id, u.last_name, u.first_name, u.type, last_msg.text AS last_message_text, last_msg.date AS last_message_date
+                u.user_id, 
+                u.last_name, 
+                u.first_name, 
+                u.type, 
+                last_msg.text AS last_message_text, 
+                last_msg.date AS last_message_date,
+                CONCAT('/download/user-file/', f.real_file_name) AS filelink,
+                f.file_name
             FROM (
                 SELECT st.user_id, st.last_name, st.first_name, 'student' as type
                 FROM `student` st WHERE st.user_id IN $ids
@@ -66,7 +73,11 @@ class Chat {
                 WHERE sb.user_id IN $ids
             ) u
             LEFT JOIN (
-                SELECT partner_id, text, date
+                SELECT 
+                    partner_id, 
+                    text, 
+                    date,
+                    file_id
                 FROM (
                     SELECT 
                         CASE 
@@ -75,6 +86,7 @@ class Chat {
                         END AS partner_id,
                         text,
                         date,
+                        file_id,
                         ROW_NUMBER() OVER (PARTITION BY 
                             CASE 
                                 WHEN from_user_id = $userId THEN to_user_id
@@ -87,6 +99,7 @@ class Chat {
                 ) ranked
                 WHERE rn = 1
             ) last_msg ON last_msg.partner_id = u.user_id
+            LEFT JOIN `file` f ON f.id = last_msg.file_id
             ORDER BY 
                 last_msg.date DESC,
                 u.last_name ASC, 
