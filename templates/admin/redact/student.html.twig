@@ -41,7 +41,7 @@
                         <div class="admin-create__field">
                             <label for="group">Группа</label>
                             <select id="group" name="group" class="admin-create__select" required>
-                                <option value = "0" {{ (updating_element.groupId is empty) ? "selected" : "" }}>Без группы</option>
+                                <option value = "0" {{ (updating_element is empty or updating_element.groupId is empty) ? "selected" : "" }}>Без группы</option>
                                 {% for group in groups %}
                                     <option value="{{ group.id }}" {{ (updating_element is not empty and updating_element.groupId == group.id) ? "selected" : "" }}>{{ group.name }}</option>
                                 {% endfor %}

@@ -11,7 +11,7 @@ framework:
         handler_id: null   # Для использования стандартного обработчика сессий PHP
         cookie_lifetime: 0  # Сессионные cookies будут удаляться по закрытию браузера
         cookie_secure: auto # Если работает через HTTPS, установите true
-        cookie_samesite: lax # Политика same-site для cookies
+        cookie_samesite: 'none' # Политика same-site для cookies
 
     #esi: true
     #fragments: true

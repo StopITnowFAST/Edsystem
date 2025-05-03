@@ -4,13 +4,25 @@ const SUBJECT_SECTION = 'subjects';
 const PROFILE_SECTION = 'profile';
 const TEST_SECTION = 'tests';
 
-const SCHEDULE_SECTION_URL = '';
-const CHAT_SECTION_URL = '';
-const SUBJECT_SECTION_URL = '';
-const PROFILE_SECTION_ULR = '';
-const TEST_SECTION_ULR = '/request/get/user/tests/';
+const SCHEDULE_SECTION_URL = '/request/get/user/' + SCHEDULE_SECTION + '/';
+const CHAT_SECTION_URL = '/request/get/user/' + CHAT_SECTION + '/';
+const MESSAGES_URL = '/request/get/user/messages/' + CHAT_SECTION + '/';
+const SEND_MESSAGE_URL = '/request/send/user/message/' + CHAT_SECTION + '/';
+const GET_UPDATES_URL = '/request/get/user/updates/' + CHAT_SECTION + '/';
+const SUBJECT_SECTION_URL = '/request/get/user/' + SUBJECT_SECTION + '/';
+const PROFILE_SECTION_ULR = '/request/get/user/' + PROFILE_SECTION + '/';
+const TEST_SECTION_ULR = '/request/get/user/' + TEST_SECTION + '/';
 
-let CONTENT_CONTAINER = document.getElementById('content');
+const CONTENT_CONTAINER = document.getElementById('content');
+const POLL_DELAY = 1000;
+
+let isPolling = false;
+let isDialogActive = false;
+let globalChatArray = [];
+let currentGroup = 'student';
+let currentDialog = 0;
+
+startPolling();
 
 document.addEventListener('DOMContentLoaded', function() {
     const buttons = document.querySelectorAll('.sidebar-button');
@@ -30,7 +42,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function loadContent(section) {
     loadPlaceHolder();
-
     switch(section) {
         case SCHEDULE_SECTION:
             // pageData = getDataFromServer(SCHEDULE_SECTION_URL);
@@ -38,7 +49,9 @@ async function loadContent(section) {
             break;
         case CHAT_SECTION:
             json = await getDataFromServer(CHAT_SECTION_URL);
+            globalChatArray = json.data;
             content = getChatPage(json.data);
+            console.log(json.data);
             break;
         case SUBJECT_SECTION:
             // pageData = getDataFromServer(SUBJECT_SECTION_URL);
@@ -90,50 +103,9 @@ function getDataFromServer(url) {
         });
 }
 
-function getChatPage(chatData) {
-    return `
-        <div class="chat-container">
-            <!-- 1. Панель групп (студенты/преподаватели) -->
-            <div class="chat-group-panel">
-                <div class="chat-group active" data-group="students">
-                    <i class="fas fa-user-graduate"></i>
-                    <span>Студенты</span>
-                </div>
-                <div class="chat-group" data-group="teachers">
-                    <i class="fas fa-chalkboard-teacher"></i>
-                    <span>Преподаватели</span>
-                </div>
-            </div>
-
-            <!-- 2. Панель списка чатов -->
-            <div class="chat-list-panel">
-                <div class="chat-list" id="chat-list">
-                    <!-- Сюда будут загружаться чаты через AJAX -->
-                    <div class="chat-list-placeholder">
-                        <i class="fas fa-comment-dots"></i>
-                        <p>Выберите группу</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3. Панель сообщений -->
-            <div class="chat-messages-panel">
-                <div class="chat-header">
-                </div>
-                <div class="chat-messages" id="chat-messages">
-                    <div class="empty-chat">
-                        <i class="fas fa-comments"></i>
-                        <p>Выберите чат, чтобы начать общение</p>
-                    </div>
-                </div>
-                <div class="chat-input">
-                    <textarea placeholder="Введите сообщение..." disabled></textarea>
-                    <button class="send-button" disabled><i class="fas fa-paper-plane"></i></button>
-                </div>
-            </div>
-        </div>
-    `;
-}
+// --------------
+// БЛОК С ТЕСТАМИ
+// --------------
 
 function getTestsPage(testsData) {
     if (!testsData || !testsData.length) {
@@ -225,9 +197,306 @@ function renderTestButton(test) {
     return `<button class="btn disabled-btn" disabled>Нет попыток</button>`;
 }
 
+// --------------
+// БЛОК С ЧАТАМИ
+// --------------
+
+function getChatPage(chatData) {
+
+    // Генерируем HTML для списка чатов студентов
+    const studentsChats = generateChatListHTML(chatData.student, 'student');
+    
+    // Генерируем HTML для списка чатов преподавателей
+    const teachersChats = generateChatListHTML(chatData.teacher, 'teacher');
+
+    return `
+        <div class="chat-container">
+            <!-- 1. Панель групп (студенты/преподаватели) -->
+            <div class="chat-group-panel">
+                <div id="students_group" class="chat-group active" data-group="students" onclick="changePlatform('student')">
+                    <i class="fas fa-user-graduate"></i>
+                    <span>Студенты</span>
+                </div>
+                <div id="teachers_group" class="chat-group" data-group="teachers" onclick="changePlatform('teacher')">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span>Преподаватели</span>
+                </div>
+            </div>
+
+            <!-- 2. Панель списка чатов -->
+            <div id="chat_list" class="chat-list-panel">
+                <div class="chat-list" id="chat-list">
+                    <!-- Секция чатов студентов -->
+                    <div id="chat_list_students" class="chat-group-section" data-group-section="students">
+                        ${studentsChats || `
+                            <div class="chat-list-placeholder">
+                                <i class="fas fa-comment-slash"></i>
+                                <p>Нет чатов с студентами</p>
+                            </div>
+                        `}
+                    </div>
+                    
+                    <!-- Секция чатов преподавателей (изначально скрыта) -->
+                    <div id="chat_list_teachers" class="chat-group-section" data-group-section="teachers" style="display:none">
+                        ${teachersChats || `
+                            <div class="chat-list-placeholder">
+                                <i class="fas fa-comment-slash"></i>
+                                <p>Нет чатов с преподавателями</p>
+                            </div>
+                        `}
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Панель сообщений -->
+            <div id="message-panel" class="chat-messages-panel">
+                <div class="chat-header">
+                    <div class="chat-info">
+                        <h3 id="current-chat-name">Выберите чат</h3>
+                    </div>
+                </div>
+                <div class="chat-messages" id="chat-messages">
+                    <div class="empty-chat">
+                        <i class="fas fa-comments"></i>
+                        <p>Выберите чат, чтобы начать общение</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Вспомогательная функция для генерации списка чатов
+function generateChatListHTML(users, type) {
+    if (!users || Object.keys(users).length === 0) return null;
+    
+    return Object.values(users).map(user => {
+        const lastMessage = user.last_message_text 
+            ? `<p class="last-message">${truncateText(user.last_message_text, 30)}</p>`
+            : '<p class="last-message no-messages">Нет сообщений</p>';
+            
+        const lastDate = user.last_message_date 
+            ? `<span class="last-message-date">${formatDate(user.last_message_date)}</span>`
+            : '';
+        
+        let userName = (user.user_id == USER_ID) ? 'Избранное' : user.last_name + " " + user.first_name;
+            
+        return `
+            <div class="chat-item" onclick="renderDialog(${user.user_id})" data-user-id="${user.user_id}" data-user-type="${type}">
+                <div class="chat-avatar">${getInitials(user.first_name, user.last_name, user.user_id)}</div>
+                <div class="chat-info">
+                    <h4>${userName}</h4>
+                    ${lastMessage}
+                </div>
+                ${lastDate}
+                ${user.unread_count > 0 ? `<span class="unread-count">${user.unread_count}</span>` : ''}
+            </div>
+        `;
+    }).join('');
+}
+
+// Вспомогательные функции
+function truncateText(text, maxLength) {
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function getInitials(firstName, lastName, id) {
+    if (id == USER_ID) {
+        return 'И';
+    }
+    return (lastName.charAt(0) + firstName.charAt(0)).toUpperCase();
+}
+
+// Функция для начала получения обновлений
+function startPolling() {
+    console.log("startPolling");
+    if (isPolling) return;    
+    isPolling = true;
+    poll();
+}
+
+// Функция для остановки получения обновлений
+function stopPolling() {
+    isPolling = false;
+}
+
+
+// Функция для смены платформы с чатом
+function changePlatform(id) {
+    currentGroup = id;
+    let students_chat_list = document.getElementById("chat_list_students");
+    let teachers_chat_list = document.getElementById("chat_list_teachers");
+    let students_group = document.getElementById("students_group");
+    let teachers_group = document.getElementById("teachers_group");
+    if (id == 'student') {
+        // Открытие группы студентов
+        students_chat_list.style.display = "block";
+        teachers_chat_list.style.display = "none";
+        students_group.classList.add("active");
+        teachers_group.classList.remove("active");
+    } else if (id == 'teacher') {
+        // Открытие группы преподавателей
+        students_chat_list.style.display = "none";
+        teachers_chat_list.style.display = "block";
+        teachers_group.classList.add("active");
+        students_group.classList.remove("active");
+    }
+
+}
+
+// Функция отображает выбранный пользователем диалог
+async function renderDialog(userId) {
+    currentDialog = userId;
+    document.getElementById("chat-messages").innerHTML = '';
+    if (!isDialogActive) {
+        document.getElementById("message-panel").insertAdjacentHTML('beforeend', getInputElement());
+        // Обработчик нажатия Enter
+        document.getElementById("text-input").addEventListener("keydown", (e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();  // Отменяем перенос строки
+                sendMessage();       // Отправляем сообщение
+            }
+        });
+        isDialogActive = true;
+    }
+    let dialogName = (userId == USER_ID) ? 'Избранное' : globalChatArray[currentGroup][userId].last_name + " " + globalChatArray[currentGroup][userId].first_name;
+    document.getElementById("current-chat-name").textContent = dialogName;
+    processMessages(globalMessageArray[userId]);
+}
+
+// Функция закрывает диалог с пользователем
+function closeDialog() {
+    messageBox = document.getElementById("chat-messages");
+    messageBox.innerHTML = `
+        <div class="empty-chat">
+        <i class="fas fa-comments"></i>
+        <p>Выберите чат, чтобы начать общение</p>
+        </div>
+    `;
+    isDialogActive = false;
+}
+
+// Функция для обработки сообщений для диалога
+function processMessages(messages) {
+    if (messages && isDialogActive) {
+        messageBox = document.getElementById("chat-messages");
+        
+        messages.forEach(message => {
+            const msgElement = makeMessageElement(message['text'], message['type'], message['id']);
+            messageBox.insertAdjacentHTML('beforeend', msgElement);
+            messageBox.scrollTop = messageBox.scrollHeight;
+            // lastId = message['id']        
+        });
+    }
+}
+
+// Функция для создания элемента сообщения
+function makeMessageElement(text, type, message_id) {
+    let divClass = (type == 'incoming') ? "incoming-message" : "outcoming-message";
+    let content = text;
+    content = content.replace('<', "&lt;");
+    content = content.replace('>', "&gt;");    
+    let element = '<div message_id=' + message_id + ' class=' + divClass + '>' + content + '</div>';
+    return element;
+}
+
+// Функция для отправки сообщения
+async function sendMessage() {
+    const messageInput = document.getElementById("text-input");
+    const text = messageInput.value.trim();
+    
+    if (!text) return; // Не отправляем пустые сообщения
+    
+    try {
+        const response = await fetch(`${SEND_MESSAGE_URL}${USER_ID}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                text: text,
+                from_id: USER_ID,
+                to_id: currentDialog
+            })
+        });
+        
+        if (!response.ok) throw new Error("Ошибка HTTP: " + response.status);
+        
+        messageInput.value = '';
+        messageInput.focus();
+        
+    } catch (error) {
+        console.error("Ошибка отправки:", error);
+        alert("Не удалось отправить сообщение. Проверьте консоль.");
+    }
+}
+
+// Функция для получения обновлений
+async function poll() {    
+    console.log("Начинаю посылать запросы");
+    try {
+        let userUpdates = formUpdateQueryArray();
+        const response = await fetch(GET_UPDATES_URL + USER_ID, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(userUpdates)
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            updateTotalMessages(data.newMessages);
+            if (data.newMessages[currentDialog]) {
+                processMessages(data.newMessages[currentDialog]);
+            }
+        }
+
+        setTimeout(() => poll(), POLL_DELAY);
+
+    } catch (error) {
+        console.error('Polling error:', error);
+        // Повторяем запрос после ошибки
+        setTimeout(() => poll(), POLL_DELAY * 2);
+    }    
+}
 
 
 
+// Функция формирует массив с id последних сообщения для всех чатов
+function formUpdateQueryArray() {
+    let update = new FormData();
+    for (chatId in globalChatArray) {
+        update[chatId] = 0;
+    }
+    for (chatId in globalMessageArray) {
+        update[chatId] = globalMessageArray[chatId][globalMessageArray[chatId].length - 1].id
+    }
+    return update;
+}
+
+// Функция обновляет массив с сообщениями
+async function updateTotalMessages(newMessages) {
+    for (userId in newMessages) {
+        let messages = newMessages[userId];
+        messages.forEach(message => {
+            globalMessageArray[userId].push(message);
+        });
+    }
+}
+
+function getInputElement() {
+    return `
+        <div class="chat-input">
+            <textarea id="text-input" placeholder="Введите сообщение..."></textarea>
+            <button class="send-button" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    `;
+}
 
 
 

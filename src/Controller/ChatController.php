@@ -50,44 +50,44 @@ class ChatController extends AbstractController
         ]);
     }
 
-    // Отправка сообщений пользователям телеграмма
-    #[Route(path: '/api/send-message', name:'send_message')]
-    public function sendMessage() {
-        $postJsonArray = json_decode(file_get_contents("php://input"), true);
-        $text = $postJsonArray['text'];
-        $groupId = $postJsonArray['id'];
+    // // Отправка сообщений пользователям телеграмма
+    // #[Route(path: '/api/send-message', name:'send_message')]
+    // public function sendMessage() {
+    //     $postJsonArray = json_decode(file_get_contents("php://input"), true);
+    //     $text = $postJsonArray['text'];
+    //     $groupId = $postJsonArray['id'];
               
-        return new Response('ok');
-    }
+    //     return new Response('ok');
+    // }
 
-    // Отправка сообщения яндекс гпт
-    #[Route(path: '/api/smart-meter/send-message', name:'send_smart_message')]
-    public function handleSmartMeterMessage() {
-        $postJsonArray = json_decode(file_get_contents("php://input"), true);
-        $text = $postJsonArray['text'];
+    // // Отправка сообщения яндекс гпт
+    // #[Route(path: '/api/smart-meter/send-message', name:'send_smart_message')]
+    // public function handleSmartMeterMessage() {
+    //     $postJsonArray = json_decode(file_get_contents("php://input"), true);
+    //     $text = $postJsonArray['text'];
 
-        $this->chat->handleSmartMeterMessage($text);
+    //     $this->chat->handleSmartMeterMessage($text);
 
-        return new Response('ok');
-    }
+    //     return new Response('ok');
+    // }
 
-    // Функция для получения информации о пользователе по его Id
-    #[Route(path: '/api/get/chats', name:'api_get_chats', methods: ['POST'])]
-    public function getChats() {
-        // $platform = json_decode(file_get_contents("php://input"), true)['platform'];
-        // $user = 2;
-        // return $this->json([
-        //     'username' => $user[0]['tg_nickname'],
-        // ]);
-    }
+    // // Функция для получения информации о пользователе по его Id
+    // #[Route(path: '/api/get/chats', name:'api_get_chats', methods: ['POST'])]
+    // public function getChats() {
+    //     // $platform = json_decode(file_get_contents("php://input"), true)['platform'];
+    //     // $user = 2;
+    //     // return $this->json([
+    //     //     'username' => $user[0]['tg_nickname'],
+    //     // ]);
+    // }
 
-    // Функция для тестов
-    #[Route(path: '/api/tes', name:'test_api')]
-    public function tests() {
-        $ids = [
-            '78' => '197',
-            '79' => '155',
-        ];
-        var_dump($this->chat->getNewMessages($ids));die;
-    }
+    // // Функция для тестов
+    // #[Route(path: '/api/tes', name:'test_api')]
+    // public function tests() {
+    //     $ids = [
+    //         '78' => '197',
+    //         '79' => '155',
+    //     ];
+    //     var_dump($this->chat->getNewMessages($ids));die;
+    // }
 }

@@ -10,6 +10,10 @@ security:
                 class: App\Entity\User
                 property: email
     firewalls:
+        api:
+            pattern: ^/request/get/user/updates
+            security: false  # Полностью отключает аутентификацию для этого пути
+            stateless: true  # Не использует сессии
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false

@@ -95,7 +95,7 @@
 .content p {
     color: var(--color-grey-0);
     font-size: 1.1rem;
-    margin-bottom: 30px;
+    /* margin-bottom: 30px; */
 }
 
 #ajax-content {
@@ -385,20 +385,6 @@
     flex-direction: column;
 }
 
-.chat-search {
-    padding: var(--offset-xs);
-    border-bottom: 1px solid var(--color-grey-300);
-}
-
-.chat-search input {
-    width: 100%;
-    padding: var(--offset-3xs) var(--offset-xs);
-    border-radius: var(--offset-3xs);
-    border: none;
-    background: var(--color-grey-300);
-    color: var(--color-font-bright);
-}
-
 .chat-list {
     flex-grow: 1;
     overflow-y: auto;
@@ -423,6 +409,7 @@
 }
 
 .chat-header {
+    color: white;
     padding: var(--offset-xs) var(--offset-s);
     border-bottom: 1px solid var(--color-grey-300);
 }
@@ -458,4 +445,139 @@
     border-radius: var(--offset-3xs);
     width: 50px;
     cursor: pointer;
+}
+
+/* Стили для элементов чата */
+.chat-item {
+    display: flex;
+    padding: var(--offset-xs);
+    border-radius: var(--offset-3xs);
+    cursor: pointer;
+    transition: background 0.2s;
+    position: relative;
+    margin-bottom: var(--offset-3xs);
+}
+
+.chat-item:hover {
+    background: var(--color-grey-300);
+}
+
+.chat-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--color-main);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: var(--offset-xs);
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.chat-info {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.chat-info h4 {
+    margin: 0 0 var(--offset-3xs) 0;
+    color: var(--color-font-bright);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.last-message {
+    margin: 0;
+    color: var(--color-grey-0);
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.last-message.no-messages {
+    color: var(--color-grey-100);
+    font-style: italic;
+}
+
+.last-message-date {
+    position: absolute;
+    top: var(--offset-xs);
+    right: var(--offset-xs);
+    color: var(--color-grey-0);
+    font-size: 0.8rem;
+}
+
+.unread-count {
+    position: absolute;
+    bottom: var(--offset-xs);
+    right: var(--offset-xs);
+    background: var(--color-main);
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+}
+
+/* Анимация переключения групп */
+.chat-group-section {
+    transition: opacity 0.3s ease;
+}
+
+/* Общие стили для всех сообщений */
+.incoming-message,
+.outcoming-message {
+    max-width: 80%; /* Максимальная ширина сообщения */
+    min-width: min-content; /* Минимальная ширина по содержимому */
+    width: fit-content; /* Ширина под содержимое */
+    padding: 15px 20px;
+    border-radius: 18px;
+    margin-bottom: 8px;
+    word-wrap: break-word;
+    box-sizing: border-box;
+}
+
+/* Входящие сообщения */
+.incoming-message {
+    align-self: flex-start;
+    background: var(--color-grey-300);
+    color: var(--color-font-bright);
+    border-top-left-radius: 0;
+    margin-right: auto; /* Заменяем var(--offset-xl) */
+}
+
+/* Исходящие сообщения */
+.outcoming-message {
+    align-self: flex-end;
+    background: var(--color-main);
+    color: white;
+    border-top-right-radius: 0;
+    margin-left: auto; /* Заменяем var(--offset-xl) */
+    text-align: end;
+}
+
+/* Время в сообщениях */
+.message-time {
+    display: block;
+    font-size: 0.75rem;
+    opacity: 0.7;
+    text-align: right;
+    margin-top: var(--offset-3xs);
+}
+
+/* Для входящих - серый текст времени */
+.incoming-message .message-time {
+    color: var(--color-grey-0);
+}
+
+/* Для исходящих - светлый текст времени */
+.outcoming-message .message-time {
+    color: rgba(255, 255, 255, 0.8);
 }
