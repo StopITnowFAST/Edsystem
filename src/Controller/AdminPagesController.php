@@ -13,6 +13,10 @@ use App\Entity\Teacher;
 use App\Service\TableWidget;
 use App\Entity\Redirect;
 use App\Entity\HeaderMenu;
+use App\Entity\ScheduleClassroom;
+use App\Entity\ScheduleLessonType;
+use App\Entity\ScheduleTime;
+use App\Entity\ScheduleSubject;
 use App\Entity\Test;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -203,6 +207,82 @@ class AdminPagesController extends AbstractController {
         return $this->render('admin/header_menu.html.twig', [
             'breadcrumbs' => $breadcrumbs,
             'notes' => $menu,
+        ]);
+    }
+
+    // Таблица аудитории
+    #[Route('/admin/schedule/classrooms/{page}', 'admin_schedule_classrooms')] 
+    function adminScheduleClassrooms($page = 1) {
+        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
+            'Аудитории' => 'admin_schedule_classrooms',
+        ], $this->router);
+        $pagination = $this->table->createPagination($page, $this->em->getRepository(ScheduleClassroom::class));
+        return $this->render('admin/schedule_classrooms.html.twig', [
+            'breadcrumbs' => $breadcrumbs,
+            'notes' => $pagination['data'],
+            'totalNotes' => $pagination['totalNotes'],
+            'pagRow' => $pagination['row'],
+            'currentPage' => $page,
+            'paginationSize' => $pagination['size'],
+            'formName' => 'admin_schedule_classrooms',
+        ]);
+    }
+
+    // Таблица типы занятий
+    #[Route('/admin/schedule/lesson-types/{page}', 'admin_schedule_lesson_types')] 
+    function adminScheduleLessonTypes($page = 1) {
+        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
+            'Типы занятий' => 'admin_schedule_lesson_types',
+        ], $this->router);
+        $pagination = $this->table->createPagination($page, $this->em->getRepository(ScheduleLessonType::class));
+        return $this->render('admin/schedule_lesson_types.html.twig', [
+            'breadcrumbs' => $breadcrumbs,
+            'notes' => $pagination['data'],
+            'totalNotes' => $pagination['totalNotes'],
+            'pagRow' => $pagination['row'],
+            'currentPage' => $page,
+            'paginationSize' => $pagination['size'],
+            'formName' => 'admin_schedule_lesson_types',
+        ]);
+    }
+
+    // Таблица предметы
+    #[Route('/admin/schedule/subjects/{page}', 'admin_schedule_subjects')] 
+    function adminScheduleSubjects($page = 1) {
+        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
+            'Предметы' => 'admin_schedule_subjects',
+        ], $this->router);
+        $groups = $this->em->getRepository(Group::class)->findBy(['status' => 1]);
+        $teachers = $this->em->getRepository(Teacher::class)->findBy(['status' => 1]);
+        $pagination = $this->table->createPagination($page, $this->em->getRepository(ScheduleSubject::class));
+        return $this->render('admin/schedule_subjects.html.twig', [
+            'breadcrumbs' => $breadcrumbs,
+            'notes' => $pagination['data'],
+            'totalNotes' => $pagination['totalNotes'],
+            'pagRow' => $pagination['row'],
+            'currentPage' => $page,
+            'paginationSize' => $pagination['size'],
+            'formName' => 'admin_schedule_subjects',
+            'groups' => $groups,
+            'teachers' => $teachers,
+        ]);
+    }
+
+    // Таблица время занятий
+    #[Route('/admin/schedule/lesson-time/{page}', 'admin_schedule_lesson_times')] 
+    function adminLessonTime($page = 1) {
+        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
+            'Время занятий' => 'admin_schedule_lesson_times',
+        ], $this->router);
+        $pagination = $this->table->createPagination($page, $this->em->getRepository(ScheduleTime::class));
+        return $this->render('admin/schedule_lesson_times.html.twig', [
+            'breadcrumbs' => $breadcrumbs,
+            'notes' => $pagination['data'],
+            'totalNotes' => $pagination['totalNotes'],
+            'pagRow' => $pagination['row'],
+            'currentPage' => $page,
+            'paginationSize' => $pagination['size'],
+            'formName' => 'admin_schedule_lesson_times',
         ]);
     }
 
@@ -494,6 +574,100 @@ class AdminPagesController extends AbstractController {
         ]);
     }  
 
+    // Создание аудитории
+    #[Route(path: '/admin/create/schedule/classroom', name: 'admin_create_schedule_classroom')] 
+    function adminCreateScheduleClassroom(Request $request, $element = null) {
+        if ($request->isMethod('POST')) {
+            $classroom = (isset($_POST['isUpdate'])) ? $this->em->getRepository(ScheduleClassroom::class)->find($_POST['updateId']) : new ScheduleClassroom;
+            $classroom->setName($_POST['name']);
+            $classroom->setClassroomType($_POST['type']);
+            $this->em->persist($classroom);
+            $this->em->flush();
+            return $this->redirectToRoute('admin_schedule_classrooms');
+        }
+        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
+            'Аудитории' => 'admin_schedule_classrooms',
+            'Добавить аудиторию' => 'admin_create_schedule_classroom',
+        ], $this->router);
+        return $this->render('admin/redact/schedule_classroom.html.twig', [
+            'breadcrumbs' => $breadcrumbs,
+            'updating_element' => $element,
+        ]);
+    }
+
+    // Создание типа занятия
+    #[Route(path: '/admin/create/schedule/lesson-type', name: 'admin_create_schedule_lesson_type')] 
+    function adminCreateScheduleLessonType(Request $request, $element = null) {
+        if ($request->isMethod('POST')) {
+            $type = (isset($_POST['isUpdate'])) ? $this->em->getRepository(ScheduleLessonType::class)->find($_POST['updateId']) : new ScheduleLessonType;
+            $type->setName($_POST['name']);            
+            $this->em->persist($type);
+            $this->em->flush();
+            return $this->redirectToRoute('admin_schedule_lesson_types');
+        }
+        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
+            'Типы занятий' => 'admin_schedule_lesson_types',
+            'Добавить тип занятия' => 'admin_create_schedule_lesson_type',
+        ], $this->router);
+        
+        return $this->render('admin/redact/schedule_lesson_type.html.twig', [
+            'breadcrumbs' => $breadcrumbs,
+            'updating_element' => $element,
+        ]);
+    }
+
+    // Создание предмета
+    #[Route(path: '/admin/create/schedule/subject', name: 'admin_create_schedule_subject')] 
+    function adminCreateScheduleSubject(Request $request, $element = null) {
+        if ($request->isMethod('POST')) {
+            $subject = (isset($_POST['isUpdate'])) ? $this->em->getRepository(ScheduleSubject::class)->find($_POST['updateId']) : new ScheduleSubject;
+            $subject->setName($_POST['name']);
+            $subject->setGroupId($_POST['group_id']);
+            $subject->setUserId($_POST['user_id']);
+            $this->em->persist($subject);
+            $this->em->flush();
+            return $this->redirectToRoute('admin_schedule_subjects');
+        }
+
+        $groups = $this->em->getRepository(Group::class)->findBy(['status' => 1]);
+        $teachers = $this->em->getRepository(Teacher::class)->findBy(['status' => 1]);
+
+        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
+            'Предметы' => 'admin_schedule_subjects',
+            'Добавить предмет' => 'admin_create_schedule_subject',
+        ], $this->router);
+
+        return $this->render('admin/redact/schedule_subject.html.twig', [
+            'breadcrumbs' => $breadcrumbs,
+            'groups' => $groups,
+            'teachers' => $teachers,
+            'updating_element' => $element,
+        ]);
+    }
+
+    // Создание времени занятия
+    #[Route(path: '/admin/create/schedule/lesson-time', name: 'admin_create_schedule_lesson_time')] 
+    function adminCreateScheduleLessonTime(Request $request, $element = null) {
+        if ($request->isMethod('POST')) {
+            $time = (isset($_POST['isUpdate'])) ? $this->em->getRepository(ScheduleTime::class)->find($_POST['updateId']) : new ScheduleTime;
+            $time->setLessonNumber($_POST['lesson_number']);
+            $time->setStartTime($_POST['start_time']);
+            $time->setEndTime($_POST['end_time']);
+            $this->em->persist($time);
+            $this->em->flush();
+            return $this->redirectToRoute('admin_schedule_lesson_times');
+        }
+        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
+            'Время занятия' => 'admin_schedule_lesson_times',
+            'Добавить время занятия' => 'admin_create_schedule_lesson_time',
+        ], $this->router);
+
+        return $this->render('admin/redact/schedule_lesson_time.html.twig', [
+            'breadcrumbs' => $breadcrumbs,
+            'updating_element' => $element,
+        ]);
+    }
+
     // Далее идут маршруты действий
 
     // Удаление элемента
@@ -507,6 +681,10 @@ class AdminPagesController extends AbstractController {
             'teachers' => $this->em->getRepository(Teacher::class)->find($id),
             'tests' => $this->em->getRepository(Test::class)->find($id),
             'files' => $this->em->getRepository(FileEntity::class)->find($id),
+            'schedule_classrooms' => $this->em->getRepository(ScheduleClassroom::class)->find($id),
+            'schedule_lesson_times' => $this->em->getRepository(ScheduleTime::class)->find($id),
+            'schedule_lesson_types' => $this->em->getRepository(ScheduleLessonType::class)->find($id),
+            'schedule_subjects' => $this->em->getRepository(ScheduleSubject::class)->find($id),
         };
         if ($type == 'files') {
             $path = $this->getParameter('kernel.project_dir').'/public/met_files/' . $element->getRealFileName();
@@ -557,6 +735,18 @@ class AdminPagesController extends AbstractController {
             case 'files':
                 $element = $this->em->getRepository(FileEntity::class)->find($id);
                 return $this->adminCreateFile($request, $element);
+            case 'schedule_classrooms':
+                $element = $this->em->getRepository(ScheduleClassroom::class)->find($id);
+                return $this->adminCreateScheduleClassroom($request, $element);
+            case 'schedule_lesson_times':
+                $element = $this->em->getRepository(ScheduleTime::class)->find($id);
+                return $this->adminCreateScheduleLessonTime($request, $element);
+            case 'schedule_lesson_types':
+                $element = $this->em->getRepository(ScheduleLessonType::class)->find($id);
+                return $this->adminCreateScheduleLessonType($request, $element);
+            case 'schedule_subjects':
+                $element = $this->em->getRepository(ScheduleSubject::class)->find($id);
+                return $this->adminCreateScheduleSubject($request, $element);
             default:
                 return $this->redirectToRoute('admin_moderators');
         }

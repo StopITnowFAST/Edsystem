@@ -1,6 +1,7 @@
 {% extends 'base.html.twig' %}
 
-{% set title = "Тесты" %}
+{% set title = "Группы" %}
+
 {% block title %}{{ title }} | {{ app_title }}{% endblock %}
 
 {% block stylesheets %}
@@ -13,10 +14,10 @@
     <div class="container">
         {{ include('blocks/breadcrumbs.html.twig') }}
         <div class="admin-table__wrap">
+            <h1>{{ title }}</h1>
             <div class="admin-table__head">
-                <h1>{{ title }}</h1>
                 <div class="admin-table__buttons">
-                    <a href="{{ path('admin_create_test') }}" class="btn btn-primary">Добавить тест</a>
+                <a href="{{ path('admin_create_group') }}" class="btn btn-primary">Добавить группу</a>
                 </div>
             </div>
             <div class="admin-table__body">
@@ -25,8 +26,10 @@
                         <tr>
                             <th>ID</th>
                             <th>Название</th>
-                            <th>Перемешивание</th>
-                            <th>Время на тест</th>
+                            <th>Код</th>
+                            <th>Год</th>
+                            <th>Семестр</th>
+                            <th>Курс</th>
                             <th>Действия</th>
                         </tr>
                     </thead>
@@ -35,22 +38,24 @@
                             <tr>
                                 <td>{{ note.id }}</td>
                                 <td>{{ note.name }}</td>
-                                <td>{{ (note.shuffle == 1) ? 'Да' : 'Нет' }}</td>
-                                <td>{{ note.time }}</td>
+                                <td>{{ note.code }}</td>
+                                <td>{{ note.year }}</td>
+                                <td>{{ note.semester }}</td>
+                                <td>{{ note.course }}</td>
                                 {{ include('blocks/action_cell.html.twig', {
-                                    'delete_path': path('admin_delete_note', {'id': note.id, 'type': 'tests'}),
-                                    'change_path': path('admin_update_note', {'id': note.id, 'type': 'tests'}),
+                                    'delete_path': path('admin_delete_note', {'id': note.id, 'type': 'groups'}),
+                                    'change_path': path('admin_update_note', {'id': note.id, 'type': 'groups'}),
                                 }) }}
-                                </tr>
-                            </tr>
                         {% endfor %}
                     </tbody>
                 </table>    
             </div>
         </div>     
-    </div>          
+    </div>
     <div class="overlay"></div>
     {% include('blocks/pagination.html.twig') %}
 {% endblock %}
 
-{% block javascripts %}{% endblock %}
+{% block javascripts %}
+    <script src="{{ asset('/js/admin_groups.js') }}"></script>
+{% endblock %}

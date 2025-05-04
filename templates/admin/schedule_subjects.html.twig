@@ -1,22 +1,22 @@
 {% extends 'base.html.twig' %}
 
-{% set title = "Тесты" %}
+{% set title = "Предметы" %}
+
 {% block title %}{{ title }} | {{ app_title }}{% endblock %}
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('/styles/admin_tables.css') }}">
     <link rel="stylesheet" href="{{ asset('/styles/pagination.css') }}">
-    <link rel="stylesheet" href="{{ asset('/styles/popup.css') }}">
 {% endblock %}
 
 {% block body %}
     <div class="container">
         {{ include('blocks/breadcrumbs.html.twig') }}
         <div class="admin-table__wrap">
+            <h1>{{ title }}</h1>
             <div class="admin-table__head">
-                <h1>{{ title }}</h1>
                 <div class="admin-table__buttons">
-                    <a href="{{ path('admin_create_test') }}" class="btn btn-primary">Добавить тест</a>
+                <a href="{{ path('admin_create_schedule_subject') }}" class="btn btn-primary">Добавить предмет</a>
                 </div>
             </div>
             <div class="admin-table__body">
@@ -25,8 +25,8 @@
                         <tr>
                             <th>ID</th>
                             <th>Название</th>
-                            <th>Перемешивание</th>
-                            <th>Время на тест</th>
+                            <th>Преподаватель</th>
+                            <th>Группа</th>
                             <th>Действия</th>
                         </tr>
                     </thead>
@@ -35,22 +35,26 @@
                             <tr>
                                 <td>{{ note.id }}</td>
                                 <td>{{ note.name }}</td>
-                                <td>{{ (note.shuffle == 1) ? 'Да' : 'Нет' }}</td>
-                                <td>{{ note.time }}</td>
+                                <td>
+                                    {% set teacher = teachers|filter(t => t.userId == note.user_id)|first %}
+                                    {{ teacher ? teacher.lastName ~ ' ' ~ teacher.firstName : '' }}
+                                </td>
+                                <td>
+                                    {% set group = groups|filter(g => g.id == note.group_id)|first %}
+                                    {{ group ? group.name : '' }}
+                                </td>
                                 {{ include('blocks/action_cell.html.twig', {
-                                    'delete_path': path('admin_delete_note', {'id': note.id, 'type': 'tests'}),
-                                    'change_path': path('admin_update_note', {'id': note.id, 'type': 'tests'}),
+                                    'delete_path': path('admin_delete_note', {'id': note.id, 'type': 'schedule_subjects'}),
+                                    'change_path': path('admin_update_note', {'id': note.id, 'type': 'schedule_subjects'}),
                                 }) }}
-                                </tr>
-                            </tr>
                         {% endfor %}
                     </tbody>
                 </table>    
             </div>
         </div>     
-    </div>          
-    <div class="overlay"></div>
+    </div>
     {% include('blocks/pagination.html.twig') %}
 {% endblock %}
 
-{% block javascripts %}{% endblock %}
+{% block javascripts %}
+{% endblock %}
