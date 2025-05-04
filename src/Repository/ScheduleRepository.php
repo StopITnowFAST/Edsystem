@@ -16,28 +16,31 @@ class ScheduleRepository extends ServiceEntityRepository
         parent::__construct($registry, Schedule::class);
     }
 
-    //    /**
-    //     * @return Schedule[] Returns an array of Schedule objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('s.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Schedule
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function findScheduleByGroupId($groupId) {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
+            SELECT 
+                s.week_number,
+                s.schedule_day,
+                st.lesson_number,
+                st.start_time,
+                st.end_time,
+                slt.name as lesson_type,
+                sc.name as classroom,
+                ss.name as subject,
+                g.code,
+                t.last_name,
+                t.first_name
+            FROM `schedule` s 
+            JOIN `schedule_time` st ON st.id = s.schedule_time_id
+            JOIN `schedule_lesson_type` slt ON slt.id = s.schedule_lesson_type_id
+            JOIN `schedule_classroom` sc ON sc.id = s.schedule_classroom_id
+            JOIN `schedule_subject` ss ON ss.id = s.schedule_subject_id
+            JOIN `group` g ON g.id = s.schedule_group_id
+            JOIN `teacher` t ON t.user_id = s.user_id
+            WHERE s.schedule_group_id = $groupId
+        ";
+        $resultSet = $conn->executeQuery($sql);        
+        return $resultSet->fetchAllAssociative();
+    }
 }

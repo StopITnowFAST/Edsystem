@@ -653,3 +653,165 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+/* Стили контейнера */
+.schedule-container {
+    padding: 20px;
+    background-color: var(--color-grey-200);
+    border-radius: var(--offset-xxs);
+    color: var(--color-font-bright);
+}
+
+.schedule-title {
+    color: var(--color-main);
+    margin-bottom: var(--offset-m);
+    padding-bottom: var(--offset-xs);
+    border-bottom: 1px solid var(--color-grey-400);
+}
+
+/* Стили недели */
+.week-section {
+    background-color: var(--color-grey-300);
+    padding: var(--offset-s);
+    border-radius: var(--offset-xxs);
+    margin-bottom: var(--offset-m);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.week-title {
+    color: var(--color-main);
+    margin-bottom: var(--offset-s);
+}
+
+/* Стили дня */
+.schedule-days {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 3fr));
+    gap: var(--offset-s);
+}
+
+.schedule-day {
+    background-color: var(--color-grey-400);
+    border-radius: var(--offset-xxs);
+    padding: var(--offset-s);
+}
+
+.day-header {
+    margin-bottom: var(--offset-xs);
+    padding-bottom: var(--offset-3xs);
+    border-bottom: 1px solid var(--color-grey-300);
+}
+
+.day-title {
+    margin: 0;
+    color: var(--color-font-bright);
+}
+
+/* Стили занятий */
+.day-lessons {
+    display: flex;
+    flex-direction: column;
+    gap: var(--offset-xs);
+}
+
+.lesson-card {
+    background-color: var(--color-grey-200);
+    border-radius: var(--offset-3xs);
+    padding: var(--offset-xs);
+    transition: transform 0.2s;
+}
+
+.lesson-card:hover {
+    transform: translateY(-2px);
+    background-color: var(--color-grey-375);
+}
+
+.lesson-time {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--offset-3xs);
+    font-size: 0.9rem;
+    color: var(--color-font-bright);
+}
+
+.lesson-number {
+    font-weight: bold;
+}
+
+.lesson-main {
+    margin-bottom: var(--offset-3xs);
+}
+
+.lesson-subject {
+    font-weight: bold;
+    margin-bottom: var(--offset-3xs);
+    color: var(--color-main);
+}
+
+.lesson-type {
+    font-size: 0.85rem;
+    color: var(--color-font-bright);
+    font-style: italic;
+}
+
+.lesson-details {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--color-font-bright);
+}
+
+.lesson-details i {
+    margin-right: 5px;
+    color: var(--color-main);
+}
+
+.no-lessons {
+    text-align: center;
+    color: var(--color-grey-100);
+    font-style: italic;
+    padding: var(--offset-xs) 0;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .schedule-days {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Подсветка текущего дня */
+.schedule-day.current-day {
+    border-left: 4px solid var(--color-main);
+    background-color: var(--color-grey-375);
+}
+
+/* Подсветка текущей пары */
+.lesson-card.current-lesson {
+    background-color: var(--color-main-transparent);
+    box-shadow: 0 0 0 2px var(--color-main);
+    transform: scale(1.02);
+}
+
+.lesson-card.current-lesson .lesson-time,
+.lesson-card.current-lesson .lesson-subject {
+    color: white;
+    font-weight: bold;
+}
+
+/* Плавная анимация */
+.lesson-card {
+    transition: all 0.3s ease;
+}
+
+.week-section.current-week {
+    border: 2px solid var(--color-main);
+}
+
+.week-section.current-week .week-title {
+    color: white;
+    background-color: var(--color-main);
+    padding: 5px 10px;
+    border-radius: 4px;
+    display: inline-block;
+}

@@ -117,6 +117,7 @@
 
 .lesson-fields {
     display: flex;
+    flex-direction: column;
     flex-wrap: wrap;
     gap: var(--offset-3xs);
 }
@@ -124,6 +125,7 @@
 .lesson-fields select {
     flex: 1;
     min-width: 120px;
+    width: 100%;
     padding: var(--offset-3xs);
     background-color: var(--color-grey-400);
     border: 1px solid var(--color-grey-300);

@@ -18,6 +18,7 @@ use App\Entity\ScheduleLessonType;
 use App\Entity\ScheduleTime;
 use App\Entity\ScheduleSubject;
 use App\Entity\Test;
+use App\Entity\Schedule;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
@@ -676,6 +677,11 @@ class AdminPagesController extends AbstractController {
         ], $this->router);
 
         $currentGroup = $this->em->getRepository(Group::class)->find($groupId);
+        // Загружаем существующее расписание для группы
+        $existingSchedules = $this->em->getRepository(Schedule::class)->findBy([
+            'schedule_group_id' => $groupId
+        ], ['week_number' => 'ASC', 'schedule_day' => 'ASC', 'schedule_time_id' => 'ASC']);
+
         $times = $this->em->getRepository(ScheduleTime::class)->findAll();
         $subjects = $this->em->getRepository(ScheduleSubject::class)->findAll();
         $types = $this->em->getRepository(ScheduleLessonType::class)->findAll();
@@ -690,6 +696,7 @@ class AdminPagesController extends AbstractController {
             'teachers' => $teachers,
             'classrooms' => $classrooms,
             'currentGroup' => $currentGroup,
+            'existingSchedules' => $existingSchedules,
         ]);
     }
 
