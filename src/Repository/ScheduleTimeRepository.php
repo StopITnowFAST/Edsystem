@@ -16,28 +16,21 @@ class ScheduleTimeRepository extends ServiceEntityRepository
         parent::__construct($registry, ScheduleTime::class);
     }
 
-    //    /**
-    //     * @return ScheduleTime[] Returns an array of ScheduleTime objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('s.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function getTableData($offset, $limit) {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
+            SELECT * FROM `schedule_time` LIMIT $limit OFFSET $offset
+        ";
+        $resultSet = $conn->executeQuery($sql);        
+        return $resultSet->fetchAllAssociative();
+    }
 
-    //    public function findOneBySomeField($value): ?ScheduleTime
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function getTotalPages() {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
+            SELECT `id` FROM `schedule_time` 
+        ";
+        $resultSet = $conn->executeQuery($sql);        
+        return $resultSet->rowCount();
+    }
 }

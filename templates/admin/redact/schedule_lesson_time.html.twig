@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% set title = "Добавить новое время" %}
+{% block title %}{{ title }} | {{ app_title }}{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('/styles/admin_tables.css') }}">
+    <link rel="stylesheet" href="{{ asset('/styles/admin_create.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        {{ include('blocks/breadcrumbs.html.twig') }}
+        <div class="admin-table__wrap">
+            <h1>{{ title }}</h1>
+            <div class="admin-table__head">
+                <div class="admin-create__head-buttons">
+                    <a href="{{ path('admin_schedule_lesson_times') }}", class="btn btn-primary">Отменить</a>
+                </div>
+            </div>
+            <div class="admin-table__body">
+                <form method="POST", enctype="multipart/form-data">
+                    {% if updating_element is not empty %}
+                        <input type="hidden" value="true" name="isUpdate">
+                        <input type="hidden" value="{{ updating_element.id }}" name="updateId">
+                    {% endif %}
+                    <div class="admin-create__input-list">                     
+                        <div class="admin-create__field">
+                            <label for="start_time">Время начала занятия</label>
+                            <input type="time" id="start_time" class="admin-create__input" name="start_time" required
+                                value="{{ (updating_element is not empty) ? updating_element.startTime : '' }}" min="00:01" max="23:59" step="60">
+                        </div>                    
+                        <div class="admin-create__field">
+                            <label for="end_time">Время окончания занятия</label>
+                            <input type="time" id="end_time" class="admin-create__input" name="end_time" required
+                                value="{{ (updating_element is not empty) ? updating_element.endTime : '' }}" min="00:01" max="23:59" step="60">
+                        </div>                    
+                        <div class="admin-create__field">
+                            <label for="number">Номер занятия</label>
+                            <input type="number" id="number" class="admin-create__input" name="lesson_number" required
+                                value="{{ (updating_element is not empty) ? updating_element.lessonNumber : "" }}">
+                        </div>                                       
+                    </div>
+                    <button class="btn btn-primary admin-create_button" type="sumbit">Сохранить</button>
+                </form>
+            </div>
+        </div>     
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+{% endblock %}

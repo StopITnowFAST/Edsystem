@@ -2,24 +2,24 @@
 
 namespace App\Repository;
 
-use App\Entity\ScheduleClassroom;
+use App\Entity\ScheduleSubject;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<ScheduleClassroom>
+ * @extends ServiceEntityRepository<ScheduleSubject>
  */
-class ScheduleClassroomRepository extends ServiceEntityRepository
+class ScheduleSubjectRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, ScheduleClassroom::class);
+        parent::__construct($registry, ScheduleSubject::class);
     }
 
     public function getTableData($offset, $limit) {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
-            SELECT * FROM `schedule_classroom` LIMIT $limit OFFSET $offset
+            SELECT * FROM `schedule_subject` LIMIT $limit OFFSET $offset
         ";
         $resultSet = $conn->executeQuery($sql);        
         return $resultSet->fetchAllAssociative();
@@ -28,9 +28,10 @@ class ScheduleClassroomRepository extends ServiceEntityRepository
     public function getTotalPages() {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
-            SELECT `id` FROM `schedule_classroom` 
+            SELECT `id` FROM `schedule_subject` 
         ";
         $resultSet = $conn->executeQuery($sql);        
         return $resultSet->rowCount();
     }
+    
 }

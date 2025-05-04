@@ -50,6 +50,7 @@ security:
 
         # Затем защищаем админ-зоны
         - { path: ^/admin, roles: ROLE_MASTER }
+        - { path: ^/_profiler, roles: ROLE_MASTER }
         - { path: ^/panel, roles: ROLE_TEACHER }
 
         # ВСЕ остальные страницы требуют ROLE_USER
