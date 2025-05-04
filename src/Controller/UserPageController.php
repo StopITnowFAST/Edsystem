@@ -15,6 +15,7 @@ use App\Entity\Test;
 use App\Entity\File as FileEntity;
 use App\Entity\TestUserResult;
 use App\Entity\UserCard;
+use App\Entity\Schedule;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Psr\Log\LoggerInterface;
@@ -92,6 +93,23 @@ class UserPageController extends AbstractController
 
         return $this->json([
             'data' => $chats,
+        ]);
+    }
+    
+    // Получение данных для расписания
+    #[Route('/request/get/user/schedule/{userId}', name: 'get_schedule')]
+    public function getSchedule($userId) {
+
+        if ($this->getUser()->getId() != $userId) {
+            return new Response('Permission Error', 403);
+        }
+
+        $groupId = $this->study->getStudentGroup($userId);
+
+        $schedule = $this->em->getRepository(Schedule::class)->findScheduleByGroupId($groupId);
+        
+        return $this->json([
+            'schedule' => $schedule
         ]);
     }
 

@@ -17,7 +17,45 @@
     <div class="lessons-container">
         <!-- Шаблон для новых строк -->
         <div class="lesson-row template" style="display: none;">
-            <!-- ... ваш существующий код шаблона ... -->
+            <div class="lesson-fields">
+                <select class="form-control time-select">
+                    <option value="">Выберите время</option>
+                    {% for time in times %}
+                        <option value="{{ time.id }}">{{ time.LessonNumber }} ({{ time.startTime }} - {{ time.endTime }})</option>
+                    {% endfor %}
+                </select>
+                
+                <select class="form-control subject-select">
+                    <option value="">Выберите предмет</option>
+                    {% for subject in subjects %}
+                        <option value="{{ subject.id }}">{{ subject.name }}</option>
+                    {% endfor %}
+                </select>
+                
+                <select class="form-control type-select">
+                    <option value="">Тип занятия</option>
+                    {% for type in lesson_types %}
+                        <option value="{{ type.id }}">{{ type.name }}</option>
+                    {% endfor %}
+                </select>
+                
+                <select class="form-control teacher-select">
+                    <option value="">Преподаватель</option>
+                    {% for teacher in teachers %}
+                        <option value="{{ teacher.userId }}">{{ teacher.lastName ~ ' ' ~ teacher.firstName }}</option>
+                    {% endfor %}
+                </select>
+                
+                <select class="form-control classroom-select">
+                    <option value="">Аудитория</option>
+                    {% for classroom in classrooms %}
+                        <option value="{{ classroom.id }}">{{ classroom.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="lesson-actions">
+                <button class="btn btn-sm btn-outline-danger remove-lesson-btn">×</button>
+            </div>
         </div>
         
         <!-- Отображение существующих занятий -->

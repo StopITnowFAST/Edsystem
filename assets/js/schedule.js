@@ -2,18 +2,27 @@ document.addEventListener('DOMContentLoaded', function() {
     // Добавление новой пары
     document.querySelectorAll('.add-lesson-btn').forEach(btn => {
         btn.addEventListener('click', function() {
-            const container = this.closest('.schedule-day').querySelector('.lessons-container');
-            const template = container.querySelector('.template');
-            const newRow = template.cloneNode(true);
+            const dayCard = this.closest('.schedule-day');
+            const container = dayCard.querySelector('.lessons-container');
+            const template = dayCard.querySelector('.template');
             
+            console.log(template); 
+            
+            const newRow = template.cloneNode(true);
             newRow.style.display = 'flex';
             newRow.classList.remove('template');
             container.appendChild(newRow);
             
-            // Добавляем обработчик удаления для новой строки
-            newRow.querySelector('.remove-lesson-btn').addEventListener('click', function() {
-                this.closest('.lesson-row').remove();
-            });
+            // Находим кнопку удаления в новой строке
+            const removeBtn = newRow.querySelector('.remove-lesson-btn');
+            
+            if (removeBtn) {
+                removeBtn.addEventListener('click', function() {
+                    this.closest('.lesson-row').remove();
+                });
+            } else {
+                console.error('Remove button not found in template!');
+            }
         });
     });
 

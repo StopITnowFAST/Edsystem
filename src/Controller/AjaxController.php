@@ -79,19 +79,12 @@ class AjaxController extends AbstractController
     function getSchedule($groupId) {
 
         $schedule = $this->em->getRepository(Schedule::class)->findBy(['schedule_group_id' => $groupId]);
-        
+
         return $this->json([
             'status' => 'ok',
             'schedule' => $schedule
         ]);
     }
-
-
-
-
-
-
-
 
     function deleteShedule($schedule) {
         foreach ($schedule as $item) {
