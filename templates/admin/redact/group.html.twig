@@ -18,6 +18,7 @@
                     <a href="{{ path('admin_groups') }}", class="btn btn-primary">Отменить</a>
                     {% if updating_element is not empty %}
                         <a href="{{ path('admin_groups_students', {'groupId':updating_element.id}) }}", class="btn btn-primary">Студенты группы</a>
+                        <a href="{{ path('admin_create_schedule', {'groupId':updating_element.id}) }}", class="btn btn-primary">Редактировать расписание</a>
                     {% endif %}
                 </div>
             </div>

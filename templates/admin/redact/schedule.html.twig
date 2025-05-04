@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% set title = "Расписание для группы " ~ currentGroup.code %}
+
+{% block title %}{{ title }} | {{ app_title }}{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('/styles/admin_tables.css') }}">
+    <link rel="stylesheet" href="{{ asset('/styles/schedule.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        {{ include('blocks/breadcrumbs.html.twig') }}
+        <div class="schedule-container">
+            <h1>{{ title }}</h1>
+
+            <div class="schedule-weeks">
+                <!-- Неделя 1 -->
+                <div class="week-section">
+                    <h2>1 НЕДЕЛЯ</h2>
+                    <div class="schedule-row">
+                        {% for day in [1, 2, 3] %}
+                            {{ include('blocks/day_card.html.twig', {week_number: 1, day_number: day}) }}
+                        {% endfor %}
+                    </div>
+                    <div class="schedule-row">
+                        {% for day in [4, 5, 6] %}
+                            {{ include('blocks/day_card.html.twig', {week_number: 1, day_number: day}) }}
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Неделя 2 -->
+                <div class="week-section">
+                    <h2>2 НЕДЕЛЯ</h2>
+                    <div class="schedule-row">
+                        {% for day in [1, 2, 3] %}
+                            {{ include('blocks/day_card.html.twig', {week_number: 2, day_number: day}) }}
+                        {% endfor %}
+                    </div>
+                    <div class="schedule-row">
+                        {% for day in [4, 5, 6] %}
+                            {{ include('blocks/day_card.html.twig', {week_number: 2, day_number: day}) }}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="schedule-actions mt-4">
+                <button id="save-schedule" class="btn btn-primary">Сохранить расписание</button>
+                <button id="reset-schedule" class="btn btn-secondary">Сбросить изменения</button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        const GROUP_ID = {{ currentGroup.id }};
+    </script>
+    <script src="{{ asset('/js/schedule.js') }}"></script>
+{% endblock %}

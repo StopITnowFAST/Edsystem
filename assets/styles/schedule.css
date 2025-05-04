@@ -1,0 +1,205 @@
+/* styles/schedule.css */
+
+.schedule-container {
+    background-color: var(--color-grey-200);
+    padding: var(--offset-s);
+    border-radius: var(--offset-xxs);
+    color: var(--color-font-bright);
+    margin-bottom: 16px;
+}
+
+.group-selector {
+    margin-bottom: var(--offset-m);
+}
+
+.group-selector label {
+    display: block;
+    margin-bottom: var(--offset-3xs);
+    color: var(--color-grey-0);
+}
+
+.group-selector select {
+    width: 100%;
+    max-width: 300px;
+    padding: var(--offset-3xs);
+    background-color: var(--color-grey-300);
+    border: 1px solid var(--color-grey-400);
+    border-radius: var(--offset-3xs);
+    color: var(--color-font-bright);
+}
+
+.schedule-weeks {
+    display: flex;
+    flex-direction: column;
+    gap: var(--offset-m);
+}
+
+.week-section {
+    background-color: var(--color-grey-300);
+    padding: var(--offset-s);
+    border-radius: var(--offset-xxs);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.week-section h2 {
+    color: var(--color-main);
+    margin-bottom: var(--offset-s);
+    padding-bottom: var(--offset-3xs);
+    border-bottom: 1px solid var(--color-grey-400);
+}
+
+.schedule-row {
+    display: flex;
+    gap: var(--offset-s);
+    margin-bottom: var(--offset-s);
+}
+
+.schedule-day {
+    flex: 1;
+    background-color: var(--color-grey-400);
+    border-radius: var(--offset-xxs);
+    padding: var(--offset-s);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.schedule-day:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.day-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--offset-s);
+    padding-bottom: var(--offset-3xs);
+    border-bottom: 1px solid var(--color-grey-300);
+}
+
+.day-header h3 {
+    margin: 0;
+    color: var(--color-font-bright);
+}
+
+.add-lesson-btn {
+    background-color: var(--color-main);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 10px !important; 
+    min-width: 0px !important;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.add-lesson-btn:hover {
+    background-color: var(--color-main-dark);
+}
+
+.lessons-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--offset-xs);
+}
+
+.lesson-row {
+    background-color: var(--color-grey-300);
+    border-radius: var(--offset-3xs);
+    padding: var(--offset-xs);
+    display: flex;
+    flex-direction: column;
+    gap: var(--offset-3xs);
+}
+
+.lesson-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--offset-3xs);
+}
+
+.lesson-fields select {
+    flex: 1;
+    min-width: 120px;
+    padding: var(--offset-3xs);
+    background-color: var(--color-grey-400);
+    border: 1px solid var(--color-grey-300);
+    border-radius: var(--offset-3xs);
+    color: var(--color-font-bright);
+}
+
+.lesson-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.remove-lesson-btn {
+    background-color: transparent;
+    color: var(--color-grey-0);
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: color 0.2s ease;
+}
+
+.remove-lesson-btn:hover {
+    color: #f44336;
+}
+
+.schedule-actions {
+    display: flex;
+    gap: var(--offset-xs);
+    margin-top: var(--offset-m);
+}
+
+.btn {
+    padding: var(--offset-3xs) var(--offset-s);
+    border-radius: var(--offset-3xs);
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background-color: var(--color-main);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-main-dark);
+    box-shadow: 0 2px 8px rgba(114, 137, 218, 0.4);
+}
+
+.btn-secondary {
+    background-color: var(--color-grey-300);
+    color: var(--color-font-bright);
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-grey-400);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .schedule-row {
+        flex-direction: column;
+    }
+    
+    .lesson-fields select {
+        min-width: 100%;
+    }
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.schedule-day {
+    animation: fadeIn 0.3s ease-out;
+}

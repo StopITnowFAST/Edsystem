@@ -523,7 +523,7 @@ class AdminPagesController extends AbstractController {
             $group->setStatus($_POST['status']);
             $this->em->persist($group);
             $this->em->flush();
-            return $this->redirectToRoute('admin_groups');
+            return $this->redirectToRoute('admin_update_note', ['type' => 'groups', 'id' => $group->getId()]);
         }
         $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
             'Группы' => 'admin_groups',
@@ -668,6 +668,31 @@ class AdminPagesController extends AbstractController {
         ]);
     }
 
+    // Создание расписания
+    #[Route('/admin/schedule/{groupId}', 'admin_create_schedule')] 
+    function adminSchedule($groupId) {
+        $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
+            'Создание расписания' => 'admin_schedule_lesson_times',
+        ], $this->router);
+
+        $currentGroup = $this->em->getRepository(Group::class)->find($groupId);
+        $times = $this->em->getRepository(ScheduleTime::class)->findAll();
+        $subjects = $this->em->getRepository(ScheduleSubject::class)->findAll();
+        $types = $this->em->getRepository(ScheduleLessonType::class)->findAll();
+        $teachers = $this->em->getRepository(Teacher::class)->findAll();
+        $classrooms = $this->em->getRepository(ScheduleClassroom::class)->findAll();
+
+        return $this->render('admin/redact/schedule.html.twig', [
+            'breadcrumbs' => $breadcrumbs,
+            'times' => $times,
+            'subjects' => $subjects,
+            'lesson_types' => $types,
+            'teachers' => $teachers,
+            'classrooms' => $classrooms,
+            'currentGroup' => $currentGroup,
+        ]);
+    }
+
     // Далее идут маршруты действий
 
     // Удаление элемента
@@ -763,27 +788,5 @@ class AdminPagesController extends AbstractController {
         $this->em->persist($student);
         $this->em->flush();
         return $this->redirectToRoute('account');
-    }
-
-    // Смена ролей для страницы модераторов
-    #[Route(path: '/request/change/role', name: 'request_change_role')] 
-    function changeRole() {    
-        $postJsonArray = json_decode(file_get_contents("php://input"), true);
-        $user = $this->em->getRepository(User::class)->find($postJsonArray['id']);
-        $roles = $user->getRoles();
-        $key = array_search("ROLE_MODERATOR", $roles);        
-        if ($key !== false) {
-            unset($roles[$key]);
-            $roles = array_values($roles);
-        } 
-        else {
-            array_push($roles, "ROLE_MODERATOR");
-        }
-        $user->setRoles($roles);
-        $this->em->persist($user);
-        $this->em->flush();
-        return $this->json([
-            'ok' => true,
-        ]);
     }
 }

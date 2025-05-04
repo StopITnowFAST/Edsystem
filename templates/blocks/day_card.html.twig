@@ -1,0 +1,61 @@
+{% set day_names = {
+    1: 'Понедельник',
+    2: 'Вторник',
+    3: 'Среда',
+    4: 'Четверг',
+    5: 'Пятница',
+    6: 'Суббота',
+    7: 'Воскресенье'
+} %}
+
+<div class="schedule-day" data-week="{{ week_number }}" data-day="{{ day_number }}">
+    <div class="day-header">
+        <h3>{{ day_names[day_number] }}</h3>
+        <button class="add-lesson-btn btn btn-sm btn-outline-primary">+</button>
+    </div>
+    
+    <div class="lessons-container">
+        <!-- Здесь будут динамически добавляться пары -->
+        <div class="lesson-row template" style="display: none;">
+            <div class="lesson-fields">
+                <select class="form-control time-select">
+                    <option value="">Выберите время</option>
+                    {% for time in times %}
+                        <option value="{{ time.id }}">{{ time.LessonNumber }} ({{ time.startTime }} - {{ time.endTime }})</option>
+                    {% endfor %}
+                </select>
+                
+                <select class="form-control subject-select">
+                    <option value="">Выберите предмет</option>
+                    {% for subject in subjects %}
+                        <option value="{{ subject.id }}">{{ subject.name }}</option>
+                    {% endfor %}
+                </select>
+                
+                <select class="form-control type-select">
+                    <option value="">Тип занятия</option>
+                    {% for type in lesson_types %}
+                        <option value="{{ type.id }}">{{ type.name }}</option>
+                    {% endfor %}
+                </select>
+                
+                <select class="form-control teacher-select">
+                    <option value="">Преподаватель</option>
+                    {% for teacher in teachers %}
+                        <option value="{{ teacher.userId }}">{{ teacher.lastName ~ ' ' ~ teacher.firstName }}</option>
+                    {% endfor %}
+                </select>
+                
+                <select class="form-control classroom-select">
+                    <option value="">Аудитория</option>
+                    {% for classroom in classrooms %}
+                        <option value="{{ classroom.id }}">{{ classroom.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="lesson-actions">
+                <button class="btn btn-sm btn-outline-danger remove-lesson-btn">×</button>
+            </div>
+        </div>
+    </div>
+</div>
