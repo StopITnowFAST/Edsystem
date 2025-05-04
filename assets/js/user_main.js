@@ -22,7 +22,6 @@ let currentGroup = 'student';
 let currentDialog = 0;
 
 startPolling();
-console.log(globalMessageArray);
 
 document.addEventListener('DOMContentLoaded', function() {
     const buttons = document.querySelectorAll('.sidebar-button');
@@ -45,8 +44,10 @@ async function loadContent(section) {
     loadPlaceHolder();
     switch(section) {
         case SCHEDULE_SECTION:
-            // pageData = getDataFromServer(SCHEDULE_SECTION_URL);
-            content = '';
+            json = await getDataFromServer(SCHEDULE_SECTION_URL);
+            console.log(json.schedule);
+            content = getSchedulePage(json.schedule);
+            highlightCurrentDayAndLesson();
             break;
         case CHAT_SECTION:
             json = await getDataFromServer(CHAT_SECTION_URL);
@@ -268,9 +269,6 @@ function getChatPage(chatData) {
 
 // Вспомогательная функция для генерации списка чатов
 function generateChatListHTML(users, type) {
-
-    console.log(users);
-
     if (!users || Object.keys(users).length === 0) return null;
 
     // Преобразуем в массив и сортируем по дате (новые → выше)
@@ -572,7 +570,6 @@ function formUpdateQueryArray() {
 
 // Функция обновляет массив с сообщениями
 async function updateTotalMessages(newMessages) {
-    console.log(newMessages);
     for (userId in newMessages) {
         let messages = newMessages[userId];
         messages.forEach(message => {
@@ -586,8 +583,6 @@ async function updateTotalMessages(newMessages) {
 }
 
 function updateChats(id, message) {
-    // Сначала двигаем элемент в чатах, а потом перемещаем его в globalChatArray
-    console.log('Передвигаю чат');
     let chatContainer = 0;
     if (id in globalChatArray['student']) {
         chatContainer = document.getElementById('chat_list_students');
@@ -600,7 +595,6 @@ function updateChats(id, message) {
     chatWithNewMessage.querySelector('.last-message').textContent = (message.filelink) ? message.file_name : message.text;
     chatWithNewMessage.remove();
     chatContainer.insertBefore(chatWithNewMessage, chatContainer.firstChild);
-    console.log(message);
 }
 
 function getInputElement() {
@@ -623,481 +617,132 @@ function getInputElement() {
     `;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+function getSchedulePage(scheduleData) {
+    // Группируем данные по неделям и дням
+    const groupedData = groupScheduleData(scheduleData);
+    
+    return `
+        <div class="schedule-container">
+            <h1 class="schedule-title">Мое расписание</h1>
+            
+            <div class="schedule-weeks">
+                ${renderWeek(1, groupedData[1])}
+                ${renderWeek(2, groupedData[2])}
+            </div>
+        </div>
+    `;
+}
+
+function groupScheduleData(data) {
+    const result = {1: {}, 2: {}};
+    const dayNames = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
+    
+    // Инициализация структуры
+    for (let week = 1; week <= 2; week++) {
+        for (let day = 1; day <= 6; day++) {
+            result[week][day] = {
+                dayName: dayNames[day - 1],
+                lessons: []
+            };
+        }
+    }
+    
+    // Заполнение данными
+    data.forEach(item => {
+        result[item.week_number][item.schedule_day].lessons.push(item);
+    });
+    
+    return result;
+}
+
+function renderWeek(weekNum, weekData) {
+    return `
+        <div class="week-section">
+            <h2 class="week-title">${weekNum} НЕДЕЛЯ</h2>
+            
+            <div class="schedule-days">
+                ${Object.entries(weekData).map(([dayNum, dayData]) => 
+                    renderDay(dayNum, dayData)
+                ).join('')}
+            </div>
+        </div>
+    `;
+}
+
+function renderDay(dayNum, dayData) {
+    return `
+        <div class="schedule-day" data-day="${dayNum}">
+            <div class="day-header">
+                <h3 class="day-title">${dayData.dayName}</h3>
+            </div>
+            
+            <div class="day-lessons">
+                ${dayData.lessons.length > 0 
+                    ? dayData.lessons.map(lesson => renderLesson(lesson)).join('')
+                    : '<div class="no-lessons">Нет занятий</div>'
+                }
+            </div>
+        </div>
+    `;
+}
+
+function renderLesson(lesson) {
+    return `
+        <div class="lesson-card">
+            <div class="lesson-time">
+                <span class="lesson-number">${lesson.lesson_number} пара</span>
+                <span class="lesson-time-range">${lesson.start_time} - ${lesson.end_time}</span>
+            </div>
+            
+            <div class="lesson-main">
+                <div class="lesson-subject">${lesson.subject}</div>
+                <div class="lesson-type">${lesson.lesson_type}</div>
+            </div>
+            
+            <div class="lesson-details">
+                <div class="lesson-classroom">
+                    <i class="fas fa-door-open"></i>
+                    ${lesson.classroom}
+                </div>
+                <div class="lesson-teacher">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    ${lesson.last_name} ${lesson.first_name}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function highlightCurrentDayAndLesson() {
+    const now = new Date();
+    const currentDay = now.getDay();
+    const currentHours = now.getHours();
+    const currentMinutes = now.getMinutes();
+    const scheduleDay = currentDay === 0 ? 7 : currentDay;
+    const allDays = document.querySelectorAll('.schedule-day');
+    allDays.forEach(day => {
+        day.classList.remove('current-day');
+        const lessons = day.querySelectorAll('.lesson-card');
+        lessons.forEach(lesson => lesson.classList.remove('current-lesson'));
+    });
+    const currentDayElement = document.querySelector(`.schedule-day[data-day="${scheduleDay}"]`);
+    if (currentDayElement) {
+        currentDayElement.classList.add('current-day');
+        const lessons = currentDayElement.querySelectorAll('.lesson-card');
+        lessons.forEach(lesson => {
+            const timeRange = lesson.querySelector('.lesson-time-range').textContent;
+            const [startTime, endTime] = timeRange.split(' - ').map(t => t.split(':'));
+            const startHours = parseInt(startTime[0]);
+            const startMinutes = parseInt(startTime[1]);
+            const endHours = parseInt(endTime[0]);
+            const endMinutes = parseInt(endTime[1]);
+            if ((currentHours > startHours || (currentHours === startHours && currentMinutes >= startMinutes)) &&
+                (currentHours < endHours || (currentHours === endHours && currentMinutes <= endMinutes))) {
+                lesson.classList.add('current-lesson');
+            }
+        });
+    }
+}
 
 
 
