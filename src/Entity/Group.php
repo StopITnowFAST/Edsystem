@@ -49,6 +49,12 @@ class Group
     #[ORM\Column]
     private ?bool $isFull = null;
 
+    #[ORM\Column(length: 20, nullable: true)]
+    private ?string $ed_starts_first = null;
+
+    #[ORM\Column(length: 20, nullable: true)]
+    private ?string $ed_starts_second = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -192,6 +198,30 @@ class Group
     public function setFull(bool $isFull): static
     {
         $this->isFull = $isFull;
+
+        return $this;
+    }
+
+    public function getEdStartsFirst(): ?string
+    {
+        return $this->ed_starts_first;
+    }
+
+    public function setEdStartsFirst(?string $ed_starts_first): static
+    {
+        $this->ed_starts_first = $ed_starts_first;
+
+        return $this;
+    }
+
+    public function getEdStartsSecond(): ?string
+    {
+        return $this->ed_starts_second;
+    }
+
+    public function setEdStartsSecond(?string $ed_starts_second): static
+    {
+        $this->ed_starts_second = $ed_starts_second;
 
         return $this;
     }
