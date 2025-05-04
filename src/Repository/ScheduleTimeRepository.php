@@ -2,39 +2,39 @@
 
 namespace App\Repository;
 
-use App\Entity\Lesson;
+use App\Entity\ScheduleTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Lesson>
+ * @extends ServiceEntityRepository<ScheduleTime>
  */
-class LessonRepository extends ServiceEntityRepository
+class ScheduleTimeRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Lesson::class);
+        parent::__construct($registry, ScheduleTime::class);
     }
 
     //    /**
-    //     * @return Lesson[] Returns an array of Lesson objects
+    //     * @return ScheduleTime[] Returns an array of ScheduleTime objects
     //     */
     //    public function findByExampleField($value): array
     //    {
-    //        return $this->createQueryBuilder('l')
-    //            ->andWhere('l.exampleField = :val')
+    //        return $this->createQueryBuilder('s')
+    //            ->andWhere('s.exampleField = :val')
     //            ->setParameter('val', $value)
-    //            ->orderBy('l.id', 'ASC')
+    //            ->orderBy('s.id', 'ASC')
     //            ->setMaxResults(10)
     //            ->getQuery()
     //            ->getResult()
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?Lesson
+    //    public function findOneBySomeField($value): ?ScheduleTime
     //    {
-    //        return $this->createQueryBuilder('l')
-    //            ->andWhere('l.exampleField = :val')
+    //        return $this->createQueryBuilder('s')
+    //            ->andWhere('s.exampleField = :val')
     //            ->setParameter('val', $value)
     //            ->getQuery()
     //            ->getOneOrNullResult()

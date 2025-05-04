@@ -36,7 +36,7 @@ class Chat {
         $sql = "
             SELECT st.user_id FROM `student` st INNER JOIN `user` u on st.user_id = u.id WHERE st.group_id = $groupId
             UNION
-            SELECT sb.user_id FROM `subject` sb INNER JOIN `user` u on sb.user_id = u.id WHERE sb.group_id = $groupId
+            SELECT sb.user_id FROM `schedule_subject` sb INNER JOIN `user` u on sb.user_id = u.id WHERE sb.group_id = $groupId
         ";
         $resultSet = $conn->executeQuery($sql);
         $results = $resultSet->fetchFirstColumn();
@@ -68,7 +68,7 @@ class Chat {
                 FROM `student` st WHERE st.user_id IN $ids
                 UNION
                 SELECT sb.user_id, t.last_name, t.first_name, 'teacher' as type
-                FROM `subject` sb
+                FROM `schedule_subject` sb
                 JOIN `teacher` t ON t.user_id = sb.user_id
                 WHERE sb.user_id IN $ids
             ) u

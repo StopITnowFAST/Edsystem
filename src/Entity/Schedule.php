@@ -6,7 +6,6 @@ use App\Repository\ScheduleRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ScheduleRepository::class)]
-#[ORM\HasLifecycleCallbacks]
 class Schedule
 {
     #[ORM\Id]
@@ -14,78 +13,113 @@ class Schedule
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
-    private ?int $status = null;
+    #[ORM\Column(length: 1)]
+    private ?string $week_number = null;
+
+    #[ORM\Column(length: 1)]
+    private ?string $schedule_day = null;
 
     #[ORM\Column]
-    private ?int $created_at = null;
+    private ?int $schedule_time_id = null;
 
     #[ORM\Column]
-    private ?int $updated_at = null;
+    private ?int $schedule_lesson_type_id = null;
 
     #[ORM\Column]
-    private ?int $group_id = null;
+    private ?int $schedule_classroom_id = null;
+
+    #[ORM\Column]
+    private ?int $schedule_group_id = null;
+
+    #[ORM\Column]
+    private ?int $user_id = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getStatus(): ?int
+    public function getWeekNumber(): ?string
     {
-        return $this->status;
+        return $this->week_number;
     }
 
-    public function setStatus(int $status): static
+    public function setWeekNumber(string $week_number): static
     {
-        $this->status = $status;
+        $this->week_number = $week_number;
 
         return $this;
     }
 
-    public function getCreatedAt(): ?int
+    public function getScheduleDay(): ?string
     {
-        return $this->created_at;
+        return $this->schedule_day;
     }
 
-    public function setCreatedAt(int $created_at): static
+    public function setScheduleDay(string $schedule_day): static
     {
-        $this->created_at = $created_at;
+        $this->schedule_day = $schedule_day;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?int
+    public function getScheduleTimeId(): ?int
     {
-        return $this->updated_at;
+        return $this->schedule_time_id;
     }
 
-    public function setUpdatedAt(int $updated_at): static
+    public function setScheduleTimeId(int $schedule_time_id): static
     {
-        $this->updated_at = $updated_at;
+        $this->schedule_time_id = $schedule_time_id;
 
         return $this;
     }
 
-    public function getGroupId(): ?int
+    public function getScheduleLessonTypeId(): ?int
     {
-        return $this->group_id;
+        return $this->schedule_lesson_type_id;
     }
 
-    public function setGroupId(int $group_id): static
+    public function setScheduleLessonTypeId(int $schedule_lesson_type_id): static
     {
-        $this->group_id = $group_id;
+        $this->schedule_lesson_type_id = $schedule_lesson_type_id;
 
         return $this;
     }
 
-    #[ORM\PrePersist]
-    #[ORM\PreUpdate]
-    public function updateTimestamps()
+    public function getScheduleClassroomId(): ?int
     {
-        $this->setUpdatedAt(time());
-        if ($this->getCreatedAt() === null) {
-            $this->setCreatedAt(time());
-        }
+        return $this->schedule_classroom_id;
+    }
+
+    public function setScheduleClassroomId(int $schedule_classroom_id): static
+    {
+        $this->schedule_classroom_id = $schedule_classroom_id;
+
+        return $this;
+    }
+
+    public function getScheduleGroupId(): ?int
+    {
+        return $this->schedule_group_id;
+    }
+
+    public function setScheduleGroupId(int $schedule_group_id): static
+    {
+        $this->schedule_group_id = $schedule_group_id;
+
+        return $this;
+    }
+
+    public function getUserId(): ?int
+    {
+        return $this->user_id;
+    }
+
+    public function setUserId(int $user_id): static
+    {
+        $this->user_id = $user_id;
+
+        return $this;
     }
 }

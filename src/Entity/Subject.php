@@ -2,11 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\SubjectRepository;
+use App\Repository\ScheduleSubjectRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: SubjectRepository::class)]
-class Subject
+#[ORM\Entity(repositoryClass: ScheduleSubjectRepository::class)]
+class ScheduleSubject
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
