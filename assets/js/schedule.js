@@ -16,6 +16,13 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
+
+    // Обработчики удаления для существующих строк
+    document.querySelectorAll('.lesson-row:not(.template) .remove-lesson-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.closest('.lesson-row').remove();
+        });
+    });
     
     // Сохранение расписания
     document.getElementById('save-schedule').addEventListener('click', function() {

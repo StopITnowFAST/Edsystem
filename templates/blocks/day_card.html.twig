@@ -15,47 +15,71 @@
     </div>
     
     <div class="lessons-container">
-        <!-- Здесь будут динамически добавляться пары -->
+        <!-- Шаблон для новых строк -->
         <div class="lesson-row template" style="display: none;">
-            <div class="lesson-fields">
-                <select class="form-control time-select">
-                    <option value="">Выберите время</option>
-                    {% for time in times %}
-                        <option value="{{ time.id }}">{{ time.LessonNumber }} ({{ time.startTime }} - {{ time.endTime }})</option>
-                    {% endfor %}
-                </select>
-                
-                <select class="form-control subject-select">
-                    <option value="">Выберите предмет</option>
-                    {% for subject in subjects %}
-                        <option value="{{ subject.id }}">{{ subject.name }}</option>
-                    {% endfor %}
-                </select>
-                
-                <select class="form-control type-select">
-                    <option value="">Тип занятия</option>
-                    {% for type in lesson_types %}
-                        <option value="{{ type.id }}">{{ type.name }}</option>
-                    {% endfor %}
-                </select>
-                
-                <select class="form-control teacher-select">
-                    <option value="">Преподаватель</option>
-                    {% for teacher in teachers %}
-                        <option value="{{ teacher.userId }}">{{ teacher.lastName ~ ' ' ~ teacher.firstName }}</option>
-                    {% endfor %}
-                </select>
-                
-                <select class="form-control classroom-select">
-                    <option value="">Аудитория</option>
-                    {% for classroom in classrooms %}
-                        <option value="{{ classroom.id }}">{{ classroom.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="lesson-actions">
-                <button class="btn btn-sm btn-outline-danger remove-lesson-btn">×</button>
-            </div>
+            <!-- ... ваш существующий код шаблона ... -->
         </div>
+        
+        <!-- Отображение существующих занятий -->
+        {% for schedule in existingSchedules %}
+            {% if schedule.weekNumber == week_number and schedule.scheduleDay == day_number %}
+            <div class="lesson-row">
+                <div class="lesson-fields">
+                    <select class="form-control time-select">
+                        <option value="">Выберите время</option>
+                        {% for time in times %}
+                            <option value="{{ time.id }}" 
+                                {{ schedule.scheduleTimeId == time.id ? 'selected' : '' }}>
+                                {{ time.LessonNumber }} ({{ time.startTime }} - {{ time.endTime }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                    
+                    <select class="form-control subject-select">
+                        <option value="">Выберите предмет</option>
+                        {% for subject in subjects %}
+                            <option value="{{ subject.id }}"
+                                {{ schedule.scheduleSubjectId == subject.id ? 'selected' : '' }}>
+                                {{ subject.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    
+                    <select class="form-control type-select">
+                        <option value="">Тип занятия</option>
+                        {% for type in lesson_types %}
+                            <option value="{{ type.id }}"
+                                {{ schedule.scheduleLessonTypeId == type.id ? 'selected' : '' }}>
+                                {{ type.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    
+                    <select class="form-control teacher-select">
+                        <option value="">Преподаватель</option>
+                        {% for teacher in teachers %}
+                            <option value="{{ teacher.userId }}"
+                                {{ schedule.userId == teacher.userId ? 'selected' : '' }}>
+                                {{ teacher.lastName ~ ' ' ~ teacher.firstName }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    
+                    <select class="form-control classroom-select">
+                        <option value="">Аудитория</option>
+                        {% for classroom in classrooms %}
+                            <option value="{{ classroom.id }}"
+                                {{ schedule.scheduleClassroomId == classroom.id ? 'selected' : '' }}>
+                                {{ classroom.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="lesson-actions">
+                    <button class="btn btn-sm btn-outline-danger remove-lesson-btn">×</button>
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
     </div>
 </div>

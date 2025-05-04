@@ -10,6 +10,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use App\Entity\User;
 use App\Entity\VkUser;
 use App\Entity\UserCard;
+use App\Entity\Schedule;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Security;
@@ -50,7 +51,7 @@ class AjaxController extends AbstractController
         $json = json_decode(file_get_contents("php://input"), true);
 
         // Находим все прошлые записи расписаний для группы
-        $oldSchedule = $this->em->getRepository(Schedule::class)->findBy(['group_id' => $groupId]);
+        $oldSchedule = $this->em->getRepository(Schedule::class)->findBy(['schedule_group_id' => $groupId]);
 
         foreach ($json['schedule'] as $scheduleNote) {
             $newSchedule = new Schedule();
@@ -60,7 +61,7 @@ class AjaxController extends AbstractController
             $newSchedule->setScheduleLessonTypeId($scheduleNote['schedule_lesson_type_id']);
             $newSchedule->setScheduleClassroomId($scheduleNote['schedule_classroom_id']);
             $newSchedule->setUserId($scheduleNote['user_id']);
-            $newSchedule->setSheduleSubjectId($scheduleNote['subject_id']);
+            $newSchedule->setScheduleSubjectId($scheduleNote['subject_id']);
             $newSchedule->setScheduleGroupId($groupId);
             $this->em->persist($newSchedule);
         }
@@ -71,13 +72,31 @@ class AjaxController extends AbstractController
         return $this->json([
             'status' => 'ok',
         ]);
+    }
+
+    // Получение расписания для группы 
+    #[Route(path: '/request/get/schedule/{groupId}', name: 'get_schedule')] 
+    function getSchedule($groupId) {
+
+        $schedule = $this->em->getRepository(Schedule::class)->findBy(['schedule_group_id' => $groupId]);
+        
+        return $this->json([
+            'status' => 'ok',
+            'schedule' => $schedule
+        ]);
+    }
 
 
-        function deleteShedule($schedule) {
-            foreach ($schedule as $item) {
-                $this->em->remove($item);
-            }
-            $this->em->flush();
+
+
+
+
+
+
+    function deleteShedule($schedule) {
+        foreach ($schedule as $item) {
+            $this->em->remove($item);
         }
+        $this->em->flush();
     }
 }
