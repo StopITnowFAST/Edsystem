@@ -34,6 +34,9 @@ class Schedule
     #[ORM\Column]
     private ?int $user_id = null;
 
+    #[ORM\Column]
+    private ?int $schedule_subject_id = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -119,6 +122,18 @@ class Schedule
     public function setUserId(int $user_id): static
     {
         $this->user_id = $user_id;
+
+        return $this;
+    }
+
+    public function getScheduleSubjectId(): ?int
+    {
+        return $this->schedule_subject_id;
+    }
+
+    public function setScheduleSubjectId(int $schedule_subject_id): static
+    {
+        $this->schedule_subject_id = $schedule_subject_id;
 
         return $this;
     }
