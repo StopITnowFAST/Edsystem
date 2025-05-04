@@ -336,7 +336,7 @@
     background: var(--color-grey-200);
     border-radius: var(--offset-xxs);
     overflow: hidden;
-    margin: 0px 100px;
+    margin: 0px 20px;
 }
 
 /* 1. Панель групп */

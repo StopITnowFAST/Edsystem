@@ -9,8 +9,6 @@
 {% endblock %}
 
 {% block body %}
-    {{dump(startfirst)}}
-    {{dump(startsecond)}}
     <div class="user__page">
         <div class="sidebar" id="sidebar">
             <div id="schedule" class="sidebar-button" title="Schedule" data-section="schedule">
@@ -38,8 +36,6 @@
     <script>
         const START_FIRST = new Date("{{ startfirst }}");
         const START_SECOND = new Date("{{ startsecond }}");
-        console.log(START_FIRST);
-        console.log(START_SECOND);
         const USER_ID = {{ userId }};
         const STARTING_SECTION = "{{ section }}";
         let globalMessageArray = JSON.parse('{{ globalMessageArray|json_encode|raw }}');
