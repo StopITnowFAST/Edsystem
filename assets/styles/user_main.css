@@ -780,38 +780,52 @@
     }
 }
 
-/* Подсветка текущего дня */
-.schedule-day.current-day {
-    border-left: 4px solid var(--color-main);
-    background-color: var(--color-grey-375);
+.schedule-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
-/* Подсветка текущей пары */
+.schedule-period {
+    color: var(--color-main);
+    font-size: 0.9rem;
+}
+
+.week-title {
+    display: inline;
+    color: var(--color-main);
+}
+
+.week-subtitle {
+    display: inline;
+    margin-left: 5px;
+}
+
+.day-date {
+    font-size: 0.8rem;
+    color: var(--color-grey-100);
+    margin-top: 3px;
+}
+
+.schedule-day.current-day {
+    border-left: 4px solid var(--color-main);
+    background-color: var(--color-grey-100);
+}
+
+.schedule-day.current-day .day-title,
+.schedule-day.current-day .day-date {
+    color: var(--color-main);
+    font-weight: bold;
+}
+
 .lesson-card.current-lesson {
     background-color: var(--color-main-transparent);
     box-shadow: 0 0 0 2px var(--color-main);
-    transform: scale(1.02);
 }
 
 .lesson-card.current-lesson .lesson-time,
 .lesson-card.current-lesson .lesson-subject {
     color: white;
     font-weight: bold;
-}
-
-/* Плавная анимация */
-.lesson-card {
-    transition: all 0.3s ease;
-}
-
-.week-section.current-week {
-    border: 2px solid var(--color-main);
-}
-
-.week-section.current-week .week-title {
-    color: white;
-    background-color: var(--color-main);
-    padding: 5px 10px;
-    border-radius: 4px;
-    display: inline-block;
 }
