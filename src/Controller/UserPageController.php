@@ -47,27 +47,29 @@ class UserPageController extends AbstractController
     #[Route(path: '/account/{section}', name:'account')]
     public function account($section = 'schedule') {
         $userId = $this->getUser()->getId();
+        $accountType = $this->study->getUserType($userId);
+
+        if ($accountType == 'hollow') 
+            return $this->render('user/main.html.twig', ['userType' => $accountType]);
+
         $globalMessageArray = $this->chat->getAllMessages($userId);
         $globalChatArray = $this->chat->getAvailableChats($userId);
-        $accountType = $this->study->getUserType($userId);
         if ($accountType == 'student') {
             $groupId = $this->study->getStudentGroup($userId);
             $group = $this->em->getRepository(Group::class)->find($groupId);
             $startfirst = $group->getEdStartsFirst();
             $startsecond = $group->getEdStartsSecond();
-        } else if ($accountType == 'teacher') {
-
-        } 
+        }         
 
         return $this->render('user/main.html.twig', [
             'userId' => $userId,
             'section' => $section,
             'globalMessageArray' => $globalMessageArray,
             'globalChatArray' => $globalChatArray,
-            'startfirst' => $startfirst ?? null,
-            'startsecond' => $startsecond ?? null,
+            'startfirst' => $startfirst ?? date("Y") . '09-01',
+            'startsecond' => $startsecond ?? date("Y") . '02-06',
             'userType' => $accountType,
-        ]);
+        ]);        
     }
 
     // Получение данных для теста
@@ -76,21 +78,24 @@ class UserPageController extends AbstractController
         if ($this->getUser()->getId() != $userId) {
             return new Response('Permission Error', 403);
         }
-        $tests = $this->study->getTestsForStudent($userId);
-        $formattedTests = [];
-        foreach ($tests as $key => $test) {
-            $bestGrade = $this->em->getRepository(TestUserResult::class)->getBestGrade($userId, $test['id']);
-            $formattedTests[$key]['id'] = $test['id'];
-            $formattedTests[$key]['title'] = $test['name'];
-            $formattedTests[$key]['status'] = "Не разработан";
-            $formattedTests[$key]['grade'] = $bestGrade[0]['grade'] ?? '-';
-            $formattedTests[$key]['attemptsLeft'] = $this->study->getAttemptsForTest($userId, $test['id']);
-            $formattedTests[$key]['questionsCount'] = $this->em->getRepository(Test::class)->getQuestinsCount($test['id']);
-            $formattedTests[$key]['timeLimit'] = $test['time'];
-        }
+        $accountType = $this->study->getUserType($userId);
+        if ($accountType == 'student') {
+            $tests = $this->study->getTestsForStudent($userId);
+            $formattedTests = []; 
+            foreach ($tests as $key => $test) {
+                $bestGrade = $this->em->getRepository(TestUserResult::class)->getBestGrade($userId, $test['id']);
+                $formattedTests[$key]['id'] = $test['id'];
+                $formattedTests[$key]['title'] = $test['name'];
+                $formattedTests[$key]['status'] = "Не разработан";
+                $formattedTests[$key]['grade'] = $bestGrade[0]['grade'] ?? '-';
+                $formattedTests[$key]['attemptsLeft'] = $this->study->getAttemptsForTest($userId, $test['id']);
+                $formattedTests[$key]['questionsCount'] = $this->em->getRepository(Test::class)->getQuestinsCount($test['id']);
+                $formattedTests[$key]['timeLimit'] = $test['time'];
+            }
+        }        
 
         return $this->json([
-            'data' => $formattedTests,
+            'data' => $formattedTests ?? null,
         ]);
     }
 
@@ -111,13 +116,17 @@ class UserPageController extends AbstractController
     #[Route('/request/get/user/schedule/{userId}', name: 'get_schedule')]
     public function getSchedule($userId) {
 
-        if ($this->getUser()->getId() != $userId) {
-            return new Response('Permission Error', 403);
+        // if ($this->getUser()->getId() != $userId) {
+        //     return new Response('Permission Error', 403);
+        // }
+
+        $accountType = $this->study->getUserType($userId);
+        if ($accountType == 'student') {
+            $groupId = $this->study->getStudentGroup($userId);    
+            $schedule = $this->em->getRepository(Schedule::class)->findScheduleByGroupId($groupId);
+        } else if ($accountType == 'teacher') {
+            $schedule = $this->em->getRepository(Schedule::class)->findTeacherSchedule($userId);
         }
-
-        $groupId = $this->study->getStudentGroup($userId);
-
-        $schedule = $this->em->getRepository(Schedule::class)->findScheduleByGroupId($groupId);
         
         return $this->json([
             'schedule' => $schedule

@@ -49,7 +49,7 @@ async function loadContent(section) {
     switch(section) {
         case SCHEDULE_SECTION:
             json = await getDataFromServer(SCHEDULE_SECTION_URL);
-            const schedulePage = getSchedulePage(json.schedule, START_FIRST, START_SECOND);
+            const schedulePage = getSchedulePage(json.schedule);
             CONTENT_CONTAINER.innerHTML = schedulePage.html;
             schedulePage.init();
             break;
@@ -626,263 +626,6 @@ function getInputElement() {
     `;
 }
 
-// Основная функция для генерации страницы расписания
-function getSchedulePage(scheduleData, START_FIRST, START_SECOND) {
-    // Группируем данные по неделям и дням
-    const groupedData = groupScheduleData(scheduleData);
-    
-    const html = `
-        <div class="schedule-container">
-            <div class="schedule-header">
-                <h1 class="schedule-title">Мое расписание</h1>
-                <div class="schedule-period"></div> 
-            </div>
-            
-            <div class="schedule-weeks">
-                ${renderWeek(1, groupedData[1])}
-                ${renderWeek(2, groupedData[2])}
-            </div>
-        </div>
-    `;
-    
-    // Возвращаем HTML и функции для последующей инициализации
-    return {
-        html: html,
-        init: function() {
-            setupScheduleWithDates(START_FIRST, START_SECOND);
-            // Обновляем каждую минуту для актуальной подсветки
-            setInterval(() => setupScheduleWithDates(START_FIRST, START_SECOND), 60000);
-        }
-    };
-}
-
-function groupScheduleData(data) {
-    const result = {1: {}, 2: {}};
-    const dayNames = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
-    
-    // Инициализация структуры
-    for (let week = 1; week <= 2; week++) {
-        for (let day = 1; day <= 6; day++) {
-            result[week][day] = {
-                dayName: dayNames[day - 1],
-                lessons: []
-            };
-        }
-    }
-    
-    // Заполнение данными
-    data.forEach(item => {
-        result[item.week_number][item.schedule_day].lessons.push(item);
-    });
-    
-    return result;
-}
-
-function renderWeek(weekNum, weekData) {
-    return `
-        <div class="week-section" data-week="${weekNum}">
-            <h2 class="week-title">${weekNum}</h2>
-            <span class="week-subtitle">НЕДЕЛЯ</span>
-            
-            <div class="schedule-days">
-                ${Object.entries(weekData).map(([dayNum, dayData]) => 
-                    renderDay(dayNum, dayData)
-                ).join('')}
-            </div>
-        </div>
-    `;
-}
-
-function renderDay(dayNum, dayData) {
-    return `
-        <div class="schedule-day" data-day="${dayNum}">
-            <div class="day-header">
-                <h3 class="day-title">${dayData.dayName}</h3>
-                <div class="day-date"></div>
-            </div>
-            
-            <div class="day-lessons">
-                ${dayData.lessons.length > 0 
-                    ? dayData.lessons.map(lesson => renderLesson(lesson)).join('')
-                    : '<div class="no-lessons">Нет занятий</div>'
-                }
-            </div>
-        </div>
-    `;
-}
-
-function renderLesson(lesson) {
-    return `
-        <div class="lesson-card">
-            <div class="lesson-time">
-                <span class="lesson-number">${lesson.lesson_number} пара</span>
-                <span class="lesson-time-range">${lesson.start_time} - ${lesson.end_time}</span>
-            </div>
-            
-            <div class="lesson-main">
-                <div class="lesson-subject">${lesson.subject}</div>
-                <div class="lesson-type">${lesson.lesson_type}</div>
-            </div>
-            
-            <div class="lesson-details">
-                <div class="lesson-classroom">
-                    <i class="fas fa-door-open"></i>
-                    ${lesson.classroom}
-                </div>
-                <div class="lesson-teacher">
-                    <i class="fas fa-chalkboard-teacher"></i>
-                    ${lesson.last_name} ${lesson.first_name}
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-// Функции для работы с датами и подсветкой
-function calculateAcademicPeriods(START_FIRST, START_SECOND) {
-    const now = new Date();
-    now.setHours(0, 0, 0, 0); // Убираем время для точного сравнения дат
-    
-    // Определяем текущее полугодие (1 или 2)
-    const startFirst = new Date(START_FIRST);
-    const startSecond = new Date(START_SECOND);
-    
-    let semesterStart, semesterNumber;
-    
-    if (now >= startFirst && now < startSecond) {
-        semesterStart = new Date(startFirst);
-        semesterNumber = 1;
-    } else {
-        semesterStart = new Date(startSecond);
-        semesterNumber = 2;
-    }
-    
-    // Вычисляем сколько недель прошло с начала семестра
-    const weeksPassed = Math.floor((now - semesterStart) / (7 * 24 * 60 * 60 * 1000));
-    const currentPeriodWeek = (weeksPassed % 2) + 1; // 1 или 2
-    
-    // Вычисляем даты для текущего двухнедельного периода
-    const periodStartDate = new Date(semesterStart);
-    periodStartDate.setDate(periodStartDate.getDate() + (weeksPassed - (currentPeriodWeek - 1)) * 7);
-    
-    const periodEndDate = new Date(periodStartDate);
-    periodEndDate.setDate(periodEndDate.getDate() + 13); // +13 дней = 2 недели
-    
-    return {
-        semester: semesterNumber,
-        currentWeek: currentPeriodWeek,
-        periodStart: periodStartDate,
-        periodEnd: periodEndDate,
-        datesForWeeks: generateDatesForWeeks(periodStartDate)
-    };
-}
-
-function generateDatesForWeeks(startDate) {
-    const dates = {};
-    const date = new Date(startDate);
-    
-    for (let week = 1; week <= 2; week++) {
-        dates[week] = {};
-        
-        for (let day = 1; day <= 6; day++) { // Понедельник-Суббота (1-6)
-            dates[week][day] = new Date(date);
-            date.setDate(date.getDate() + 1);
-        }
-        
-        // Добавляем воскресенье (7 день) с пропуском даты
-        dates[week][7] = null; // Воскресенье не имеет даты
-        
-        // Если это не последняя неделя, переходим к следующему понедельнику
-        if (week < 2) {
-            date.setDate(date.getDate() + 1); // Пропускаем воскресенье
-        }
-    }
-    
-    return dates;
-}
-
-function setupScheduleWithDates(START_FIRST, START_SECOND) {
-    // Получаем данные о текущем периоде
-    const { 
-        currentWeek, 
-        datesForWeeks,
-        periodStart,
-        periodEnd
-    } = calculateAcademicPeriods(START_FIRST, START_SECOND);
-    
-    // Отображаем диапазон дат
-    const periodElement = document.querySelector('.schedule-period');
-    if (periodElement) {
-        periodElement.textContent = 
-            `Период: ${formatDate(periodStart)} - ${formatDate(periodEnd)}`;
-    }
-    
-    // Сбрасываем все подсветки
-    document.querySelectorAll('.schedule-day').forEach(day => {
-        day.classList.remove('current-day');
-    });
-    document.querySelectorAll('.lesson-card').forEach(lesson => {
-        lesson.classList.remove('current-lesson');
-    });
-    
-    // Добавляем даты к дням недели
-    document.querySelectorAll('.week-section').forEach(weekSection => {
-        const weekNum = parseInt(weekSection.dataset.week);
-        const days = weekSection.querySelectorAll('.schedule-day');
-        
-        days.forEach(day => {
-            const dayNum = parseInt(day.dataset.day);
-            const date = datesForWeeks[weekNum][dayNum];
-            const dateElement = day.querySelector('.day-date');
-            
-            if (date && dateElement) {
-                dateElement.textContent = formatDate(date);
-                
-                // Подсвечиваем текущий день
-                if (isSameDate(date, new Date()) && weekNum === currentWeek) {
-                    day.classList.add('current-day');
-                    highlightCurrentLesson(day);
-                }
-            }
-        });
-    });
-}
-
-function highlightCurrentLesson(dayElement) {
-    const now = new Date();
-    const currentHours = now.getHours();
-    const currentMinutes = now.getMinutes();
-    
-    dayElement.querySelectorAll('.lesson-card').forEach(lesson => {
-        const timeRange = lesson.querySelector('.lesson-time-range').textContent;
-        const [startTime, endTime] = timeRange.split(' - ').map(t => t.split(':'));
-        
-        const startHours = parseInt(startTime[0]);
-        const startMinutes = parseInt(startTime[1]);
-        const endHours = parseInt(endTime[0]);
-        const endMinutes = parseInt(endTime[1]);
-        
-        if ((currentHours > startHours || (currentHours === startHours && currentMinutes >= startMinutes)) &&
-            (currentHours < endHours || (currentHours === endHours && currentMinutes <= endMinutes))) {
-            lesson.classList.add('current-lesson');
-        }
-    });
-}
-
-// Вспомогательные функции
-function formatDate(date) {
-    const options = { day: 'numeric', month: 'long' };
-    return date.toLocaleDateString('ru-RU', options);
-}
-
-function isSameDate(date1, date2) {
-    return date1.getDate() === date2.getDate() && 
-           date1.getMonth() === date2.getMonth() && 
-           date1.getFullYear() === date2.getFullYear();
-}
-
-
-
 function getPlaceholder() {
     return `
         <div class="loading-container">
@@ -921,4 +664,193 @@ function getPlaceholder() {
             }
         </style>
     `;
+}
+
+function getSchedulePage(lessons) {
+    console.log(lessons);
+    // 1. Сортируем и группируем занятия по датам
+    const lessonsByDate = {};
+    lessons.sort((a, b) => a.lesson_number - b.lesson_number).forEach(lesson => {
+        if (!lessonsByDate[lesson.date]) {
+            lessonsByDate[lesson.date] = [];
+        }
+        lessonsByDate[lesson.date].push(lesson);
+    });
+
+    // 2. Получаем все даты и разбиваем на 2 недели
+    const allDates = Object.keys(lessonsByDate).sort((a, b) => parseDate(a) - parseDate(b));
+    
+    // Создаем полный список дат на 2 недели (14 дней)
+    const fullDates = generateFullTwoWeeksDates(allDates);
+    const week1Dates = fullDates.slice(0, 6);
+    const week2Dates = fullDates.slice(7, 13);
+
+    // 3. Генерируем HTML
+    const html = `
+        <div class="schedule-container">
+            <div class="schedule-header">
+                <h1 class="schedule-title">Мое расписание</h1>
+                <div class="schedule-period">${getCurrentPeriod(fullDates)}</div>
+            </div>
+            
+            <div class="schedule-weeks">
+                ${renderWeek(1, week1Dates, lessonsByDate)}
+                ${renderWeek(2, week2Dates, lessonsByDate)}
+            </div>
+        </div>
+    `;
+
+    return {
+        html: html,
+        init: function() {
+            initScheduleHighlighting();
+            setInterval(initScheduleHighlighting, 60000);
+        }
+    };
+}
+
+// Генерируем полные 2 недели с заполнением пропущенных дат
+function generateFullTwoWeeksDates(existingDates) {
+    if (existingDates.length === 0) return [];
+    
+    const startDate = parseDate(existingDates[0]);
+    const fullDates = [];
+    
+    // Находим понедельник первой недели
+    const firstMonday = new Date(startDate);
+    firstMonday.setDate(startDate.getDate() - startDate.getDay() + (startDate.getDay() === 0 ? -6 : 1));
+    
+    // Генерируем 14 дней (2 недели)
+    for (let i = 0; i < 14; i++) {
+        const date = new Date(firstMonday);
+        date.setDate(firstMonday.getDate() + i);
+        fullDates.push(formatDateToKey(date));
+    }
+    
+    return fullDates;
+}
+
+// Функции рендеринга с оригинальными стилями
+function renderWeek(weekNum, dates, lessonsData) {
+    return `
+        <div class="week-section" data-week="${weekNum}">
+            <h2 class="week-title">${weekNum}</h2>
+            <span class="week-subtitle">НЕДЕЛЯ</span>
+            
+            <div class="schedule-days">
+                ${dates.map(date => renderDay(date, lessonsData[date])).join('')}
+                ${dates.length < 7 ? '<div class="empty-day"></div>'.repeat(7 - dates.length) : ''}
+            </div>
+        </div>
+    `;
+}
+
+function renderDay(date, lessons = []) {
+    const dateObj = parseDate(date);
+    const hasLessons = lessons && lessons.length > 0;
+    
+    return `
+        <div class="schedule-day" data-date="${date}">
+            <div class="day-header">
+                <h3 class="day-title">${getDayName(dateObj.getDay())}</h3>
+                <div class="day-date">${formatDate(dateObj)}</div>
+            </div>
+            
+            <div class="day-lessons">
+                ${hasLessons 
+                    ? lessons.map(renderLesson).join('') 
+                    : '<div class="no-lessons">Нет занятий в этот день</div>'
+                }
+            </div>
+        </div>
+    `;
+}
+
+function renderLesson(lesson) {
+    return `
+        <div class="lesson-card">
+            <div class="lesson-time">
+                <span class="lesson-number">${lesson.lesson_number} пара</span>
+                <span class="lesson-time-range">${lesson.start_time} - ${lesson.end_time}</span>
+            </div>
+            
+            <div class="lesson-main">
+                <div class="lesson-subject">${lesson.subject}</div>
+                <div class="lesson-type">${lesson.lesson_type}</div>
+            </div>
+            
+            <div class="lesson-details">
+                <div class="lesson-classroom">
+                    <i class="fas fa-door-open"></i>
+                    ${lesson.classroom}
+                </div>
+                <div class="lesson-teacher">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    ${lesson.last_name} ${lesson.first_name}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Вспомогательные функции
+function parseDate(dateStr) {
+    const [day, month] = dateStr.split('.').map(Number);
+    return new Date(new Date().getFullYear(), month - 1, day);
+}
+
+function formatDate(date) {
+    const options = { day: 'numeric', month: 'long' };
+    return date.toLocaleDateString('ru-RU', options);
+}
+
+function getDayName(dayIndex) {
+    const days = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
+    return days[dayIndex];
+}
+
+function getCurrentPeriod(dates) {
+    if (dates.length === 0) return '';
+    const first = parseDate(dates[0]);
+    const last = parseDate(dates[dates.length - 1]);
+    return `Период: ${formatDate(first)} - ${formatDate(last)}`;
+}
+
+function initScheduleHighlighting() {
+    const now = new Date();
+    const todayStr = formatDateToKey(now);
+    
+    // Сброс подсветки
+    document.querySelectorAll('.schedule-day, .lesson-card').forEach(el => {
+        el.classList.remove('current-day', 'current-lesson');
+    });
+    
+    // Подсветка текущего дня
+    const currentDay = document.querySelector(`.schedule-day[data-date="${todayStr}"]`);
+    if (currentDay) {
+        currentDay.classList.add('current-day');
+        highlightCurrentLessons(currentDay);
+    }
+}
+
+function highlightCurrentLessons(dayElement) {
+    const now = new Date();
+    dayElement.querySelectorAll('.lesson-card').forEach(lesson => {
+        const timeRange = lesson.querySelector('.lesson-time-range').textContent;
+        const [start, end] = timeRange.split(' - ').map(t => t.split(':'));
+        
+        const startTime = new Date();
+        startTime.setHours(parseInt(start[0]), parseInt(start[1]));
+        
+        const endTime = new Date();
+        endTime.setHours(parseInt(end[0]), parseInt(end[1]));
+        
+        if (now >= startTime && now <= endTime) {
+            lesson.classList.add('current-lesson');
+        }
+    });
+}
+
+function formatDateToKey(date) {
+    return `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}`;
 }

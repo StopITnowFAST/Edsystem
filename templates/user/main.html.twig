@@ -10,36 +10,39 @@
 
 {% block body %}
     <div class="user__page">
-        <div class="sidebar" id="sidebar">
-            <div id="schedule" class="sidebar-button" title="Schedule" data-section="schedule">
-                <i class="fas fa-calendar-alt"></i>
+        {% if userType != 'hollow' %}
+            <div class="sidebar" id="sidebar">
+                <div id="schedule" class="sidebar-button" title="Schedule" data-section="schedule">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div id="chat" class="sidebar-button" title="Chat" data-section="chat">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <div id="subjects" class="sidebar-button" title="Subjects" data-section="subjects">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div id="profile" class="sidebar-button" title="Profile" data-section="profile">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div id="tests" class="sidebar-button" title="Tests" data-section="tests">
+                    <i class="fas fa-tasks"></i>
+                </div>
             </div>
-            <div id="chat" class="sidebar-button" title="Chat" data-section="chat">
-                <i class="fas fa-comments"></i>
-            </div>
-            <div id="subjects" class="sidebar-button" title="Subjects" data-section="subjects">
-                <i class="fas fa-book"></i>
-            </div>
-            <div id="profile" class="sidebar-button" title="Profile" data-section="profile">
-                <i class="fas fa-user"></i>
-            </div>
-            <div id="tests" class="sidebar-button" title="Tests" data-section="tests">
-                <i class="fas fa-tasks"></i>
-            </div>
-        </div>
-        
+        {% endif %}
         <div class="content" id="content"></div>
     </div>
 {% endblock %}
 
 {% block javascripts %}
-    <script>
-        const START_FIRST = new Date("{{ startfirst }}");
-        const START_SECOND = new Date("{{ startsecond }}");
-        const USER_ID = {{ userId }};
-        const STARTING_SECTION = "{{ section }}";
-        let globalMessageArray = JSON.parse('{{ globalMessageArray|json_encode|raw }}');
-        let globalChatArray = JSON.parse('{{ globalChatArray|json_encode|raw }}');
-    </script>
-    <script src="{{ asset('js/user_main.js') }}"></script>
+    {% if userType != 'hollow' %}
+        <script>
+            const START_FIRST = new Date("{{ startfirst }}");
+            const START_SECOND = new Date("{{ startsecond }}");
+            const USER_ID = {{ userId }};
+            const STARTING_SECTION = "{{ section }}";
+            let globalMessageArray = JSON.parse('{{ globalMessageArray|json_encode|raw }}');
+            let globalChatArray = JSON.parse('{{ globalChatArray|json_encode|raw }}');
+        </script>
+        <script src="{{ asset('js/user_main.js') }}"></script>
+    {% endif %}
 {% endblock %}
