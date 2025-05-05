@@ -910,28 +910,45 @@ function createLessonCard(lesson, userType) {
                        'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
     const formattedDate = `${parseInt(day)} ${monthNames[parseInt(month) - 1]}`;
 
-    const hasGrades = lesson.hasGrades || false;
+    // Определяем классы для карточки
+    const cardClasses = ['subject-lesson-card'];
+    
+    // Добавляем класс absent если студент отсутствовал
+    if (lesson.attendance === 'absent') {
+        cardClasses.push('absent');
+    }
+    
+    // Добавляем класс has-grade если есть оценка
+    if (lesson.grade) {
+        cardClasses.push('has-grade');
+    }
+
+    // Добавляем класс по типу занятия
+    cardClasses.push(lesson.type.toLowerCase().replace(' ', '-'));
 
     return `
-        <div class="subject-lesson-card" 
+        <div class="${cardClasses.join(' ')}" 
              data-date="${lesson.date}" 
              data-type="${lesson.type}"
              data-time="${lesson.time}"
-             ${userType == 'teacher' ? `data-has-students="${hasGrades}"` : ''}>
+             ${userType == 'teacher' ? 'data-has-students="true"' : ''}>
             <div class="subject-lesson-date">${formattedDate}</div>
             <div class="subject-lesson-type ${lesson.type.toLowerCase().replace(' ', '-')}">
                 ${lesson.type}
             </div>
             <div class="subject-lesson-time">${lesson.time}</div>
             
+            ${lesson.grade ? `<div class="subject-lesson-grade">${lesson.grade}</div>` : ''}
+            
             ${userType == 'teacher' ? `
             <div class="subject-lesson-controls">
-                <button class="show-students-btn">${hasGrades ? 'Показать оценки' : 'Показать студентов'}</button>
+                <button class="show-students-btn">Показать студентов</button>
             </div>
             ` : ''}
         </div>
     `;
 }
+
 
 // Инициализация после рендеринга
 function initSubjectPage(userType) {
