@@ -12,6 +12,7 @@ use App\Service\Chat;
 use App\Service\File;
 use App\Entity\Message;
 use App\Entity\Test;
+use App\Entity\Group;
 use App\Entity\File as FileEntity;
 use App\Entity\TestUserResult;
 use App\Entity\UserCard;
@@ -48,14 +49,21 @@ class UserPageController extends AbstractController
         $userId = $this->getUser()->getId();
         $globalMessageArray = $this->chat->getAllMessages($userId);
         $globalChatArray = $this->chat->getAvailableChats($userId);
+        $groupId = $this->study->getStudentGroup($userId);
+        $group = $this->em->getRepository(Group::class)->find($groupId);
 
-        // var_dump($globalChatArray); die;
+        if ($group) {
+            $startfirst = $group->getEdStartsFirst();
+            $startsecond = $group->getEdStartsSecond();
+        }
 
         return $this->render('user/main.html.twig', [
             'userId' => $userId,
             'section' => $section,
             'globalMessageArray' => $globalMessageArray,
             'globalChatArray' => $globalChatArray,
+            'startfirst' => $startfirst,
+            'startsecond' => $startsecond,
         ]);
     }
 

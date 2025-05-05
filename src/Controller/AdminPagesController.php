@@ -520,6 +520,8 @@ class AdminPagesController extends AbstractController {
             $group->setCourse($_POST['course']);
             $group->setGroupToken($this->helper->generateRandomString(50));
             $group->setFull($_POST['isFull']);
+            $group->setEdStartsFirst($_POST['first_date']);
+            $group->setEdStartsSecond($_POST['second_date']);
             $group->setDescription($_POST['description']);
             $group->setStatus($_POST['status']);
             $this->em->persist($group);

@@ -69,7 +69,17 @@
                             </select>
                         </div>
                         <div class="admin-create__field">
-                            <label for="description">Описание</label>
+                            <label for="first_date">Дата начала обучения в первом семестре</label>
+                            <input type="date" id="first_date" class="admin-create__input" name="first_date"
+                                value="{{ (updating_element is not empty) ? updating_element.edStartsFirst : "" }}">
+                        </div>
+                        <div class="admin-create__field">
+                            <label for="second_date">Дата начала обучения во втором семестре</label>
+                            <input type="date" id="second_date" class="admin-create__input" name="second_date"
+                                value="{{ (updating_element is not empty) ? updating_element.edStartsSecond : "" }}">
+                        </div>
+                        <div class="admin-create__field">
+                            <label for="description">Описание </label>
                             <textarea rows="5" id="description" class="textarea-input admin-create__input" name="description" required
                                 >{{ (updating_element is not empty) ? updating_element.description : "" }}</textarea>
                         </div>

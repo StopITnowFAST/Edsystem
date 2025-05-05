@@ -34,10 +34,8 @@
 
 {% block javascripts %}
     <script>
-        {# const START_FIRST = "{{ startfirst }}";
-        const START_SECOND = "{{ startsecond }}"; #}
-        const START_FIRST = 3;
-        const START_SECOND = 4;
+        const START_FIRST = new Date("{{ startfirst }}");
+        const START_SECOND = new Date("{{ startsecond }}");
         const USER_ID = {{ userId }};
         const STARTING_SECTION = "{{ section }}";
         let globalMessageArray = JSON.parse('{{ globalMessageArray|json_encode|raw }}');

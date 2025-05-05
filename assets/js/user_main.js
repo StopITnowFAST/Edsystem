@@ -45,29 +45,32 @@ async function loadContent(section) {
     switch(section) {
         case SCHEDULE_SECTION:
             json = await getDataFromServer(SCHEDULE_SECTION_URL);
-            console.log(json.schedule);
-            content = getSchedulePage(json.schedule);
-            highlightCurrentDayAndLesson();
+            const schedulePage = getSchedulePage(json.schedule, START_FIRST, START_SECOND);
+            CONTENT_CONTAINER.innerHTML = schedulePage.html;
+            schedulePage.init();
             break;
         case CHAT_SECTION:
             json = await getDataFromServer(CHAT_SECTION_URL);
             globalChatArray = json.data;
             content = getChatPage(globalChatArray);
+            renderContent(content);   
             break;
         case SUBJECT_SECTION:
             // pageData = getDataFromServer(SUBJECT_SECTION_URL);
             content = '';
+            renderContent(content);   
             break;
         case PROFILE_SECTION:
             // pageData = getDataFromServer(PROFILE_SECTION_ULR);
             content = '';
+            renderContent(content);   
             break;
         case TEST_SECTION:
             json = await getDataFromServer(TEST_SECTION_ULR);
             content = getTestsPage(json.data);
+            renderContent(content);   
             break;
-    }
-    renderContent(content);    
+    } 
 }
 
 function loadPlaceHolder() {
@@ -617,13 +620,17 @@ function getInputElement() {
     `;
 }
 
-function getSchedulePage(scheduleData) {
+// Основная функция для генерации страницы расписания
+function getSchedulePage(scheduleData, START_FIRST, START_SECOND) {
     // Группируем данные по неделям и дням
     const groupedData = groupScheduleData(scheduleData);
     
-    return `
+    const html = `
         <div class="schedule-container">
-            <h1 class="schedule-title">Мое расписание</h1>
+            <div class="schedule-header">
+                <h1 class="schedule-title">Мое расписание</h1>
+                <div class="schedule-period"></div> 
+            </div>
             
             <div class="schedule-weeks">
                 ${renderWeek(1, groupedData[1])}
@@ -631,6 +638,16 @@ function getSchedulePage(scheduleData) {
             </div>
         </div>
     `;
+    
+    // Возвращаем HTML и функции для последующей инициализации
+    return {
+        html: html,
+        init: function() {
+            setupScheduleWithDates(START_FIRST, START_SECOND);
+            // Обновляем каждую минуту для актуальной подсветки
+            setInterval(() => setupScheduleWithDates(START_FIRST, START_SECOND), 60000);
+        }
+    };
 }
 
 function groupScheduleData(data) {
@@ -657,8 +674,9 @@ function groupScheduleData(data) {
 
 function renderWeek(weekNum, weekData) {
     return `
-        <div class="week-section">
-            <h2 class="week-title">${weekNum} НЕДЕЛЯ</h2>
+        <div class="week-section" data-week="${weekNum}">
+            <h2 class="week-title">${weekNum}</h2>
+            <span class="week-subtitle">НЕДЕЛЯ</span>
             
             <div class="schedule-days">
                 ${Object.entries(weekData).map(([dayNum, dayData]) => 
@@ -674,6 +692,7 @@ function renderDay(dayNum, dayData) {
         <div class="schedule-day" data-day="${dayNum}">
             <div class="day-header">
                 <h3 class="day-title">${dayData.dayName}</h3>
+                <div class="day-date"></div>
             </div>
             
             <div class="day-lessons">
@@ -713,38 +732,148 @@ function renderLesson(lesson) {
     `;
 }
 
-function highlightCurrentDayAndLesson() {
+// Функции для работы с датами и подсветкой
+function calculateAcademicPeriods(START_FIRST, START_SECOND) {
     const now = new Date();
-    const currentDay = now.getDay();
-    const currentHours = now.getHours();
-    const currentMinutes = now.getMinutes();
-    const scheduleDay = currentDay === 0 ? 7 : currentDay;
-    const allDays = document.querySelectorAll('.schedule-day');
-    allDays.forEach(day => {
-        day.classList.remove('current-day');
-        const lessons = day.querySelectorAll('.lesson-card');
-        lessons.forEach(lesson => lesson.classList.remove('current-lesson'));
-    });
-    const currentDayElement = document.querySelector(`.schedule-day[data-day="${scheduleDay}"]`);
-    if (currentDayElement) {
-        currentDayElement.classList.add('current-day');
-        const lessons = currentDayElement.querySelectorAll('.lesson-card');
-        lessons.forEach(lesson => {
-            const timeRange = lesson.querySelector('.lesson-time-range').textContent;
-            const [startTime, endTime] = timeRange.split(' - ').map(t => t.split(':'));
-            const startHours = parseInt(startTime[0]);
-            const startMinutes = parseInt(startTime[1]);
-            const endHours = parseInt(endTime[0]);
-            const endMinutes = parseInt(endTime[1]);
-            if ((currentHours > startHours || (currentHours === startHours && currentMinutes >= startMinutes)) &&
-                (currentHours < endHours || (currentHours === endHours && currentMinutes <= endMinutes))) {
-                lesson.classList.add('current-lesson');
-            }
-        });
+    now.setHours(0, 0, 0, 0); // Убираем время для точного сравнения дат
+    
+    // Определяем текущее полугодие (1 или 2)
+    const startFirst = new Date(START_FIRST);
+    const startSecond = new Date(START_SECOND);
+    
+    let semesterStart, semesterNumber;
+    
+    if (now >= startFirst && now < startSecond) {
+        semesterStart = new Date(startFirst);
+        semesterNumber = 1;
+    } else {
+        semesterStart = new Date(startSecond);
+        semesterNumber = 2;
     }
+    
+    // Вычисляем сколько недель прошло с начала семестра
+    const weeksPassed = Math.floor((now - semesterStart) / (7 * 24 * 60 * 60 * 1000));
+    const currentPeriodWeek = (weeksPassed % 2) + 1; // 1 или 2
+    
+    // Вычисляем даты для текущего двухнедельного периода
+    const periodStartDate = new Date(semesterStart);
+    periodStartDate.setDate(periodStartDate.getDate() + (weeksPassed - (currentPeriodWeek - 1)) * 7);
+    
+    const periodEndDate = new Date(periodStartDate);
+    periodEndDate.setDate(periodEndDate.getDate() + 13); // +13 дней = 2 недели
+    
+    return {
+        semester: semesterNumber,
+        currentWeek: currentPeriodWeek,
+        periodStart: periodStartDate,
+        periodEnd: periodEndDate,
+        datesForWeeks: generateDatesForWeeks(periodStartDate)
+    };
 }
 
+function generateDatesForWeeks(startDate) {
+    const dates = {};
+    const date = new Date(startDate);
+    
+    for (let week = 1; week <= 2; week++) {
+        dates[week] = {};
+        
+        for (let day = 1; day <= 6; day++) { // Понедельник-Суббота (1-6)
+            dates[week][day] = new Date(date);
+            date.setDate(date.getDate() + 1);
+        }
+        
+        // Добавляем воскресенье (7 день) с пропуском даты
+        dates[week][7] = null; // Воскресенье не имеет даты
+        
+        // Если это не последняя неделя, переходим к следующему понедельнику
+        if (week < 2) {
+            date.setDate(date.getDate() + 1); // Пропускаем воскресенье
+        }
+    }
+    
+    return dates;
+}
 
+function setupScheduleWithDates(START_FIRST, START_SECOND) {
+    // Получаем данные о текущем периоде
+    const { 
+        currentWeek, 
+        datesForWeeks,
+        periodStart,
+        periodEnd
+    } = calculateAcademicPeriods(START_FIRST, START_SECOND);
+    
+    // Отображаем диапазон дат
+    const periodElement = document.querySelector('.schedule-period');
+    if (periodElement) {
+        periodElement.textContent = 
+            `Период: ${formatDate(periodStart)} - ${formatDate(periodEnd)}`;
+    }
+    
+    // Сбрасываем все подсветки
+    document.querySelectorAll('.schedule-day').forEach(day => {
+        day.classList.remove('current-day');
+    });
+    document.querySelectorAll('.lesson-card').forEach(lesson => {
+        lesson.classList.remove('current-lesson');
+    });
+    
+    // Добавляем даты к дням недели
+    document.querySelectorAll('.week-section').forEach(weekSection => {
+        const weekNum = parseInt(weekSection.dataset.week);
+        const days = weekSection.querySelectorAll('.schedule-day');
+        
+        days.forEach(day => {
+            const dayNum = parseInt(day.dataset.day);
+            const date = datesForWeeks[weekNum][dayNum];
+            const dateElement = day.querySelector('.day-date');
+            
+            if (date && dateElement) {
+                dateElement.textContent = formatDate(date);
+                
+                // Подсвечиваем текущий день
+                if (isSameDate(date, new Date()) && weekNum === currentWeek) {
+                    day.classList.add('current-day');
+                    highlightCurrentLesson(day);
+                }
+            }
+        });
+    });
+}
+
+function highlightCurrentLesson(dayElement) {
+    const now = new Date();
+    const currentHours = now.getHours();
+    const currentMinutes = now.getMinutes();
+    
+    dayElement.querySelectorAll('.lesson-card').forEach(lesson => {
+        const timeRange = lesson.querySelector('.lesson-time-range').textContent;
+        const [startTime, endTime] = timeRange.split(' - ').map(t => t.split(':'));
+        
+        const startHours = parseInt(startTime[0]);
+        const startMinutes = parseInt(startTime[1]);
+        const endHours = parseInt(endTime[0]);
+        const endMinutes = parseInt(endTime[1]);
+        
+        if ((currentHours > startHours || (currentHours === startHours && currentMinutes >= startMinutes)) &&
+            (currentHours < endHours || (currentHours === endHours && currentMinutes <= endMinutes))) {
+            lesson.classList.add('current-lesson');
+        }
+    });
+}
+
+// Вспомогательные функции
+function formatDate(date) {
+    const options = { day: 'numeric', month: 'long' };
+    return date.toLocaleDateString('ru-RU', options);
+}
+
+function isSameDate(date1, date2) {
+    return date1.getDate() === date2.getDate() && 
+           date1.getMonth() === date2.getMonth() && 
+           date1.getFullYear() === date2.getFullYear();
+}
 
 
 
