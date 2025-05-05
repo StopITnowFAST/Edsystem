@@ -49,21 +49,24 @@ class UserPageController extends AbstractController
         $userId = $this->getUser()->getId();
         $globalMessageArray = $this->chat->getAllMessages($userId);
         $globalChatArray = $this->chat->getAvailableChats($userId);
-        $groupId = $this->study->getStudentGroup($userId);
-        $group = $this->em->getRepository(Group::class)->find($groupId);
-
-        if ($group) {
+        $accountType = $this->study->getUserType($userId);
+        if ($accountType == 'student') {
+            $groupId = $this->study->getStudentGroup($userId);
+            $group = $this->em->getRepository(Group::class)->find($groupId);
             $startfirst = $group->getEdStartsFirst();
             $startsecond = $group->getEdStartsSecond();
-        }
+        } else if ($accountType == 'teacher') {
+
+        } 
 
         return $this->render('user/main.html.twig', [
             'userId' => $userId,
             'section' => $section,
             'globalMessageArray' => $globalMessageArray,
             'globalChatArray' => $globalChatArray,
-            'startfirst' => $startfirst,
-            'startsecond' => $startsecond,
+            'startfirst' => $startfirst ?? null,
+            'startsecond' => $startsecond ?? null,
+            'userType' => $accountType,
         ]);
     }
 
@@ -115,6 +118,22 @@ class UserPageController extends AbstractController
         $groupId = $this->study->getStudentGroup($userId);
 
         $schedule = $this->em->getRepository(Schedule::class)->findScheduleByGroupId($groupId);
+        
+        return $this->json([
+            'schedule' => $schedule
+        ]);
+    }
+    
+    // Получение данных для предметов
+    #[Route('/request/get/user/subjects/{userId}', name: 'get_subjects')]
+    public function getSubjects($userId) {
+
+        if ($this->getUser()->getId() != $userId) {
+            return new Response('Permission Error', 403);
+        }
+
+        $groupId = $this->study->getStudentGroup($userId);
+        $schedule = $this->study->getAllSubjectDates($groupId);
         
         return $this->json([
             'schedule' => $schedule
@@ -266,10 +285,11 @@ class UserPageController extends AbstractController
     #[Route('/testss', name: 'test')]
     public function test() {
         $userId = $this->getUser()->getId();
+        $groupId = $this->study->getStudentGroup($userId);
         $ids = [
             2 => 3,
             6 => 4,
         ];
-        var_dump($this->chat->getAvailableChats($userId)); die;
+        var_dump($this->study->getAllSubjectDates($groupId)); die;
     }
 }

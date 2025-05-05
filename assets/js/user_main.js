@@ -16,10 +16,14 @@ const TEST_SECTION_ULR = '/request/get/user/' + TEST_SECTION + '/';
 const CONTENT_CONTAINER = document.getElementById('content');
 const POLL_DELAY = 1000;
 
+let colors = ['#4a6fa5', '#5cb85c', '#5bc0de', '#f0ad4e', '#d9534f'];
 let isPolling = false;
 let isDialogActive = false;
 let currentGroup = 'student';
 let currentDialog = 0;
+
+let currentSubject = null;
+let subjectScheduleData = {};
 
 startPolling();
 
@@ -56,8 +60,8 @@ async function loadContent(section) {
             renderContent(content);   
             break;
         case SUBJECT_SECTION:
-            // pageData = getDataFromServer(SUBJECT_SECTION_URL);
-            content = '';
+            json = await getDataFromServer(SUBJECT_SECTION_URL);
+            content = getSubjectPage(json.data);
             renderContent(content);   
             break;
         case PROFILE_SECTION:
@@ -292,10 +296,12 @@ function generateChatListHTML(users, type) {
             : '';
         
         let userName = (user.user_id == USER_ID) ? 'Избранное' : `${user.last_name} ${user.first_name}`;
-            
+        
+        let color = colors[user.user_id % colors.length];
+
         return `
             <div class="chat-item" onclick="renderDialog(${user.user_id})" data-user-id="${user.user_id}" data-user-type="${type}">
-                <div class="chat-avatar">${getInitials(user.first_name, user.last_name, user.user_id)}</div>
+                <div style="background-color: ${color}" class="chat-avatar">${getInitials(user.first_name, user.last_name, user.user_id)}</div>
                 <div class="chat-info">
                     <h4>${userName}</h4>
                     ${lastMessage}

@@ -48,63 +48,88 @@ class Chat {
 
     // Функция возвращает доступные чаты для пользователя
     public function getAvailableChats($userId) {
-        $groupId = $this->study->getStudentGroup($userId);        
         $conn = $this->em->getConnection();
-        $ids = $this->getAvailableChatIds($userId, $groupId);
+        $accountType = $this->study->getUserType($userId);
 
-        // Достаю данные для первичной загрузки 
-        $sql = "
-            SELECT 
-                u.user_id, 
-                u.last_name, 
-                u.first_name, 
-                u.type, 
-                last_msg.text AS last_message_text, 
-                last_msg.date AS last_message_date,
-                CONCAT('/download/user-file/', f.real_file_name) AS filelink,
-                f.file_name
-            FROM (
-                SELECT st.user_id, st.last_name, st.first_name, 'student' as type
-                FROM `student` st WHERE st.user_id IN $ids
-                UNION
-                SELECT sb.user_id, t.last_name, t.first_name, 'teacher' as type
-                FROM `schedule_subject` sb
-                JOIN `teacher` t ON t.user_id = sb.user_id
-                WHERE sb.user_id IN $ids
-            ) u
-            LEFT JOIN (
-                SELECT 
-                    partner_id, 
-                    text, 
-                    date,
-                    file_id
+        if ($accountType == 'student') {
+            $groupId = $this->study->getStudentGroup($userId);        
+            $ids = $this->getAvailableChatIds($userId, $groupId);
+            $sql = "
+                SELECT u.user_id, u.last_name, u.first_name, u.type, last_msg.text AS last_message_text, last_msg.date AS last_message_date,
+                    CONCAT('/download/user-file/', f.real_file_name) AS filelink, f.file_name
                 FROM (
-                    SELECT 
-                        CASE 
-                            WHEN from_user_id = $userId THEN to_user_id
-                            ELSE from_user_id
-                        END AS partner_id,
-                        text,
-                        date,
-                        file_id,
-                        ROW_NUMBER() OVER (PARTITION BY 
+                    SELECT st.user_id, st.last_name, st.first_name, 'student' as type
+                    FROM `student` st WHERE st.user_id IN $ids
+                    UNION
+                    SELECT sb.user_id, t.last_name, t.first_name, 'teacher' as type
+                    FROM `schedule_subject` sb
+                    JOIN `teacher` t ON t.user_id = sb.user_id
+                    WHERE sb.user_id IN $ids
+                ) u
+                LEFT JOIN (
+                    SELECT partner_id, text, date,file_id
+                    FROM (
+                        SELECT 
                             CASE 
                                 WHEN from_user_id = $userId THEN to_user_id
                                 ELSE from_user_id
-                            END 
-                            ORDER BY date DESC
-                        ) AS rn
-                    FROM `message`
-                    WHERE (from_user_id = $userId OR to_user_id = $userId)
-                ) ranked
-                WHERE rn = 1
-            ) last_msg ON last_msg.partner_id = u.user_id
-            LEFT JOIN `file` f ON f.id = last_msg.file_id
-            ORDER BY 
-                last_msg.date DESC,
-                u.last_name ASC, 
-                u.first_name ASC
-        ";
+                            END AS partner_id, 
+                            text, date, file_id, 
+                            ROW_NUMBER() OVER (PARTITION BY 
+                                CASE 
+                                    WHEN from_user_id = $userId THEN to_user_id
+                                    ELSE from_user_id
+                                END 
+                                ORDER BY date DESC
+                            ) AS rn
+                        FROM `message`
+                        WHERE (from_user_id = $userId OR to_user_id = $userId)
+                    ) ranked
+                    WHERE rn = 1
+                ) last_msg ON last_msg.partner_id = u.user_id
+                LEFT JOIN `file` f ON f.id = last_msg.file_id
+                ORDER BY last_msg.date DESC, u.last_name ASC, u.first_name ASC
+            ";
+        } else if ($accountType == 'teacher') {
+            $sql = "
+                SELECT 
+                    u.user_id, u.last_name, u.first_name, u.type, last_msg.text AS last_message_text, last_msg.date AS last_message_date,
+                    CONCAT('/download/user-file/', f.real_file_name) AS filelink, f.file_name
+                FROM (
+                    SELECT st.user_id, st.last_name, st.first_name, 'student' as type
+                    FROM `student` st
+                    
+                    UNION
+                    
+                    SELECT t.user_id, t.last_name, t.first_name, 'teacher' as type
+                    FROM `teacher` t
+                ) u
+                LEFT JOIN (
+                    SELECT partner_id, text, date,file_id
+                    FROM (
+                        SELECT 
+                            CASE 
+                                WHEN from_user_id = $userId THEN to_user_id
+                                ELSE from_user_id
+                            END AS partner_id, text, date, file_id, 
+                            ROW_NUMBER() OVER (
+                                PARTITION BY 
+                                    CASE 
+                                        WHEN from_user_id = $userId THEN to_user_id
+                                        ELSE from_user_id
+                                    END 
+                                ORDER BY date DESC
+                            ) AS rn
+                        FROM `message`
+                        WHERE from_user_id = $userId OR to_user_id = $userId
+                    ) ranked
+                    WHERE rn = 1
+                ) last_msg ON last_msg.partner_id = u.user_id
+                LEFT JOIN `file` f ON f.id = last_msg.file_id
+                ORDER BY last_msg.date DESC, u.last_name ASC, u.first_name ASC
+            ";
+        }
+        
         $resultSet = $conn->executeQuery($sql);
         $results = $resultSet->fetchAllAssociative();
         $chats = [];
@@ -114,8 +139,7 @@ class Chat {
         return $chats;
     }
 
-    public function getAllMessages($userId) {
-        $groupId = $this->study->getStudentGroup($userId);        
+    public function getAllMessages($userId) { 
         $conn = $this->em->getConnection();
         $sql = "
             SELECT m.*, f.real_file_name, f.file_name FROM `message` m 
