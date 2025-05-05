@@ -149,7 +149,7 @@ class UserPageController extends AbstractController
         $accountType = $this->study->getUserType($userId);
         if ($accountType == 'student') {
             $groupId = $this->study->getStudentGroup($userId);
-            $subjects = $this->study->getAllSubjectDates($groupId);
+            $subjects = $this->study->getAllSubjectDates($groupId, $userId);
         } else if ($accountType == 'teacher') {
             $subjects = $this->study->getTeacherSubjectsDates($userId);
             

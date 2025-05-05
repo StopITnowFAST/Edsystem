@@ -865,6 +865,7 @@ function formatDateToKey(date) {
 
 
 function getSubjectPage(data, userType) {
+    console.log(data);
     if (!data) {
         return `
             <div class="subject-no-data">

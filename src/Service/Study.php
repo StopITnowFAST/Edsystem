@@ -86,19 +86,19 @@ class Study
         return $resultSet->rowCount() - 1;
     }
 
-    function getAllSubjectDates($group_id) {
-        // 1. Получаем данные группы
+    function getAllSubjectDates($group_id, $student_id = null) {
+        // 1. Получаем данные группы (существующий код)
         $group = $this->em->getRepository(Group::class)->find($group_id);
         if (!$group) {
             throw new \Exception("Группа не найдена");
         }
     
-        // 2. Определяем даты начала и конца семестра
+        // 2. Определяем даты начала и конца семестра (существующий код)
         $currentDate = new \DateTime();
         $startFirst = new \DateTime($group->getEdStartsFirst());
         $startSecond = $group->getEdStartsSecond() ? new \DateTime($group->getEdStartsSecond()) : null;
     
-        // Определяем текущий семестр
+        // Определяем текущий семестр (существующий код)
         if ($currentDate >= $startFirst && ($startSecond === null || $currentDate < $startSecond)) {
             $semesterStart = clone $startFirst;
             $semesterEnd = $startSecond ? (clone $startSecond)->modify('-1 day') : new \DateTime($startFirst->format('Y') . '-12-31');
@@ -109,18 +109,42 @@ class Study
             throw new \Exception("Не удалось определить текущий семестр");
         }
     
-        // 3. Получаем все записи расписания для группы
+        // 3. Получаем все записи расписания для группы (существующий код)
         $scheduleItems = $this->em->getRepository(Schedule::class)->findBy(
             ['schedule_group_id' => $group_id],
             ['week_number' => 'ASC', 'schedule_day' => 'ASC', 'schedule_time_id' => 'ASC']
         );
     
-        // 4. Подготавливаем структуру для результатов
+        // 4. Получаем все оценки студента за этот период (НОВЫЙ КОД)
+        $grades = [];
+        if ($student_id) {
+            $gradesQuery = $this->em->createQuery(
+                'SELECT g 
+                FROM App\Entity\Grade g
+                WHERE g.user_id = :student_id
+                AND g.date BETWEEN :start_date AND :end_date'
+            )->setParameters([
+                'student_id' => $student_id,
+                'start_date' => $semesterStart,
+                'end_date' => $semesterEnd
+            ]);
+            
+            $gradesResult = $gradesQuery->getResult();
+            foreach ($gradesResult as $grade) {
+                $dateKey = $grade->getDate();
+                $grades[$dateKey][$grade->getType()][$grade->getTime()] = [
+                    'grade' => $grade->getGrade(),
+                    'is_absent' => $grade->IsAbsent()
+                ];
+            }
+        }
+    
+        // 5. Подготавливаем структуру для результатов (существующий код)
         $result = [];
         $currentDate = clone $semesterStart;
         $endDate = clone $semesterEnd;
     
-        // 5. Проходим по всем дням от начала до конца семестра
+        // 6. Проходим по всем дням от начала до конца семестра (модифицированный код)
         while ($currentDate <= $endDate) {
             // Пропускаем воскресенья (день 7)
             if ($currentDate->format('N') == 7) {
@@ -140,7 +164,7 @@ class Study
                 if ($item->getWeekNumber() == $currentWeekNumber && 
                     $item->getScheduleDay() == $dayOfWeek) {
                     
-                    // Получаем данные предмета и типа занятия
+                    // Получаем данные предмета и типа занятия (существующий код)
                     $subject = $this->em->getRepository(ScheduleSubject::class)
                         ->find($item->getScheduleSubjectId())->getName();
                     
@@ -150,15 +174,36 @@ class Study
                     $time = $this->em->getRepository(ScheduleTime::class)
                         ->find($item->getScheduleTimeId());
     
-                    // Формируем запись о паре
+                    $timeString = $time->getLessonNumber() . ' пара (' . 
+                                $time->getStartTime() . '-' . $time->getEndTime() . ')';
+    
+                    // Формируем запись о паре (добавлены данные об оценках)
                     $lessonData = [
                         'date' => $currentDate->format('Y-m-d'),
                         'day_of_week' => $this->getDayOfWeekName($dayOfWeek),
                         'type' => $lessonType,
                         'week_number' => $currentWeekNumber,
-                        'time' => $time->getLessonNumber() . ' пара (' . 
-                                  $time->getStartTime() . '-' . $time->getEndTime() . ')'
+                        'time' => $timeString,
+                        'time_raw' => $time->getStartTime() // Для точного сопоставления с оценками
                     ];
+    
+                    // Добавляем данные об оценке и посещаемости (НОВЫЙ КОД)
+                    if ($student_id) {
+                        $dateKey = $currentDate->format('Y-m-d');
+                        $lessonTypeId = $this->em->getRepository(ScheduleLessonType::class)->findOneBy(['name' => $lessonType])->getId();
+
+
+                        if (isset($grades[$dateKey][$lessonTypeId][$time->getId()])) {
+                            $gradeInfo = $grades[$dateKey][$lessonTypeId][$time->getId()];
+                            $lessonData['grade'] = $gradeInfo['grade'];
+                            $lessonData['attendance'] = $gradeInfo['is_absent'] ? 'absent' : 'present';
+                            $lessonData['has_grade'] = true;
+                        } else {
+                            $lessonData['grade'] = null;
+                            $lessonData['attendance'] = 'present';
+                            $lessonData['has_grade'] = false;
+                        }
+                    }
     
                     // Добавляем в результат, группируя по предмету
                     if (!isset($result[$subject])) {
@@ -176,7 +221,7 @@ class Study
         ksort($result);
     
         return $result;
-    }
+    }   
     
     // Вспомогательная функция для получения названия дня недели
     private function getDayOfWeekName($dayNumber) {
