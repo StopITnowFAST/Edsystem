@@ -145,7 +145,7 @@ class UserPageController extends AbstractController
         $schedule = $this->study->getAllSubjectDates($groupId);
         
         return $this->json([
-            'schedule' => $schedule
+            'data' => $schedule
         ]);
     }
 

@@ -62,7 +62,8 @@ async function loadContent(section) {
         case SUBJECT_SECTION:
             json = await getDataFromServer(SUBJECT_SECTION_URL);
             content = getSubjectPage(json.data);
-            renderContent(content);   
+            renderContent(content);
+            initSubjectPage();
             break;
         case PROFILE_SECTION:
             // pageData = getDataFromServer(PROFILE_SECTION_ULR);
@@ -853,4 +854,94 @@ function highlightCurrentLessons(dayElement) {
 
 function formatDateToKey(date) {
     return `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+}
+
+function getSubjectPage(data) {
+    // Проверка данных
+    if (!data) {
+        return `
+            <div class="subject-no-data">
+                <i class="fas fa-calendar-times"></i>
+                <p>Нет данных о расписании предметов</p>
+            </div>
+        `;
+    }
+
+    // Создаем HTML для переключателя предметов
+    const subjects = Object.keys(data);
+    let subjectTabs = subjects.map(subject => 
+        `<div class="subject-tab" data-subject="${subject}">${subject}</div>`
+    ).join('');
+
+    // Создаем HTML для карточек
+    let subjectCards = '';
+    for (const [subjectName, lessons] of Object.entries(data)) {
+        subjectCards += `
+            <div class="subject-cards-container" data-subject="${subjectName}">
+                <div class="subject-cards-grid">
+                    ${lessons.map(lesson => createLessonCard(lesson)).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    // Финальная разметка
+    return `
+        <div class="subject-section">
+            <div class="subject-tabs-container">
+                ${subjectTabs}
+            </div>
+            
+            ${subjectCards}
+        </div>
+    `;
+}
+
+function createLessonCard(lesson) {
+    // Форматируем дату (02.04 -> 2 апреля)
+    const [year, month, day] = lesson.date.split('-');
+    
+    const monthNames = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 
+                       'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+    const formattedDate = `${parseInt(day)} ${monthNames[parseInt(month) - 1]}`;
+
+    return `
+        <div class="subject-lesson-card" data-date="${lesson.date}" data-type="${lesson.type}">
+            <div class="subject-lesson-date">${formattedDate}</div>
+            <div class="subject-lesson-type ${lesson.type.toLowerCase().replace(' ', '-')}">
+                ${lesson.type}
+            </div>
+            <div class="subject-lesson-time">${lesson.time}</div>
+            
+            <div class="subject-lesson-controls">
+                <div class="subject-grade"></div>
+            </div>
+        </div>
+    `;
+}
+
+// Инициализация после рендеринга
+function initSubjectPage() {
+    // Переключение между предметами
+    const tabs = document.querySelectorAll('.subject-tab');
+    if (tabs.length > 0) {
+        tabs[0].classList.add('active');
+        document.querySelector(`.subject-cards-container[data-subject="${tabs[0].dataset.subject}"]`)
+            .classList.add('active');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                document.querySelectorAll('.subject-cards-container').forEach(container => {
+                    container.classList.remove('active');
+                });
+                
+                const subject = tab.dataset.subject;
+                document.querySelector(`.subject-cards-container[data-subject="${subject}"]`)
+                    .classList.add('active');
+            });
+        });
+    }    
 }

@@ -94,17 +94,19 @@ class Study
         }
     
         // 2. Определяем даты начала и конца семестра
-        $startDate = ($group->getSemester() % 2 == 1) 
-            ? new \DateTime($group->getEdStartsSecond())
-            : new \DateTime($group->getEdStartsFirst());
-        
-        if ($group->getSemester() % 2 == 1) {
-            // Весенний семестр - заканчивается 1 июня
-            $year = $startDate->format('m') > 6 ? $startDate->format('Y') + 1 : $startDate->format('Y');
-            $endSemester = new \DateTime($year . '-06-01');
+        $currentDate = new \DateTime();
+        $startFirst = new \DateTime($group->getEdStartsFirst());
+        $startSecond = $group->getEdStartsSecond() ? new \DateTime($group->getEdStartsSecond()) : null;
+    
+        // Определяем текущий семестр
+        if ($currentDate >= $startFirst && ($startSecond === null || $currentDate < $startSecond)) {
+            $semesterStart = clone $startFirst;
+            $semesterEnd = $startSecond ? (clone $startSecond)->modify('-1 day') : new \DateTime($startFirst->format('Y') . '-12-31');
+        } else if ($startSecond !== null && $currentDate >= $startSecond) {
+            $semesterStart = clone $startSecond;
+            $semesterEnd = new \DateTime($startSecond->format('Y') . '-06-01');
         } else {
-            // Осенний семестр - заканчивается 31 декабря
-            $endSemester = new \DateTime($startDate->format('Y') . '-12-31');
+            throw new \Exception("Не удалось определить текущий семестр");
         }
     
         // 3. Получаем все записи расписания для группы
@@ -115,19 +117,28 @@ class Study
     
         // 4. Подготавливаем структуру для результатов
         $result = [];
-        $currentWeek = 1;
-        $currentDay = 1;
-        $date = clone $startDate;
+        $currentDate = clone $semesterStart;
+        $endDate = clone $semesterEnd;
     
         // 5. Проходим по всем дням от начала до конца семестра
-        while ($date <= $endSemester) {
+        while ($currentDate <= $endDate) {
+            // Пропускаем воскресенья (день 7)
+            if ($currentDate->format('N') == 7) {
+                $currentDate->modify('+1 day');
+                continue;
+            }
+    
             // Определяем номер недели (1 или 2)
-            $weekNumber = ($currentWeek % 2) ? 1 : 2;
-            
+            $daysDiff = $currentDate->diff($semesterStart)->days;
+            $currentWeekNumber = (floor($daysDiff / 7) % 2) + 1;
+    
+            // Получаем номер дня недели (1-6, понедельник-суббота)
+            $dayOfWeek = $currentDate->format('N'); // 1-7 (пн-вс)
+    
             // Ищем занятия на текущий день недели
             foreach ($scheduleItems as $item) {
-                if ($item->getWeekNumber() == $weekNumber && 
-                    $item->getScheduleDay() == $currentDay) {
+                if ($item->getWeekNumber() == $currentWeekNumber && 
+                    $item->getScheduleDay() == $dayOfWeek) {
                     
                     // Получаем данные предмета и типа занятия
                     $subject = $this->em->getRepository(ScheduleSubject::class)
@@ -141,10 +152,10 @@ class Study
     
                     // Формируем запись о паре
                     $lessonData = [
-                        'date' => $date->format('Y-m-d'),
-                        'day_of_week' => $this->getDayOfWeekName($currentDay),
+                        'date' => $currentDate->format('Y-m-d'),
+                        'day_of_week' => $this->getDayOfWeekName($dayOfWeek),
                         'type' => $lessonType,
-                        'week_number' => $weekNumber,
+                        'week_number' => $currentWeekNumber,
                         'time' => $time->getLessonNumber() . ' пара (' . 
                                   $time->getStartTime() . '-' . $time->getEndTime() . ')'
                     ];
@@ -158,14 +169,7 @@ class Study
             }
     
             // Переходим к следующему дню
-            $date->modify('+1 day');
-            $currentDay++;
-            
-            // Если прошли неделю, сбрасываем день и увеличиваем счетчик недель
-            if ($currentDay > 7) {
-                $currentDay = 1;
-                $currentWeek++;
-            }
+            $currentDate->modify('+1 day');
         }
     
         // Сортируем предметы по алфавиту

@@ -7,7 +7,7 @@
 }
 
 .sidebar {
-    width: 120px;
+    min-width: 120px;
     height: auto;
     background-color: var(--color-grey-400);
     display: flex;
@@ -830,3 +830,205 @@
     font-weight: bold;
 }
 
+/* Стили для секции предметов */
+.subject-section {
+    padding: 20px;
+    background-color: var(--color-grey-200);
+    border-radius: var(--offset-xxs);
+    color: var(--color-font-bright);
+}
+
+/* Переключатель предметов */
+.subject-tabs-container {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--color-grey-400);
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.subject-tab {
+    padding: 10px 20px;
+    background-color: var(--color-grey-300);
+    border-radius: 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.subject-tab:hover {
+    background-color: var(--color-grey-375);
+}
+
+.subject-tab.active {
+    background-color: var(--color-main);
+    color: white;
+}
+
+/* Контейнер карточек */
+.subject-cards-container {
+    display: none;
+    animation: fadeIn 0.4s ease-out;
+}
+
+.subject-cards-container.active {
+    display: block;
+}
+
+.subject-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 15px;
+}
+
+/* Карточка занятия */
+.subject-lesson-card {
+    background-color: var(--color-grey-300);
+    border-radius: var(--offset-xxs);
+    padding: 15px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.subject-lesson-card.absent {
+    background-color: rgba(244, 67, 54, 0.1);
+    border-left: 3px solid #f44336;
+}
+
+.subject-lesson-date {
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+    color: var(--color-main);
+}
+
+.subject-lesson-type {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    margin-bottom: 10px;
+}
+
+.subject-lesson-type.лекция {
+    background-color: rgba(33, 150, 243, 0.2);
+    color: #2196F3;
+}
+
+.subject-lesson-type.лабораторная-работа {
+    background-color: rgba(76, 175, 80, 0.2);
+    color: #4CAF50;
+}
+
+.subject-lesson-time {
+    color: var(--color-grey-0);
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+
+/* Элементы управления */
+.subject-lesson-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.subject-grade-input {
+    width: 60px;
+    padding: 5px 8px;
+    border: 1px solid var(--color-grey-400);
+    border-radius: 4px;
+    background-color: var(--color-grey-200);
+    color: var(--color-font-bright);
+}
+
+/* Переключатель посещения */
+.attendance-toggle {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.attendance-checkbox {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+.attendance-checkbox:checked + .toggle-slider {
+    background-color: #4CAF50;
+}
+
+.attendance-checkbox:checked + .toggle-slider:before {
+    transform: translateX(26px);
+}
+
+/* Кнопка загрузки файла */
+.file-upload-button {
+    background-color: var(--color-grey-400);
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    color: var(--color-font-bright);
+    transition: all 0.3s ease;
+}
+
+.file-upload-button:hover {
+    background-color: var(--color-main);
+    color: white;
+}
+
+.file-input-hidden {
+    display: none;
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .subject-cards-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .subject-tabs-container {
+        flex-wrap: wrap;
+    }
+}
