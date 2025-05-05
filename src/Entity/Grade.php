@@ -28,6 +28,12 @@ class Grade
     #[ORM\Column(length: 20)]
     private ?string $date = null;
 
+    #[ORM\Column]
+    private ?int $type = null;
+
+    #[ORM\Column]
+    private ?int $time = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -89,6 +95,30 @@ class Grade
     public function setDate(string $date): static
     {
         $this->date = $date;
+
+        return $this;
+    }
+
+    public function getType(): ?int
+    {
+        return $this->type;
+    }
+
+    public function setType(int $type): static
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    public function getTime(): ?int
+    {
+        return $this->time;
+    }
+
+    public function setTime(int $time): static
+    {
+        $this->time = $time;
 
         return $this;
     }
