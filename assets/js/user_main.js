@@ -856,8 +856,7 @@ function formatDateToKey(date) {
     return `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}`;
 }
 
-function getSubjectPage(data) {
-    // Проверка данных
+function getSubjectPage(data, userType) {
     if (!data) {
         return `
             <div class="subject-no-data">
@@ -867,61 +866,64 @@ function getSubjectPage(data) {
         `;
     }
 
-    // Создаем HTML для переключателя предметов
     const subjects = Object.keys(data);
     let subjectTabs = subjects.map(subject => 
         `<div class="subject-tab" data-subject="${subject}">${subject}</div>`
     ).join('');
 
-    // Создаем HTML для карточек
     let subjectCards = '';
     for (const [subjectName, lessons] of Object.entries(data)) {
         subjectCards += `
             <div class="subject-cards-container" data-subject="${subjectName}">
                 <div class="subject-cards-grid">
-                    ${lessons.map(lesson => createLessonCard(lesson)).join('')}
+                    ${lessons.map(lesson => createLessonCard(lesson, userType)).join('')}
                 </div>
+                ${userType === 'teacher' ? '<div class="students-table-container" style="display:none;"></div>' : ''}
             </div>
         `;
     }
 
-    // Финальная разметка
     return `
         <div class="subject-section">
             <div class="subject-tabs-container">
                 ${subjectTabs}
             </div>
-            
             ${subjectCards}
+            ${userType === 'teacher' ? '<button id="save-grades-btn" style="display:none;">Сохранить изменения</button>' : ''}
         </div>
     `;
 }
 
-function createLessonCard(lesson) {
-    // Форматируем дату (02.04 -> 2 апреля)
+
+function createLessonCard(lesson, userType) {
     const [year, month, day] = lesson.date.split('-');
-    
     const monthNames = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 
                        'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
     const formattedDate = `${parseInt(day)} ${monthNames[parseInt(month) - 1]}`;
 
     return `
-        <div class="subject-lesson-card" data-date="${lesson.date}" data-type="${lesson.type}">
+        <div class="subject-lesson-card" 
+             data-date="${lesson.date}" 
+             data-type="${lesson.type}"
+             data-time="${lesson.time}"
+             ${userType === 'teacher' ? 'data-has-students="false"' : ''}>
             <div class="subject-lesson-date">${formattedDate}</div>
             <div class="subject-lesson-type ${lesson.type.toLowerCase().replace(' ', '-')}">
                 ${lesson.type}
             </div>
             <div class="subject-lesson-time">${lesson.time}</div>
             
+            ${userType === 'teacher' ? `
             <div class="subject-lesson-controls">
-                <div class="subject-grade"></div>
+                <button class="show-students-btn">Показать студентов</button>
             </div>
+            ` : ''}
         </div>
     `;
 }
 
 // Инициализация после рендеринга
-function initSubjectPage() {
+function initSubjectPage(userType) {
     // Переключение между предметами
     const tabs = document.querySelectorAll('.subject-tab');
     if (tabs.length > 0) {
@@ -943,5 +945,142 @@ function initSubjectPage() {
                     .classList.add('active');
             });
         });
-    }    
+    }
+    
+    if (userType === 'teacher') {
+        // Обработка кликов по карточкам занятий
+        document.querySelectorAll('.subject-lesson-card').forEach(card => {
+            card.addEventListener('click', async function(e) {
+                if (e.target.closest('.show-students-btn')) {
+                    const container = this.closest('.subject-cards-container');
+                    const tableContainer = container.querySelector('.students-table-container');
+                    const subject = container.dataset.subject;
+                    const date = this.dataset.date;
+                    const type = this.dataset.type;
+                    const time = this.dataset.time;
+                    
+                    // Если данные студентов еще не загружены
+                    if (this.dataset.hasStudents === 'false') {
+                        try {
+                            // Загрузка списка студентов
+                            const students = await loadStudentsForLesson(subject, date, type, time);
+                            tableContainer.innerHTML = createStudentsTable(students);
+                            this.dataset.hasStudents = 'true';
+                        } catch (error) {
+                            console.error('Ошибка загрузки студентов:', error);
+                            tableContainer.innerHTML = '<div class="error-message">Не удалось загрузить список студентов</div>';
+                        }
+                    }
+                    
+                    // Показываем/скрываем таблицу
+                    tableContainer.style.display = tableContainer.style.display === 'none' ? 'block' : 'none';
+                    document.getElementById('save-grades-btn').style.display = 'block';
+                }
+            });
+        });
+        
+        // Обработка сохранения изменений
+        document.getElementById('save-grades-btn').addEventListener('click', async function() {
+            const changes = collectGradeChanges();
+            try {
+                await saveGradeChanges(changes);
+                alert('Изменения успешно сохранены');
+            } catch (error) {
+                console.error('Ошибка сохранения:', error);
+                alert('Ошибка при сохранении изменений');
+            }
+        });
+    }
+}
+
+
+function createStudentsTable(students) {
+    return `
+        <div class="students-table-wrapper">
+            <table class="students-table">
+                <thead>
+                    <tr>
+                        <th>Студент</th>
+                        <th>Посещение</th>
+                        <th>Оценка</th>
+                        <th>Комментарий</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${students.map(student => `
+                        <tr data-student-id="${student.id}">
+                            <td>${student.full_name}</td>
+                            <td>
+                                <select class="attendance-select">
+                                    <option value="present" ${student.attendance === 'present' ? 'selected' : ''}>Присутствовал</option>
+                                    <option value="absent" ${student.attendance === 'absent' ? 'selected' : ''}>Отсутствовал</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="number" min="0" max="10" 
+                                       class="grade-input" 
+                                       value="${student.grade || ''}">
+                            </td>
+                            <td>
+                                <input type="text" class="comment-input" 
+                                       value="${student.comment || ''}">
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
+}
+
+async function loadStudentsForLesson(subject, date, type, time) {
+    const response = await fetch('/api/students-for-lesson', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            subject,
+            date,
+            type,
+            time
+        })
+    });
+    
+    if (!response.ok) {
+        throw new Error('Ошибка загрузки данных');
+    }
+    
+    return await response.json();
+}
+
+function collectGradeChanges() {
+    const changes = [];
+    
+    document.querySelectorAll('.students-table tbody tr').forEach(row => {
+        changes.push({
+            studentId: row.dataset.studentId,
+            attendance: row.querySelector('.attendance-select').value,
+            grade: row.querySelector('.grade-input').value,
+            comment: row.querySelector('.comment-input').value
+        });
+    });
+    
+    return changes;
+}
+
+async function saveGradeChanges(changes) {
+    const response = await fetch('/api/save-grades', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(changes)
+    });
+    
+    if (!response.ok) {
+        throw new Error('Ошибка сохранения данных');
+    }
+    
+    return await response.json();
 }

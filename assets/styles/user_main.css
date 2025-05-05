@@ -1032,3 +1032,79 @@
         flex-wrap: wrap;
     }
 }
+
+/* Стили для таблицы студентов */
+.students-table-container {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: var(--color-grey-300);
+    border-radius: var(--offset-xxs);
+}
+
+.students-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.students-table th, 
+.students-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--color-grey-400);
+}
+
+.students-table th {
+    background-color: var(--color-grey-400);
+    color: var(--color-font-bright);
+    font-weight: 500;
+}
+
+.students-table tr:hover {
+    background-color: var(--color-grey-375);
+}
+
+.attendance-select, 
+.grade-input, 
+.comment-input {
+    padding: 8px 12px;
+    border: 1px solid var(--color-grey-400);
+    border-radius: 4px;
+    background-color: var(--color-grey-200);
+    color: var(--color-font-bright);
+    width: 100%;
+}
+
+.grade-input {
+    width: 60px;
+}
+
+#save-grades-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: var(--color-main);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#save-grades-btn:hover {
+    background-color: var(--color-main-dark);
+}
+
+.show-students-btn {
+    padding: 8px 15px;
+    background-color: var(--color-grey-400);
+    color: var(--color-font-bright);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.show-students-btn:hover {
+    background-color: var(--color-main);
+    color: white;
+}

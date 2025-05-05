@@ -141,11 +141,16 @@ class UserPageController extends AbstractController
             return new Response('Permission Error', 403);
         }
 
-        $groupId = $this->study->getStudentGroup($userId);
-        $schedule = $this->study->getAllSubjectDates($groupId);
+        $accountType = $this->study->getUserType($userId);
+        if ($accountType == 'student') {
+            $groupId = $this->study->getStudentGroup($userId);
+            $subjects = $this->study->getAllSubjectDates($groupId);
+        } else if ($accountType == 'teacher') {
+            $subjects = $this->study->getTeacherSubjectsDates($userId);
+        }
         
         return $this->json([
-            'data' => $schedule
+            'data' => $subjects
         ]);
     }
 
