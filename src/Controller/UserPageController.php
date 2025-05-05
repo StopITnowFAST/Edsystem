@@ -16,7 +16,12 @@ use App\Entity\Group;
 use App\Entity\File as FileEntity;
 use App\Entity\TestUserResult;
 use App\Entity\UserCard;
+use App\Entity\ScheduleSubject;
 use App\Entity\Schedule;
+use App\Entity\Student;
+use App\Entity\ScheduleLessonType;
+use App\Entity\ScheduleTime;
+use App\Entity\Grade;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Psr\Log\LoggerInterface;
@@ -147,12 +152,103 @@ class UserPageController extends AbstractController
             $subjects = $this->study->getAllSubjectDates($groupId);
         } else if ($accountType == 'teacher') {
             $subjects = $this->study->getTeacherSubjectsDates($userId);
+            
+            foreach ($subjects as &$subjectData) {
+                foreach ($subjectData as &$lesson) {
+
+                    $conn = $this->em->getConnection();
+                    $sql = "
+                        SELECT EXISTS(
+                            SELECT 1 FROM grade 
+                            WHERE date = :date 
+                            AND type = :type 
+                            AND time = :time
+                            LIMIT 1
+                        ) AS has_grades
+                    ";
+                    $stmt = $conn->prepare($sql);
+                    $result = $stmt->executeQuery([
+                        'date' => $lesson['date'],
+                        'type' => $this->em->getRepository(ScheduleLessonType::class)->findOneBy(['name' => $lesson['type']])->getId(),
+                        'time' => mb_substr($lesson['time'], 0, 1)
+                    ]);
+                    $hasGrades = (bool) $result->fetchOne();
+                    
+                    $lesson['hasGrades'] = $hasGrades > 0;
+                }
+            }
         }
         
         return $this->json([
             'data' => $subjects
         ]);
     }
+
+    // Получение данных для оценок
+    #[Route('/request/get/user/students', name: 'get_subjects_students')]
+    public function getStudentsForLesson(Request $request) {
+        $data = json_decode($request->getContent(), true);
+        $userId = $this->getUser()->getId();
+        
+        // Валидация
+        if (!isset($data['subject'], $data['date'], $data['type'], $data['time'])) {
+            return new JsonResponse(['error' => 'Недостаточно данных'], 400);
+        }
+                
+        try {
+            // 1. Находим предмет по имени
+            $subject = $this->em->getRepository(ScheduleSubject::class)
+                ->findOneBy(['name' => $data['subject']]);
+            
+            if (!$subject) {
+                return new JsonResponse(['error' => 'Предмет не найден'], 404);
+            }
+            
+            // 2. Получаем группу из расписания преподавателя
+            $schedule = $this->em->getRepository(Schedule::class)
+                ->findOneBy([
+                    'user_id' => $userId,
+                    'schedule_subject_id' => $subject->getId(),
+                ]);
+            
+            if (!$schedule) {
+                return new JsonResponse(['error' => 'Расписание не найдено'], 404);
+            }
+            
+            $groupId = $schedule->getScheduleGroupId();
+            
+            // 3. Получаем всех студентов группы
+            $students = $this->em->getRepository(Student::class)->findBy(['group_id' => $groupId]);
+            
+            // 4. Формируем ответ с оценками и посещаемостью
+            $result = [];
+
+            foreach ($students as $student) {
+                $grade = $this->em->getRepository(Grade::class)
+                    ->findOneBy([
+                        'user_id' => $student->getUserId(),
+                        'subject_id' => $subject->getId(),
+                        'date' => $data['date'],
+                        'time' => mb_substr($data['time'], 0, 1),
+                        'type' => $this->em->getRepository(ScheduleLessonType::class)->findOneBy(['name' => $data['type']])->getId(),
+                    ]);
+                
+                $result[] = [
+                    'id' => $student->getId(),
+                    'full_name' => $student->getLastName() . " " . $student->getFirstName(),
+                    'grade' => $grade ? $grade->getGrade() : null,
+                    'attendance' => $grade && $grade->isAbsent() ? 'absent' : 'present',
+                    'group_id' => $groupId
+                ];
+            }
+            
+            return new JsonResponse($result);
+            
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => 'Ошибка сервера: ' . $e->getMessage()], 500);
+        }
+    }
+
 
     // Получение сообщений для чатов
     #[Route(path: '/request/get/user/messages/chat/{userId}', name:'get_chats_messages')]
@@ -214,6 +310,54 @@ class UserPageController extends AbstractController
         return new JsonResponse(['status' => 'success', 'message_id' => $message->getId()]);
     }
 
+
+    // Сохранение оценки    
+    #[Route(path: '/request/set/user/grade', name:'set_grade')]
+    public function saveGrades(Request $request) {
+
+        $data = json_decode($request->getContent(), true);
+        $user = $this->getUser()->getId();        
+        
+        try {
+            foreach ($data as $gradeData) {
+                $userId = $this->em->getRepository(Student::class)->find($gradeData['studentId'])->getUserId();
+                $subjectId = $this->em->getRepository(ScheduleSubject::class)
+                    ->findOneBy(['name' => $gradeData['subject']])->getId();
+                $typeId = $this->em->getRepository(ScheduleLessonType::class)->findOneBy(['name' => $gradeData['type']])->getId();
+                $timeId = $this->em->getRepository(ScheduleTime::class)->findOneBy(['lesson_number' => mb_substr($gradeData['time'], 0, 1)])->getId();
+                
+                $grade = $this->em->getRepository(Grade::class)
+                    ->findOneBy([
+                        'user_id' => $userId,
+                        'subject_id' => $subjectId,
+                        'date' => $gradeData['date'],
+                        'time' => $timeId,
+                        'type' => $typeId,                        
+                    ]) ?? new Grade();
+                
+                $grade->setUserId($userId);
+                $grade->setSubjectId($subjectId);
+                $grade->setGrade($gradeData['grade']);
+                $grade->setAbsent($gradeData['attendance'] === 'absent');
+                $grade->setDate($gradeData['date']);
+                $grade->setType($typeId);
+                $grade->setTime($timeId);                
+                $this->em->persist($grade);
+            }
+            
+            $this->em->flush();
+            
+            return new JsonResponse(['status' => 'success']);
+            
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 500);
+        }
+    }
+
+
+
+
+    
     private function handleJsonRequest(Request $request, int $userId, EntityManagerInterface $em): Response 
     {
         $data = json_decode($request->getContent(), true);
