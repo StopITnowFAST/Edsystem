@@ -61,9 +61,9 @@ async function loadContent(section) {
             break;
         case SUBJECT_SECTION:
             json = await getDataFromServer(SUBJECT_SECTION_URL);
-            content = getSubjectPage(json.data);
+            content = getSubjectPage(json.data, userType);
             renderContent(content);
-            initSubjectPage();
+            initSubjectPage(userType);
             break;
         case PROFILE_SECTION:
             // pageData = getDataFromServer(PROFILE_SECTION_ULR);
@@ -206,9 +206,9 @@ function renderTestButton(test) {
     return `<button class="btn disabled-btn" disabled>Нет попыток</button>`;
 }
 
-// --------------
-// БЛОК С ЧАТАМИ
-// --------------
+// -------------------------------------------------------------------------------------------------------------------------------------------------------------
+// БЛОК С ЧАТОМ ------------------------------------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 function getChatPage(chatData) {
     
@@ -667,8 +667,11 @@ function getPlaceholder() {
     `;
 }
 
+// -------------------------------------------------------------------------------------------------------------------------------------------------------------
+// БЛОК С РАСПИСАНИЕМ ------------------------------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 function getSchedulePage(lessons) {
-    console.log(lessons);
     // 1. Сортируем и группируем занятия по датам
     const lessonsByDate = {};
     lessons.sort((a, b) => a.lesson_number - b.lesson_number).forEach(lesson => {
@@ -856,7 +859,13 @@ function formatDateToKey(date) {
     return `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}`;
 }
 
+// -------------------------------------------------------------------------------------------------------------------------------------------------------------
+// БЛОК С ПРЕДМЕТАМИ--------------------------------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
 function getSubjectPage(data, userType) {
+    console.log(data);
     if (!data) {
         return `
             <div class="subject-no-data">
@@ -878,7 +887,7 @@ function getSubjectPage(data, userType) {
                 <div class="subject-cards-grid">
                     ${lessons.map(lesson => createLessonCard(lesson, userType)).join('')}
                 </div>
-                ${userType === 'teacher' ? '<div class="students-table-container" style="display:none;"></div>' : ''}
+                ${userType == 'teacher' ? '<div class="students-table-container" style="display:none;"></div>' : ''}
             </div>
         `;
     }
@@ -889,7 +898,7 @@ function getSubjectPage(data, userType) {
                 ${subjectTabs}
             </div>
             ${subjectCards}
-            ${userType === 'teacher' ? '<button id="save-grades-btn" style="display:none;">Сохранить изменения</button>' : ''}
+            ${userType == 'teacher' ? '<button id="save-grades-btn" style="display:none;">Сохранить изменения</button>' : ''}
         </div>
     `;
 }
@@ -901,19 +910,37 @@ function createLessonCard(lesson, userType) {
                        'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
     const formattedDate = `${parseInt(day)} ${monthNames[parseInt(month) - 1]}`;
 
+    // Определяем классы для карточки
+    const cardClasses = ['subject-lesson-card'];
+    
+    // Добавляем класс absent если студент отсутствовал
+    if (lesson.attendance === 'absent') {
+        cardClasses.push('absent');
+    }
+    
+    // Добавляем класс has-grade если есть оценка
+    if (lesson.grade) {
+        cardClasses.push('has-grade');
+    }
+
+    // Добавляем класс по типу занятия
+    cardClasses.push(lesson.type.toLowerCase().replace(' ', '-'));
+
     return `
-        <div class="subject-lesson-card" 
+        <div class="${cardClasses.join(' ')}" 
              data-date="${lesson.date}" 
              data-type="${lesson.type}"
              data-time="${lesson.time}"
-             ${userType === 'teacher' ? 'data-has-students="false"' : ''}>
+             ${userType == 'teacher' ? 'data-has-students="true"' : ''}>
             <div class="subject-lesson-date">${formattedDate}</div>
             <div class="subject-lesson-type ${lesson.type.toLowerCase().replace(' ', '-')}">
                 ${lesson.type}
             </div>
             <div class="subject-lesson-time">${lesson.time}</div>
             
-            ${userType === 'teacher' ? `
+            ${lesson.grade ? `<div class="subject-lesson-grade">${lesson.grade}</div>` : ''}
+            
+            ${userType == 'teacher' ? `
             <div class="subject-lesson-controls">
                 <button class="show-students-btn">Показать студентов</button>
             </div>
@@ -921,6 +948,7 @@ function createLessonCard(lesson, userType) {
         </div>
     `;
 }
+
 
 // Инициализация после рендеринга
 function initSubjectPage(userType) {
@@ -947,7 +975,7 @@ function initSubjectPage(userType) {
         });
     }
     
-    if (userType === 'teacher') {
+    if (userType == 'teacher') {
         // Обработка кликов по карточкам занятий
         document.querySelectorAll('.subject-lesson-card').forEach(card => {
             card.addEventListener('click', async function(e) {
@@ -959,21 +987,33 @@ function initSubjectPage(userType) {
                     const type = this.dataset.type;
                     const time = this.dataset.time;
                     
-                    // Если данные студентов еще не загружены
-                    if (this.dataset.hasStudents === 'false') {
-                        try {
-                            // Загрузка списка студентов
-                            const students = await loadStudentsForLesson(subject, date, type, time);
-                            tableContainer.innerHTML = createStudentsTable(students);
-                            this.dataset.hasStudents = 'true';
-                        } catch (error) {
-                            console.error('Ошибка загрузки студентов:', error);
-                            tableContainer.innerHTML = '<div class="error-message">Не удалось загрузить список студентов</div>';
-                        }
+                    // Если таблица уже видима - просто скрываем ее
+                    if (tableContainer.style.display !== 'none') {
+                        tableContainer.style.display = 'none';
+                        document.getElementById('save-grades-btn').style.display = 'none';
+                        return;
                     }
                     
-                    // Показываем/скрываем таблицу
-                    tableContainer.style.display = tableContainer.style.display === 'none' ? 'block' : 'none';
+                    // Показываем индикатор загрузки
+                    tableContainer.innerHTML = '<div class="loading-message">Загрузка данных...</div>';
+                    tableContainer.style.display = 'block';
+                    
+                    try {
+                        // Всегда загружаем свежие данные с сервера
+                        const students = await loadStudentsForLesson(subject, date, type, time);
+                        console.log(students);
+                        tableContainer.innerHTML = createStudentsTable(students);
+                        this.dataset.hasStudents = 'true';
+                        
+                        // Обновляем текст кнопки
+                        const btn = this.querySelector('.show-students-btn');
+                        if (btn) btn.textContent = 'Показать оценки';
+                        
+                    } catch (error) {
+                        console.error('Ошибка загрузки студентов:', error);
+                        tableContainer.innerHTML = '<div class="error-message">Не удалось загрузить список студентов</div>';
+                    }
+                    
                     document.getElementById('save-grades-btn').style.display = 'block';
                 }
             });
@@ -1003,7 +1043,6 @@ function createStudentsTable(students) {
                         <th>Студент</th>
                         <th>Посещение</th>
                         <th>Оценка</th>
-                        <th>Комментарий</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1021,10 +1060,6 @@ function createStudentsTable(students) {
                                        class="grade-input" 
                                        value="${student.grade || ''}">
                             </td>
-                            <td>
-                                <input type="text" class="comment-input" 
-                                       value="${student.comment || ''}">
-                            </td>
                         </tr>
                     `).join('')}
                 </tbody>
@@ -1034,7 +1069,7 @@ function createStudentsTable(students) {
 }
 
 async function loadStudentsForLesson(subject, date, type, time) {
-    const response = await fetch('/api/students-for-lesson', {
+    const response = await fetch('/request/get/user/students', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -1043,7 +1078,7 @@ async function loadStudentsForLesson(subject, date, type, time) {
             subject,
             date,
             type,
-            time
+            time,
         })
     });
     
@@ -1056,13 +1091,23 @@ async function loadStudentsForLesson(subject, date, type, time) {
 
 function collectGradeChanges() {
     const changes = [];
+    const activeCard = document.querySelector('.subject-lesson-card[data-has-students="true"]');
+    
+    if (!activeCard) return changes;
+    
+    const lessonData = {
+        subject: activeCard.closest('.subject-cards-container').dataset.subject,
+        date: activeCard.dataset.date,
+        type: activeCard.dataset.type,
+        time: activeCard.dataset.time
+    };
     
     document.querySelectorAll('.students-table tbody tr').forEach(row => {
         changes.push({
             studentId: row.dataset.studentId,
             attendance: row.querySelector('.attendance-select').value,
             grade: row.querySelector('.grade-input').value,
-            comment: row.querySelector('.comment-input').value
+            ...lessonData // добавляем данные о занятии
         });
     });
     
@@ -1070,7 +1115,7 @@ function collectGradeChanges() {
 }
 
 async function saveGradeChanges(changes) {
-    const response = await fetch('/api/save-grades', {
+    const response = await fetch('/request/set/user/grade', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
