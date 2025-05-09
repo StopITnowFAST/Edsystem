@@ -12,6 +12,7 @@ use App\Service\Chat;
 use App\Service\File;
 use App\Entity\Message;
 use App\Entity\Test;
+use App\Entity\Teacher;
 use App\Entity\SubjectWiki;
 use App\Entity\Group;
 use App\Entity\File as FileEntity;
@@ -628,6 +629,141 @@ class UserPageController extends AbstractController
             2 => 3,
             6 => 4,
         ];
-        var_dump($this->study->getAllSubjectDates($groupId)); die;
+    }
+
+    #[Route('/request/get/user/profile/{userId}', name: 'get_user_profile')]
+    public function getUserProfile(int $userId): JsonResponse {
+        $userId = $this->getUser()->getId();
+
+        $profileData = $this->getProfileData($userId);
+        
+        return $this->json([
+            'status' => 'success',
+            'data' => $profileData
+        ]);
+    }
+
+    private function getProfileData($userId): array {
+        $accountType = $this->study->getUserType($userId);
+        $user = ($accountType == 'student') ? $this->em->getRepository(Student::class)->findOneBy(['user_id' => $userId])
+            : $this->em->getRepository(Teacher::class)->findOneBy(['user_id' => $userId]);
+        $fullName = $user->getLastName() . ' ' . $user->getFirstName() . ' ' . $user->getMiddleName();
+
+        $profileData = [
+            'full_name' => $fullName,
+            'type' => $accountType,
+        ];
+
+        if ($accountType == 'teacher') {
+            $profileData['subjects'] = $this->getTeacherSubjects($userId);
+        } else {
+            $profileData['group'] = $this->getStudentGroupInfo($userId);
+            $profileData['subjects'] = $this->getStudentSubjectsWithGrades($userId);
+        }
+
+        return $profileData;
+    }
+
+    private function getTeacherSubjects($userId): array {
+        $subjects = [];
+        $teacherSubjects = $this->study->getSubjectsForUser($userId);
+
+        foreach ($teacherSubjects as $subject) {
+            $groups = [];
+            $allGroupsForSubject = $this->study->getGroups($subjectId);
+            foreach ($allGroupsForSubject as $group) {
+                $groups[] = $group['code'];
+            }
+
+            $subjects[] = [
+                'name' => $subject['name'],
+                'groups' => $groups
+            ];
+        }
+
+        return $subjects;
+    }
+
+    private function getStudentGroupInfo($userId): array
+    {
+        $groupId = $this->study->getStudentGroup($userId);
+        $group = $this->em->getRepository(Group::class)->find($groupId);
+
+        return [
+            'code' => $group->getCode(),
+            'course' => $group->getCourse(),
+            'semester' => $group->getSemester(),
+            'admission_year' => $group->getYear()
+        ];
+    }
+
+    private function getStudentSubjectsWithGrades($userId): array
+    {
+        $subjects = [];
+        $gradesData = $this->study->getGrades($userId);
+        
+        // Группируем оценки по предметам
+        $groupedGrades = [];
+        foreach ($gradesData as $grade) {
+            $subjectId = $grade['subject_id'];
+            if (!isset($groupedGrades[$subjectId])) {
+                $groupedGrades[$subjectId] = [];
+            }
+            $groupedGrades[$subjectId][] = $grade;
+        }
+        
+        // Получаем информацию о предметах
+        $subjectIds = array_keys($groupedGrades);
+        $subjectsInfo = $this->getSubjectsInfo($subjectIds);
+        
+        // Формируем итоговый массив
+        foreach ($groupedGrades as $subjectId => $grades) {
+            $total = 0;
+            $count = 0;
+            $gradesList = [];
+            
+            foreach ($grades as $grade) {
+                $total += $grade['grade'];
+                $count++;
+                
+                $gradesList[] = [
+                    'date' => $grade['date'],
+                    'lesson_type' => $this->em->getRepository(ScheduleLessonType::class)->find($grade['type'])->getName(),
+                    'value' => $grade['grade'],
+                ];
+            }
+            
+            $subjectName = $subjectsInfo[$subjectId] ?? 'Неизвестный предмет';
+            
+            $subjects[] = [
+                'id' => $subjectId,
+                'name' => $subjectName,
+                'grades' => $gradesList,
+                'average_grade' => $count > 0 ? round($total / $count, 2) : 0
+            ];
+        }
+        
+        return $subjects;
+    }
+
+    private function getSubjectsInfo(array $subjectIds): array
+    {
+        if (empty($subjectIds)) {
+            return [];
+        }
+        
+        $conn = $this->em->getConnection();
+        $placeholders = implode(',', array_fill(0, count($subjectIds), '?'));
+        $sql = "SELECT id, name FROM schedule_subject WHERE id IN ($placeholders)";
+        
+        $stmt = $conn->executeQuery($sql, $subjectIds);
+        $result = $stmt->fetchAllAssociative();
+        
+        $subjects = [];
+        foreach ($result as $row) {
+            $subjects[$row['id']] = $row['name'];
+        }
+        
+        return $subjects;
     }
 }

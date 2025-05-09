@@ -11,7 +11,7 @@ const MESSAGES_URL = '/request/get/user/messages/' + CHAT_SECTION + '/';
 const SEND_MESSAGE_URL = '/request/send/user/message/' + CHAT_SECTION + '/';
 const GET_UPDATES_URL = '/request/get/user/updates/' + CHAT_SECTION + '/';
 const SUBJECT_SECTION_URL = '/request/get/user/' + SUBJECT_SECTION + '/';
-const PROFILE_SECTION_ULR = '/request/get/user/' + PROFILE_SECTION + '/';
+const PROFILE_SECTION_URL = '/request/get/user/' + PROFILE_SECTION + '/';
 const TEST_SECTION_ULR = '/request/get/user/' + TEST_SECTION + '/';
 const WIKI_SECTION_URL = '/request/get/user/' + WIKI_SECTION + '/';
 const CREATE_WIKI_ENTRY_URL = '/request/create/wiki/entry';
@@ -78,9 +78,9 @@ async function loadContent(section) {
             initSubjectPage(userType);
             break;
         case PROFILE_SECTION:
-            // pageData = getDataFromServer(PROFILE_SECTION_ULR);
-            content = '';
-            renderContent(content);   
+            json = await getDataFromServer(PROFILE_SECTION_URL);
+            content = renderProfilePage(json.data);
+            renderContent(content);
             break;
         case TEST_SECTION:
             json = await getDataFromServer(TEST_SECTION_ULR);
@@ -1607,4 +1607,117 @@ function getAllUserSubjects() {
         name,
         id
     }));
+}
+
+function renderProfilePage(profileData) {
+    return `
+        <div class="profile-container">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="profile-info">
+                    <h2>${profileData.full_name}</h2>
+                    <div class="profile-meta">
+                        <span class="profile-type ${profileData.type}">
+                            ${profileData.type === 'teacher' ? 'Преподаватель' : 'Студент'}
+                        </span>
+                        ${profileData.birth_date ? `
+                            <span class="profile-birthdate">
+                                <i class="fas fa-birthday-cake"></i>
+                                ${new Date(profileData.birth_date).toLocaleDateString()}
+                            </span>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+
+            ${profileData.type === 'student' ? renderStudentProfile(profileData) : renderTeacherProfile(profileData)}
+        </div>
+    `;
+}
+
+function renderStudentProfile(studentData) {
+    return `
+        <div class="profile-section">
+            <h3><i class="fas fa-user-graduate"></i> Учебная информация</h3>
+            <div class="profile-grid">
+                <div class="profile-item">
+                    <label>Группа</label>
+                    <div>${studentData.group.code || 'Не указана'}</div>
+                </div>
+                <div class="profile-item">
+                    <label>Курс</label>
+                    <div>${studentData.group.course || '-'}</div>
+                </div>
+                <div class="profile-item">
+                    <label>Семестр</label>
+                    <div>${studentData.group.semester || '-'}</div>
+                </div>
+                <div class="profile-item">
+                    <label>Год поступления</label>
+                    <div>${studentData.group.admission_year || '-'}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-section">
+            <h3><i class="fas fa-book-open"></i> Предметы и оценки</h3>
+            <div class="subjects-grades">
+                ${studentData.subjects.map(subject => `
+                    <div class="subject-grade-item">
+                        <div class="subject-header">
+                            <h4>${subject.name}</h4>
+                            <div class="subject-average">Средний балл: ${subject.average_grade.toFixed(2)}</div>
+                        </div>
+                        <div class="grades-list">
+                            ${subject.grades.length > 0 ? `
+                                <table class="grades-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Дата</th>
+                                            <th>Тип занятия</th>
+                                            <th>Оценка</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${subject.grades.map(grade => `
+                                            <tr>
+                                                <td>${new Date(grade.date).toLocaleDateString()}</td>
+                                                <td>${grade.lesson_type}</td>
+                                                <td class="grade-value ${getGradeClass(grade.value)}">${grade.value}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            ` : '<p>Нет оценок по этому предмету</p>'}
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+function renderTeacherProfile(teacherData) {
+    return `
+        <div class="profile-section">
+            <h3><i class="fas fa-chalkboard-teacher"></i> Преподаваемые предметы</h3>
+            <div class="teacher-subjects">
+                ${teacherData.subjects.map(subject => `
+                    <div class="subject-item">
+                        <div class="subject-name">${subject.name}</div>
+                        <div class="subject-groups">Группы: ${subject.groups.join(', ')}</div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+function getGradeClass(grade) {
+    if (grade >= 4.5) return 'excellent';
+    if (grade >= 3.5) return 'good';
+    if (grade >= 2.5) return 'satisfactory';
+    return 'unsatisfactory';
 }

@@ -19,6 +19,29 @@ class Study
     ) {
     }
 
+    public function getGrades($userId) {
+        $conn = $this->em->getConnection();
+        $sql = "
+            SELECT g.* from `grade` g
+            JOIN `schedule_subject` ss ON ss.id = g.subject_id
+            WHERE g.user_id = $userId
+        ";
+        $resultSet = $conn->executeQuery($sql);
+        $grades = $resultSet->fetchAllAssociative();
+        return $grades;
+    }
+
+    public function getGroups($subjectId) {
+        $conn = $this->em->getConnection();
+        $sql = "
+            SELECT g.* from `group` g
+            JOIN `schedule` s ON s.schedule_group_id = g.id
+            WHERE s.schedule_subject_id = $subjectId
+        ";
+        $resultSet = $conn->executeQuery($sql);
+        return $resultSet->fetchAllAssociative();
+    }
+
     public function getSubjectsForUser($userId) {
         $role = $this->getUserType($userId);
         $conn = $this->em->getConnection();
