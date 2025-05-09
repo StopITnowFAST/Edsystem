@@ -879,11 +879,12 @@ function formatDateToKey(date) {
 
 
 function getSubjectPage(data, userType) {
-    if (!data) {
+    console.log(data);
+    if (!data || data.length == 0) {
         return `
-            <div class="subject-no-data">
-                <i class="fas fa-calendar-times"></i>
-                <p>Нет данных о расписании предметов</p>
+            <div class="wiki-no-data">
+                <i class="fas fa-book-open"></i>
+                <p>Нет доступных предметов</p>
             </div>
         `;
     }
@@ -1035,18 +1036,21 @@ function initSubjectPage(userType) {
                 }
             });
         });
-        
-        // Обработка сохранения изменений
-        document.getElementById('save-grades-btn').addEventListener('click', async function() {
-            const changes = collectGradeChanges(subject, date, type, time);
-            try {
-                await saveGradeChanges(changes);
-                alert('Изменения успешно сохранены');
-            } catch (error) {
-                console.error('Ошибка сохранения:', error);
-                alert('Ошибка при сохранении изменений');
-            }
-        });
+
+        buttons = document.getElementById('save-grades-btn');
+        if (buttons) {
+            // Обработка сохранения изменений
+            buttons.addEventListener('click', async function() {
+                const changes = collectGradeChanges(subject, date, type, time);
+                try {
+                    await saveGradeChanges(changes);
+                    alert('Изменения успешно сохранены');
+                } catch (error) {
+                    console.error('Ошибка сохранения:', error);
+                    alert('Ошибка при сохранении изменений');
+                }
+            });
+        }        
     }
 }
 

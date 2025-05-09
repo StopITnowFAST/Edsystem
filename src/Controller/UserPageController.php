@@ -57,8 +57,17 @@ class UserPageController extends AbstractController
         $userId = $this->getUser()->getId();
         $accountType = $this->study->getUserType($userId);
 
-        if ($accountType == 'hollow') 
+        if ($accountType == 'hollow') {
             return $this->render('user/main.html.twig', ['userType' => $accountType]);
+        } else if ($accountType == 'student') {
+            $group = $this->study->getStudentGroup($userId);
+        }
+
+        if (isset($group) && $group == 0)
+            return $this->render('user/main.html.twig', [
+                'userType' => $accountType,
+                'break' => true,
+            ]);
 
         $globalMessageArray = $this->chat->getAllMessages($userId);
         $globalChatArray = $this->chat->getAvailableChats($userId);

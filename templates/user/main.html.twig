@@ -10,7 +10,7 @@
 
 {% block body %}
     <div class="user__page">
-        {% if userType != 'hollow' %}
+        {% if userType != 'hollow' and break is not defined %}
             <div class="sidebar" id="sidebar">
                 <div id="schedule" class="sidebar-button" title="Schedule" data-section="schedule">
                     <i class="fas fa-calendar-alt"></i>
@@ -39,7 +39,7 @@
 {% endblock %}
 
 {% block javascripts %}
-    {% if userType != 'hollow' %}
+    {% if userType != 'hollow' and break is not defined %}
         <script>
             const START_FIRST = new Date("{{ startfirst }}");
             const START_SECOND = new Date("{{ startsecond }}");

@@ -300,9 +300,10 @@ class AdminPagesController extends AbstractController {
             $student->setGroupid($_POST['group']);
             $student->setBirthdayDate(strtotime($_POST['birthdayDate']));
             $student->setStatus($_POST['status']);
+            $student->setStudentToken($this->helper->generateRandomString(50));
             $this->em->persist($student);
             $this->em->flush();
-            return $this->redirectToRoute('admin_students');
+            return $this->redirectToRoute('admin_update_note', ['type' => 'students', 'id' => $student->getId()]);
         }
         $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
             'Студенты' => 'admin_students',
@@ -313,11 +314,13 @@ class AdminPagesController extends AbstractController {
         }        
         $groups = $this->em->getRepository(Group::class)->findAll();
         $statuses = $this->em->getRepository(Status::class)->findAll();
+        $link = ($element) ? $_ENV['HOSTNAME'] . "connect-with-student/" .  $element->getStudentToken() : null;
         return $this->render('admin/redact/student.html.twig', [
             'breadcrumbs' => $breadcrumbs,
             'groups' => $groups,
             'statuses' => $statuses,
             'updating_element' => $element,
+            'link' => $link,
         ]); 
     }
 
@@ -336,19 +339,22 @@ class AdminPagesController extends AbstractController {
             $teacher->setDivision($_POST['division']);
             $teacher->setDescription($_POST['description']);
             $teacher->setStatus($_POST['status']);
+            $teacher->setTeacherToken($this->helper->generateRandomString(50));
             $this->em->persist($teacher);
             $this->em->flush();
-            return $this->redirectToRoute('admin_teachers');
+            return $this->redirectToRoute('admin_update_note', ['type' => 'teachers', 'id' => $teacher->getId()]);
         }
         $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
             'Преподаватели' => 'admin_teachers',
             'Добавить преподавателя' => 'admin_create_teacher',
         ], $this->router);
+        $link = ($element) ? $_ENV['HOSTNAME'] . "connect-with-teacher/" .  $element->getTeacherToken() : null;
         $statuses = $this->em->getRepository(Status::class)->findAll();
         return $this->render('admin/redact/teacher.html.twig', [
             'breadcrumbs' => $breadcrumbs,
             'statuses' => $statuses,
             'updating_element' => $element,
+            'link' => $link,
         ]);
     }
 
@@ -798,6 +804,36 @@ class AdminPagesController extends AbstractController {
         $student->setGroupId($group->getId());
         $this->em->persist($student);
         $this->em->flush();
+        return $this->redirectToRoute('account');
+    }
+
+    // Присоединение студента к аккаунту
+    #[Route('/connect-with-student/{studentToken}', name: 'connect_with_student')]
+    public function connectWithStudent($studentToken) {
+        $student = $this->em->getRepository(Student::class)->findOneBy(['student_token' => $studentToken]);
+        $userId = $this->getUser()->getId();
+        if ($student->getUserId() == null) {
+            $student->setUserId($userId);
+            $this->em->persist($student);
+            $this->em->flush();
+        } else {
+            return new Response('Permission Error', 403);
+        }
+        return $this->redirectToRoute('account');
+    }
+
+    // Присоединение преподавателя к аккаунту
+    #[Route('/connect-with-teacher/{teacherToken}', name: 'connect_with_teacher')]
+    public function connectWithTeacher($teacherToken) {
+        $teacher = $this->em->getRepository(Teacher::class)->findOneBy(['teacher_token' => $teacherToken]);
+        $userId = $this->getUser()->getId();
+        if ($teacher->getUserId() == null) {
+            $teacher->setUserId($userId);
+            $this->em->persist($teacher);
+            $this->em->flush();
+        } else {
+            return new Response('Permission Error', 403);
+        }
         return $this->redirectToRoute('account');
     }
 }

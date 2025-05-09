@@ -12,9 +12,14 @@
     <div class="container">
         {{ include('blocks/breadcrumbs.html.twig') }}
         <div class="admin-table__wrap">
+            <h1>{{ title }}</h1>
             <div class="admin-table__head">
-                <h1>{{ title }}</h1>
-                <a href="{{ path('admin_students') }}", class="btn btn-primary">Отменить</a>
+                <div class="admin-create__head-buttons">
+                    <a href="{{ path('admin_students') }}", class="btn btn-primary">Отменить</a>
+                    {% if link is not empty %}
+                        <button class="btn btn-primary" onclick="copyToClipboard('{{ link }}')">Копировать ссылку для добавления аккаунта</button>
+                    {% endif %}
+                </div>
             </div>
             <div class="admin-table__body">
                 <form method="POST", enctype="multipart/form-data">
@@ -70,5 +75,5 @@
 {% endblock %}
 
 {% block javascripts %}
-    {# <script src="{{ asset('/js/files-table.js') }}"></script> #}
+    <script src="{{ asset('/js/copy.js') }}"></script>
 {% endblock %}
