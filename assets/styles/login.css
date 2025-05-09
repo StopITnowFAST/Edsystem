@@ -6,10 +6,7 @@
 }
 
 .login__inputs {
-    position: fixed;
-    top: 40%;          /* Сдвигаем вниз на 50% от высоты экрана */
-    left: 50%;         /* Сдвигаем вправо на 50% от ширины экрана */
-    transform: translate(-50%, -50%); /* Смещаем назад на 50% своей ширины/высоты */
+    margin: 40px 0px;
     display: grid;
     grid-auto-flow: column;
     gap: 10px;         /* Отступ между элементами */

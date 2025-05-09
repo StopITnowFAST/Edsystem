@@ -34,7 +34,7 @@ class Study
     public function getGroups($subjectId) {
         $conn = $this->em->getConnection();
         $sql = "
-            SELECT g.* from `group` g
+            SELECT DISTINCT g.* from `group` g
             JOIN `schedule` s ON s.schedule_group_id = g.id
             WHERE s.schedule_subject_id = $subjectId
         ";

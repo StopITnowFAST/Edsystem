@@ -22,7 +22,7 @@
             </div>
             <div class="admin-table__body">
                 {% if totalPoints != 0 %}
-                    Максимальное количество баллов в тесте: {{ totalPoints }}
+                    <p style="color: var(--color-main); font-size: 30px"> Максимальное количество баллов в тесте: {{ totalPoints }} </p>
                 {% endif %}
                 <form id="test" method="POST", enctype="multipart/form-data">
                     {% if updating_element is not empty %}

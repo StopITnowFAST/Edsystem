@@ -2,7 +2,7 @@
     display: flex;
     background-color: var(--color-grey-200);
     border-radius: var(--offset-xxs);
-    margin-top: 20px;
+    margin: 20px 0px;
     min-height: 6vh;
 }
 

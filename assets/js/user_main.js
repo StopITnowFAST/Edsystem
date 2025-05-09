@@ -783,6 +783,7 @@ function renderDay(date, lessons = []) {
 }
 
 function renderLesson(lesson) {
+    console.log(lesson);
     return `
         <div class="lesson-card">
             <div class="lesson-time">
@@ -793,6 +794,7 @@ function renderLesson(lesson) {
             <div class="lesson-main">
                 <div class="lesson-subject">${lesson.subject}</div>
                 <div class="lesson-type">${lesson.lesson_type}</div>
+                <div class="lesson-group">${lesson.code}</div>
             </div>
             
             <div class="lesson-details">
@@ -877,7 +879,6 @@ function formatDateToKey(date) {
 
 
 function getSubjectPage(data, userType) {
-    console.log(data);
     if (!data) {
         return `
             <div class="subject-no-data">
@@ -996,9 +997,7 @@ function initSubjectPage(userType) {
         // Обработка кликов по карточкам занятий
         document.querySelectorAll('.subject-lesson-card').forEach(card => {
             card.addEventListener('click', async function(e) {
-                console.log("Что то нажато");
                 if (e.target.closest('.show-students-btn')) {
-                    console.log("Начал собирать дату");
                     const container = this.closest('.subject-cards-container');
                     const tableContainer = container.querySelector('.students-table-container');
                     subject = container.dataset.subject;
@@ -1020,7 +1019,6 @@ function initSubjectPage(userType) {
                     try {
                         // Всегда загружаем свежие данные с сервера
                         const students = await loadStudentsForLesson(subject, date, type, time);
-                        console.log(students);
                         tableContainer.innerHTML = createStudentsTable(students);
                         this.dataset.hasStudents = 'true';
                         
@@ -1109,7 +1107,6 @@ async function loadStudentsForLesson(subject, date, type, time) {
 }
 
 function collectGradeChanges(subject, date, type, time) {
-    console.log("Собираю оценки");
     const changes = [];
 
     const lessonData = {
@@ -1118,10 +1115,9 @@ function collectGradeChanges(subject, date, type, time) {
         type: type,
         time: time
     };
-    
-    console.log(lessonData);
-
-    document.querySelectorAll('.students-table tbody tr').forEach(row => {
+    let activeCard = document.querySelector('.subject-cards-container.active');
+    activeCard.querySelectorAll('.students-table tbody tr').forEach(row => {
+        console.log('push');
         changes.push({
             studentId: row.dataset.studentId,
             attendance: row.querySelector('.attendance-select').value,
@@ -1134,7 +1130,6 @@ function collectGradeChanges(subject, date, type, time) {
 }
 
 async function saveGradeChanges(changes) {
-    console.log("Сохраняю изменения");
     const response = await fetch('/request/set/user/grade', {
         method: 'POST',
         headers: {

@@ -675,7 +675,9 @@ class AdminPagesController extends AbstractController {
     #[Route('/admin/schedule/{groupId}', 'admin_create_schedule')] 
     function adminSchedule($groupId) {
         $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
-            'Создание расписания' => 'admin_schedule_lesson_times',
+            'Группы' => 'admin_groups',
+            'Добавить группу' => ['admin_update_note', ['type' => 'groups', 'id' => $groupId]],
+            'Редактировать расписание' => 'admin_schedule_lesson_times',
         ], $this->router);
 
         $currentGroup = $this->em->getRepository(Group::class)->find($groupId);

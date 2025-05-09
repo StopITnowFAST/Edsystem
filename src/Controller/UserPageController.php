@@ -670,7 +670,7 @@ class UserPageController extends AbstractController
 
         foreach ($teacherSubjects as $subject) {
             $groups = [];
-            $allGroupsForSubject = $this->study->getGroups($subjectId);
+            $allGroupsForSubject = $this->study->getGroups($subject['id']);
             foreach ($allGroupsForSubject as $group) {
                 $groups[] = $group['code'];
             }
