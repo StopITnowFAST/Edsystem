@@ -41,6 +41,9 @@ class Student
     #[ORM\Column]
     private ?int $updated_at = null;
 
+    #[ORM\Column(length: 50)]
+    private ?string $student_token = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -162,5 +165,17 @@ class Student
         if ($this->getCreatedAt() === null) {
             $this->setCreatedAt(time());
         }
+    }
+
+    public function getStudentToken(): ?string
+    {
+        return $this->student_token;
+    }
+
+    public function setStudentToken(string $student_token): static
+    {
+        $this->student_token = $student_token;
+
+        return $this;
     }
 }

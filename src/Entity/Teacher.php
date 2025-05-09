@@ -44,6 +44,9 @@ class Teacher
     #[ORM\Column]
     private ?int $status = null;
 
+    #[ORM\Column(length: 50)]
+    private ?string $teacher_token = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -163,6 +166,18 @@ class Teacher
     public function setStatus(int $status): static
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getTeacherToken(): ?string
+    {
+        return $this->teacher_token;
+    }
+
+    public function setTeacherToken(string $teacher_token): static
+    {
+        $this->teacher_token = $teacher_token;
 
         return $this;
     }
