@@ -12,10 +12,12 @@ use App\Service\Chat;
 use App\Service\File;
 use App\Entity\Message;
 use App\Entity\Test;
+use App\Entity\SubjectWiki;
 use App\Entity\Group;
 use App\Entity\File as FileEntity;
 use App\Entity\TestUserResult;
 use App\Entity\UserCard;
+use App\Entity\SubjectWikiFile;
 use App\Entity\ScheduleSubject;
 use App\Entity\Schedule;
 use App\Entity\Student;
@@ -121,9 +123,9 @@ class UserPageController extends AbstractController
     #[Route('/request/get/user/schedule/{userId}', name: 'get_schedule')]
     public function getSchedule($userId) {
 
-        // if ($this->getUser()->getId() != $userId) {
-        //     return new Response('Permission Error', 403);
-        // }
+        if ($this->getUser()->getId() != $userId) {
+            return new Response('Permission Error', 403);
+        }
 
         $accountType = $this->study->getUserType($userId);
         if ($accountType == 'student') {
@@ -181,6 +183,185 @@ class UserPageController extends AbstractController
         
         return $this->json([
             'data' => $subjects
+        ]);
+    }
+
+    #[Route('/request/create/wiki/entry', name: 'create_wiki')]
+    public function createWikiEntry(Request $request): Response {
+        $user = $this->getUser();
+        $userId = $user->getId();
+        $accountType = $this->study->getUserType($userId);
+        
+        // Проверяем, что пользователь авторизован и является преподавателем
+        if ($accountType != 'teacher') {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Только преподаватели могут создавать записи'
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        // Получаем и валидируем данные
+        $data = json_decode($request->getContent(), true);
+        
+        if (!isset($data['text']) || empty(trim($data['text']))) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Текст записи не может быть пустым'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        if (!isset($data['subject_id']) || !is_numeric($data['subject_id'])) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Неверный идентификатор предмета'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Находим предмет
+        $subject = $this->em->getRepository(ScheduleSubject::class)->find($data['subject_id']);
+
+        if (!$subject) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Предмет не найден'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        // Создаем новую запись
+        $wikiEntry = new SubjectWiki();
+        $wikiEntry->setText(trim($data['text']));
+        $wikiEntry->setCanUploadFile($data['can_upload'] ?? false);
+        $wikiEntry->setSubjectId($subject->getId());
+        
+        // Сохраняем в базу
+        $this->em->persist($wikiEntry);
+        $this->em->flush();
+
+        // Возвращаем успешный ответ с ID созданной записи
+        return $this->json([
+            'status' => 'success',
+            'message' => 'Запись успешно создана',
+            'entry_id' => $wikiEntry->getId()
+        ]);
+    }
+
+    
+    // Получение данных для вики
+    #[Route('/request/get/user/wiki/{userId}', name: 'get_wiki')]
+    public function getWiki($userId) {
+
+        // Получаем все предметы, к которым у пользователя есть доступ
+        $subjects = $this->study->getSubjectsForUser($userId);
+        
+        $data = [];
+        
+        foreach ($subjects as $subject) {
+            $wikiEntries = $this->em
+                ->getRepository(SubjectWiki::class)
+                ->findBy(['subject_id' => $subject['id']], ['created_at' => 'DESC']);
+            
+            $subjectData = [];
+            foreach ($wikiEntries as $entry) {
+                $teacherFiles = $this->em->getRepository(SubjectWikiFile::class)->findBy([
+                    'wiki_id' => $entry->getId(),
+                    'file_type' => 'teacher',
+                ]);
+                
+                $studentFiles = $this->em->getRepository(SubjectWikiFile::class)->findBy([
+                    'wiki_id' => $entry->getId(),
+                    'file_type' => 'student',
+                ]);
+                
+                $entryData = [
+                    'id' => $entry->getId(),
+                    'text' => $entry->getText(),
+                    'can_upload_file' => $entry->isCanUploadFile(),
+                    'created_at' => gmdate("Y.m.d", $entry->getCreatedAt()),
+                    'teacher_files' => [],
+                    'student_files' => []
+                ];
+                
+                foreach ($teacherFiles as $file) {
+                    $fileEntity = $this->em->getRepository(FileEntity::class)->find($file->getFileId());
+                    $entryData['teacher_files'][] = [
+                        'id' => $fileEntity->getId(),
+                        'name' => $fileEntity->getFileName(),
+                        'url' => '/download/user-file/' . $fileEntity->getRealFileName(),
+                    ];
+                }
+                
+                foreach ($studentFiles as $file) {
+                    $fileEntity = $this->em->getRepository(FileEntity::class)->find($file->getFileId());
+                    $student = $this->em->getRepository(Student::class)->findOneBy(['user_id' => $fileEntity->getCreatedBy()]);
+                    $studentName = $student->getLastName() . ' ' . $student->getFirstName();
+                    $entryData['student_files'][] = [
+                        'id' => $fileEntity->getId(),
+                        'name' => $fileEntity->getFileName(),
+                        'url' => '/download/user-file/' . $fileEntity->getRealFileName(),
+                        'student_name' => $studentName,
+                    ];
+                }
+                
+                $subjectData[] = $entryData;
+            }
+            
+            $data[$subject['name']] = $subjectData;
+        }
+        
+        // Добавляем ID предметов в ответ
+        $subjectIds = [];
+        foreach ($subjects as $subject) {
+            $subjectIds[$subject['name']] = $subject['id'];
+        }
+        
+        return $this->json([
+            'status' => 'success', 
+            'data' => $data,
+            'subjects' => $subjectIds
+        ]);
+    }
+
+
+    #[Route('/request/delete/wiki/entry', name: 'delete_wiki')]
+    public function deleteWIki(Request $request) {
+        $data = json_decode($request->getContent(), true);
+        $entryId = $data['entry_id'];
+        $entry = $this->em->getRepository(SubjectWiki::class)->find($entryId);
+        $this->em->remove($entry);
+        $this->em->flush();
+        return $this->json([
+            'status' => 'success',
+        ]);
+    }
+
+
+    #[Route('/request/upload/wiki/file', name: 'upload_file')]
+    public function uploadFile(Request $request) {
+        $userId = $this->getUser()->getId();
+        $data = json_decode($request->getContent(), true);
+        $uploadedFiles = $request->files->get('files', []);
+        foreach ($uploadedFiles as $file) {
+            $filedata = var_export($file, true);
+            $this->logger->info($filedata);
+            $fileEntity = $this->fileService->handleUploadedFile($file, $userId);
+            $wikiFile = new SubjectWikiFile;
+            $wikiFile->setFileId($fileEntity->getId());
+            $wikiFile->setFileType($request->request->get('file_type'));
+            $wikiFile->setWikiId($request->request->get('entry_id'));
+            $this->em->persist($wikiFile);
+        }
+        $this->em->flush();
+        return new Response('ok');
+    }
+
+    #[Route('/request/delete/wiki/file', name: 'delete_file')]
+    public function deleteAnswerFile(Request $request) {
+        $data = json_decode($request->getContent(), true);
+        $wikiFile = $this->em->getRepository(SubjectWikiFile::class)->findOneBy(['file_id' => $data['file_id']]);
+        $this->em->remove($wikiFile);
+        $this->em->flush();
+        return $this->json([
+            'status' => 'success',
         ]);
     }
 
@@ -248,7 +429,6 @@ class UserPageController extends AbstractController
             return new JsonResponse(['error' => 'Ошибка сервера: ' . $e->getMessage()], 500);
         }
     }
-
 
     // Получение сообщений для чатов
     #[Route(path: '/request/get/user/messages/chat/{userId}', name:'get_chats_messages')]
@@ -332,16 +512,16 @@ class UserPageController extends AbstractController
                         'subject_id' => $subjectId,
                         'date' => $gradeData['date'],
                         'time' => $timeId,
-                        'type' => $typeId,                        
+                        'type' => $typeId,
                     ]) ?? new Grade();
                 
                 $grade->setUserId($userId);
                 $grade->setSubjectId($subjectId);
-                $grade->setGrade($gradeData['grade']);
+                $grade->setGrade(($gradeData['grade'] == '') ? null : $gradeData['grade']);
                 $grade->setAbsent($gradeData['attendance'] === 'absent');
                 $grade->setDate($gradeData['date']);
                 $grade->setType($typeId);
-                $grade->setTime($timeId);                
+                $grade->setTime($timeId);
                 $this->em->persist($grade);
             }
             

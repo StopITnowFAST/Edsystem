@@ -19,6 +19,28 @@ class Study
     ) {
     }
 
+    public function getSubjectsForUser($userId) {
+        $role = $this->getUserType($userId);
+        $conn = $this->em->getConnection();
+        if ($role == 'student') {
+            $sql = "
+                SELECT ss.* from `schedule_subject` ss
+                JOIN `schedule` s ON s.schedule_subject_id = ss.id
+                JOIN `group` g ON s.schedule_group_id = g.id
+                JOIN `student` stud ON stud.group_id = g.id
+                WHERE stud.user_id = $userId
+            ";
+        } else if ($role == 'teacher') {
+            $sql = "
+                SELECT DISTINCT ss.* from `schedule` s
+                JOIN `schedule_subject` ss ON ss.id = s.schedule_subject_id
+                WHERE s.user_id = $userId
+            ";
+        }
+        $resultSet = $conn->executeQuery($sql);
+        return $resultSet->fetchAllAssociative();        
+    }
+
     // Получить тип пользоваля по ID (студент | преподаватель | без аккаунта)
     public function getUserType($userId) {
         $student = $this->em->getRepository(Student::class)->findOneBy(['user_id' => $userId]);

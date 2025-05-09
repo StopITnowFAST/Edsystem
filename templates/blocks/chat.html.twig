@@ -30,7 +30,8 @@
                 <div id="messageBox" class="history__messages"></div>
                 <div class="history__text-field">
                     <button class="history__message-file" onclick="setFileToMessage()">Прикрепить</button>
-                    <input type="file" name="file" id="fileField" multiple hidden>
+                    <input type="file" name="file" id="fileField" multiple hidden
+                        accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.zip,.rar">
                     <textarea id="messageInput" class="history__message-field"></textarea>
                     <button id="sendButton" class="history__message-send" onclick="send()">></button>
                 </div>

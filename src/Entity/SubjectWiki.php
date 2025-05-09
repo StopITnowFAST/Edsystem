@@ -7,6 +7,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SubjectWikiRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class SubjectWiki
 {
     #[ORM\Id]
@@ -21,7 +22,7 @@ class SubjectWiki
     private ?int $subject_id = null;
 
     #[ORM\Column]
-    private ?bool $cat_upload_file = null;
+    private ?bool $can_upload_file = null;
 
     #[ORM\Column]
     private ?int $created_at = null;
@@ -55,14 +56,14 @@ class SubjectWiki
         return $this;
     }
 
-    public function isCatUploadFile(): ?bool
+    public function isCanUploadFile(): ?bool
     {
-        return $this->cat_upload_file;
+        return $this->can_upload_file;
     }
 
-    public function setCatUploadFile(bool $cat_upload_file): static
+    public function setCanUploadFile(bool $can_upload_file): static
     {
-        $this->cat_upload_file = $cat_upload_file;
+        $this->can_upload_file = $can_upload_file;
 
         return $this;
     }
@@ -77,5 +78,14 @@ class SubjectWiki
         $this->created_at = $created_at;
 
         return $this;
+    }
+
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
+    public function updateTimestamps()
+    {
+        if ($this->getCreatedAt() === null) {
+            $this->setCreatedAt(time());
+        }
     }
 }

@@ -1147,3 +1147,334 @@
 .subject-lesson-card.absent .subject-lesson-grade {
     background-color: #f44336;
 }
+
+/* Wiki стили */
+.wiki-container {
+    padding: 20px;
+    background-color: var(--color-grey-200);
+    border-radius: var(--offset-xxs);
+    color: var(--color-font-bright);
+}
+
+.wiki-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--color-grey-400);
+}
+
+.wiki-title {
+    color: var(--color-main);
+    margin: 0;
+}
+
+.no-wiki-message {
+    text-align: center;
+    padding: 40px;
+    color: var(--color-grey-0);
+    background: var(--color-grey-300);
+    border-radius: 10px;
+}
+
+.no-wiki-message i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: var(--color-main);
+}
+
+.no-wiki-message p {
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+.wiki-entries {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.wiki-entry {
+    background-color: var(--color-grey-300);
+    border-radius: var(--offset-xxs);
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.wiki-entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--color-grey-400);
+}
+
+.wiki-entry-title {
+    margin: 0;
+    color: var(--color-main);
+}
+
+.wiki-entry-meta {
+    display: flex;
+    gap: 10px;
+    font-size: 0.9rem;
+    color: var(--color-grey-0);
+}
+
+.wiki-entry-type {
+    background-color: var(--color-main);
+    color: white;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+
+.wiki-entry-content {
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.wiki-entry-files {
+    margin-top: 20px;
+}
+
+.wiki-entry-files h4 {
+    margin-bottom: 10px;
+    font-size: 1rem;
+    color: var(--color-main);
+}
+
+.teacher-files, .student-files {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.wiki-file-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background-color: var(--color-grey-400);
+    border-radius: 4px;
+}
+
+.wiki-file-link {
+    color: var(--color-font-bright);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-grow: 1;
+}
+
+.wiki-file-link:hover {
+    color: var(--color-main);
+}
+
+.wiki-file-student {
+    font-size: 0.8rem;
+    color: var(--color-grey-0);
+}
+
+.wiki-file-upload {
+    margin-top: 10px;
+}
+
+.wiki-entry-controls {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid var(--color-grey-400);
+}
+
+/* Модальное окно создания записи */
+.wiki-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.wiki-modal-content {
+    background-color: var(--color-grey-300);
+    padding: 25px;
+    border-radius: var(--offset-xxs);
+    width: 100%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.wiki-modal-content h3 {
+    margin-top: 0;
+    color: var(--color-main);
+    margin-bottom: 20px;
+}
+
+#wiki-entry-text {
+    width: 100%;
+    min-height: 200px;
+    padding: 12px;
+    border-radius: var(--offset-3xs);
+    border: 1px solid var(--color-grey-400);
+    background-color: var(--color-grey-200);
+    color: var(--color-font-bright);
+    margin-bottom: 20px;
+    resize: vertical;
+}
+
+.wiki-modal-options {
+    margin-bottom: 20px;
+}
+
+.wiki-modal-options label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.wiki-modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* Кнопки */
+.create-btn {
+    background-color: var(--color-main);
+    color: white;
+}
+
+.create-btn:hover {
+    background-color: var(--color-main-dark);
+}
+
+.toggle-upload-btn {
+    background-color: var(--color-grey-400);
+    color: var(--color-font-bright);
+}
+
+.toggle-upload-btn:hover {
+    background-color: var(--color-grey-375);
+}
+
+.delete-btn {
+    background-color: #f44336;
+    color: white;
+    padding: 8px 12px;
+}
+
+.delete-btn:hover {
+    background-color: #d32f2f;
+}
+
+.cancel-btn {
+    background-color: var(--color-grey-400);
+    color: var(--color-font-bright);
+}
+
+.confirm-btn {
+    background-color: var(--color-main);
+    color: white;
+}
+
+/* Wiki Section */
+.wiki-section {
+    padding: 20px;
+    background-color: var(--color-grey-200);
+    border-radius: var(--offset-xxs);
+    color: var(--color-font-bright);
+}
+
+.wiki-no-data {
+    text-align: center;
+    padding: 40px;
+    color: var(--color-grey-0);
+}
+
+.wiki-no-data i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: var(--color-main);
+}
+
+.wiki-no-data p {
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+/* Subject tabs (используем существующие стили из .subject-tabs-container) */
+
+.wiki-subject-container {
+    margin-top: 20px;
+    animation: fadeIn 0.4s ease-out;
+}
+
+.no-wiki-entries {
+    text-align: center;
+    padding: 40px;
+    color: var(--color-grey-0);
+    background: var(--color-grey-300);
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+.no-wiki-entries i {
+    font-size: 2rem;
+    margin-bottom: 15px;
+    color: var(--color-main);
+}
+
+.no-wiki-entries p {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+}
+
+.create-entry-btn {
+    background-color: var(--color-main);
+    color: white;
+    margin-bottom: 20px;
+}
+
+.create-entry-btn:hover {
+    background-color: var(--color-main-dark);
+}
+
+.wiki-entries-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.file-info {
+    font-size: 0.8rem;
+    color: var(--color-grey-0);
+    margin-left: auto;
+    margin-right: 10px;
+}
+
+.delete-file-btn {
+    padding: 2px 5px;
+    background: transparent;
+    color: #ff4444;
+    border: none;
+}
+
+.button-like-icon {
+    height: 20px !important;
+    width: 20px !important;
+    min-width: 0px !important;
+}

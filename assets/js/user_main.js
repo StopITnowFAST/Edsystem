@@ -3,6 +3,7 @@ const CHAT_SECTION = 'chat';
 const SUBJECT_SECTION = 'subjects';
 const PROFILE_SECTION = 'profile';
 const TEST_SECTION = 'tests';
+const WIKI_SECTION = 'wiki';
 
 const SCHEDULE_SECTION_URL = '/request/get/user/' + SCHEDULE_SECTION + '/';
 const CHAT_SECTION_URL = '/request/get/user/' + CHAT_SECTION + '/';
@@ -12,6 +13,10 @@ const GET_UPDATES_URL = '/request/get/user/updates/' + CHAT_SECTION + '/';
 const SUBJECT_SECTION_URL = '/request/get/user/' + SUBJECT_SECTION + '/';
 const PROFILE_SECTION_ULR = '/request/get/user/' + PROFILE_SECTION + '/';
 const TEST_SECTION_ULR = '/request/get/user/' + TEST_SECTION + '/';
+const WIKI_SECTION_URL = '/request/get/user/' + WIKI_SECTION + '/';
+const CREATE_WIKI_ENTRY_URL = '/request/create/wiki/entry';
+const UPLOAD_WIKI_FILE_URL = '/request/upload/wiki/file';
+const GET_WIKI_FILES_URL = '/request/get/wiki/files';
 
 const CONTENT_CONTAINER = document.getElementById('content');
 const POLL_DELAY = 1000;
@@ -58,6 +63,13 @@ async function loadContent(section) {
             globalChatArray = json.data;
             content = getChatPage(globalChatArray);
             renderContent(content);   
+            break;
+        case WIKI_SECTION:
+            json = await getDataFromServer(WIKI_SECTION_URL);
+            window.userSubjects = json.subjects;
+            content = getWikiPage(json.data, userType);
+            renderContent(content);
+            initWikiPage(userType);
             break;
         case SUBJECT_SECTION:
             json = await getDataFromServer(SUBJECT_SECTION_URL);
@@ -974,18 +986,25 @@ function initSubjectPage(userType) {
             });
         });
     }
+
+    let subject = {};
+    let date = '';
+    let type = '';
+    let time = '';
     
     if (userType == 'teacher') {
         // Обработка кликов по карточкам занятий
         document.querySelectorAll('.subject-lesson-card').forEach(card => {
             card.addEventListener('click', async function(e) {
+                console.log("Что то нажато");
                 if (e.target.closest('.show-students-btn')) {
+                    console.log("Начал собирать дату");
                     const container = this.closest('.subject-cards-container');
                     const tableContainer = container.querySelector('.students-table-container');
-                    const subject = container.dataset.subject;
-                    const date = this.dataset.date;
-                    const type = this.dataset.type;
-                    const time = this.dataset.time;
+                    subject = container.dataset.subject;
+                    date = this.dataset.date;
+                    type = this.dataset.type;
+                    time = this.dataset.time;
                     
                     // Если таблица уже видима - просто скрываем ее
                     if (tableContainer.style.display !== 'none') {
@@ -1021,7 +1040,7 @@ function initSubjectPage(userType) {
         
         // Обработка сохранения изменений
         document.getElementById('save-grades-btn').addEventListener('click', async function() {
-            const changes = collectGradeChanges();
+            const changes = collectGradeChanges(subject, date, type, time);
             try {
                 await saveGradeChanges(changes);
                 alert('Изменения успешно сохранены');
@@ -1056,7 +1075,7 @@ function createStudentsTable(students) {
                                 </select>
                             </td>
                             <td>
-                                <input type="number" min="0" max="10" 
+                                <input type="number" min="2" max="5" 
                                        class="grade-input" 
                                        value="${student.grade || ''}">
                             </td>
@@ -1089,19 +1108,19 @@ async function loadStudentsForLesson(subject, date, type, time) {
     return await response.json();
 }
 
-function collectGradeChanges() {
+function collectGradeChanges(subject, date, type, time) {
+    console.log("Собираю оценки");
     const changes = [];
-    const activeCard = document.querySelector('.subject-lesson-card[data-has-students="true"]');
-    
-    if (!activeCard) return changes;
-    
+
     const lessonData = {
-        subject: activeCard.closest('.subject-cards-container').dataset.subject,
-        date: activeCard.dataset.date,
-        type: activeCard.dataset.type,
-        time: activeCard.dataset.time
+        subject: subject,
+        date: date,
+        type: type,
+        time: time
     };
     
+    console.log(lessonData);
+
     document.querySelectorAll('.students-table tbody tr').forEach(row => {
         changes.push({
             studentId: row.dataset.studentId,
@@ -1115,6 +1134,7 @@ function collectGradeChanges() {
 }
 
 async function saveGradeChanges(changes) {
+    console.log("Сохраняю изменения");
     const response = await fetch('/request/set/user/grade', {
         method: 'POST',
         headers: {
@@ -1128,4 +1148,463 @@ async function saveGradeChanges(changes) {
     }
     
     return await response.json();
+}
+
+// -----------------------------------------------------------------------------
+// БЛОК С WIKI (УЧЕБНЫЕ МАТЕРИАЛЫ И ЗАДАНИЯ)
+// -----------------------------------------------------------------------------
+
+function getWikiPage(wikiData, userType) {
+    // Получаем список всех предметов пользователя (даже без записей)
+    const allSubjects = getAllUserSubjects(); // Эта функция должна быть реализована
+    
+    if (!allSubjects || allSubjects.length === 0) {
+        return `
+            <div class="wiki-no-data">
+                <i class="fas fa-book-open"></i>
+                <p>Нет доступных предметов</p>
+            </div>
+        `;
+    }
+
+    const subjectTabs = allSubjects.map(subject => 
+        `<div class="subject-tab" data-subject="${subject.name}">${subject.name}</div>`
+    ).join('');
+
+    let subjectContents = '';
+    for (const subject of allSubjects) {
+        const entries = wikiData[subject.name] || [];
+        subjectContents += `
+            <div class="wiki-subject-container" data-subject="${subject.name}" style="display: none;">
+                ${renderWikiEntries(entries, userType, subject.id)}
+            </div>
+        `;
+    }
+
+    return `
+        <div class="wiki-section">
+            <div class="subject-tabs-container">
+                ${subjectTabs}
+            </div>
+            ${subjectContents}
+        </div>
+    `;
+}
+
+
+
+function renderWikiEntries(entries, userType, subjectId) {
+    const noEntriesHtml = `
+        <div class="no-wiki-entries">
+            <i class="fas fa-info-circle"></i>
+            <p>Нет учебных материалов по этому предмету</p>
+            ${userType === 'teacher' ? 
+                `<button class="btn create-entry-btn" data-subject-id="${subjectId}">
+                    Создать первую запись
+                </button>` : 
+                ''}
+        </div>
+    `;
+
+    if (!entries || entries.length === 0) {
+        return noEntriesHtml;
+    }
+
+    return `
+        <div class="wiki-entries-list">
+            ${userType === 'teacher' ? 
+                `<button class="btn create-entry-btn" data-subject-id="${subjectId}">
+                    Создать новую запись
+                </button>` : 
+                ''}
+            ${entries.map(entry => renderWikiEntry(entry, userType)).join('')}
+        </div>
+    `;
+}
+
+function renderWikiEntry(entry, userType, userId) {
+    const isAssignment = entry.can_upload_file;
+
+    // Первая строка текста - заголовок
+    const title = entry.text.split('\n')[0];
+    const content = entry.text.split('\n').slice(1).join('<br>');
+
+    // Фильтруем файлы студента - показываем только его файлы
+    const studentFiles = userType === 'student' 
+        ? entry.student_files.filter(file => file.student_id == userId)
+        : entry.student_files;
+
+    return `
+        <div class="wiki-entry" data-entry-id="${entry.id}">
+            <div class="wiki-entry-header">
+                <h3 class="wiki-entry-title">${title}</h3>
+                <div class="wiki-entry-meta">
+                    <span class="wiki-entry-date">${entry.created_at}</span>
+                    ${isAssignment ? '<span class="wiki-entry-type">Задание</span>' : ''}
+                </div>
+            </div>
+            
+            <div class="wiki-entry-content">
+                ${content}
+            </div>
+            
+            ${isAssignment ? `
+                <div class="wiki-entry-files">
+                    ${entry.teacher_files.length != 0 ? `
+                        <h4>Файлы преподавателя:</h4>
+                        <div class="teacher-files">
+                            ${entry.teacher_files.map(file => renderFileItem(file, 'teacher', 'teacher')).join('')}
+                        </div>
+                    ` : ''}
+                    
+                    ${userType === 'teacher' ? `
+                        <div class="wiki-file-upload">
+                            <input type="file" id="teacher-file-upload-${entry.id}" class="file-input-hidden"
+                                accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.zip,.rar">
+                            <label for="teacher-file-upload-${entry.id}" class="file-upload-button">
+                                <i class="fas fa-plus"></i> Файл
+                            </label>
+                        </div>
+                    ` : ''}
+                    
+                    <!-- Блок для студенческих файлов -->
+                    ${userType === 'student' && studentFiles.length > 0 ? `
+                        <h4>Мои файлы:</h4>
+                        <div class="student-files">
+                            ${studentFiles.map(file => renderFileItem(file, 'student', 'student')).join('')}
+                        </div>
+                    ` : ''}
+                    
+                    ${userType === 'teacher' && entry.student_files.length > 0 ? `
+                        <h4>Ответы студентов:</h4>
+                        <div class="student-files">
+                            ${entry.student_files.map(file => renderFileItem(file, 'student', 'teacher')).join('')}
+                        </div>
+                    ` : ''}
+                    
+                    ${userType === 'student' ? `
+                        <div class="wiki-file-upload">
+                            <input type="file" id="student-file-upload-${entry.id}" class="file-input-hidden"
+                                accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.zip,.rar">
+                            <label for="student-file-upload-${entry.id}" class="file-upload-button">
+                                <i class="fas fa-plus"></i> ${studentFiles.length > 0 ? 'Файл' : 'Файл'}
+                            </label>
+                        </div>
+                    ` : ''}
+                </div>
+            ` : `
+                <div class="wiki-entry-files">
+                    ${userType === 'teacher' ? `
+                        <div class="wiki-file-upload">
+                            <input type="file" id="teacher-file-upload-${entry.id}" class="file-input-hidden"
+                                accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.zip,.rar">
+                            <label for="teacher-file-upload-${entry.id}" class="file-upload-button">
+                                <i class="fas fa-plus"></i> Файл
+                            </label>
+                        </div>
+                    ` : ''}
+                        
+                    <h4>Файлы:</h4>
+                    <div class="teacher-files">
+                        ${entry.teacher_files.length != 0 ? entry.teacher_files.map(file => renderFileItem(file, 'teacher', 'teacher')).join('') : 'Нет файлов'}
+                    </div>
+                </div>
+            `}
+            
+            ${userType === 'teacher' ? `
+                <div class="wiki-entry-controls">
+                    <button class="btn delete-btn">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            ` : ''}
+        </div>
+    `;
+}
+
+
+
+function renderFileItem(file, fileType, role) {
+    return `
+        <div class="wiki-file-item" data-file-id="${file.id}">
+            <a href="${file.url}" class="wiki-file-link" download>
+                <i class="${getFileIcon(file.name)}"></i>
+                ${file.name}
+            </a>
+            ${fileType === 'student' ? `
+                <span class="file-info">
+                    ${file.student_name || 'Студент'}
+                    ${file.upload_date ? `(${new Date(file.upload_date).toLocaleDateString()})` : ''}
+                </span>
+            ` : ''}
+            ${fileType === 'student' && role != 'teacher' && file.student_id == window.currentUserId ? `
+                <button class="btn btn-sm delete-file-btn button-like-icon" data-file-id="${file.id}">
+                    <i class="fas fa-times"></i>
+                </button>
+            ` : ''}
+        </div>
+    `;
+}
+
+function getFileIcon(filename) {
+    const ext = filename.split('.').pop().toLowerCase();
+    const icons = {
+        pdf: 'fa-file-pdf',
+        jpg: 'fa-file-image',
+        jpeg: 'fa-file-image',
+        png: 'fa-file-image',
+        gif: 'fa-file-image',
+        doc: 'fa-file-word',
+        docx: 'fa-file-word',
+        xls: 'fa-file-excel',
+        xlsx: 'fa-file-excel',
+        zip: 'fa-file-archive',
+        rar: 'fa-file-archive'
+    };
+    return `fas ${icons[ext] || 'fa-file'}`;
+}
+
+function initWikiPage(userType) {
+    // Обработка переключения между предметами
+    const tabs = document.querySelectorAll('.subject-tab');
+    if (tabs.length > 0) {
+        tabs[0].classList.add('active');
+        const firstSubject = tabs[0].dataset.subject;
+        document.querySelector(`.wiki-subject-container[data-subject="${firstSubject}"]`).style.display = 'block';
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                const subject = tab.dataset.subject;
+                document.querySelectorAll('.wiki-subject-container').forEach(container => {
+                    container.style.display = 'none';
+                });
+                document.querySelector(`.wiki-subject-container[data-subject="${subject}"]`).style.display = 'block';
+            });
+        });
+    }
+    if (userType === 'teacher') {
+        document.querySelectorAll('.create-entry-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const subjectId = this.dataset.subjectId;
+                showCreateWikiModal(subjectId);
+            });
+        });
+        // Обработка создания новой записи
+        document.getElementById('create-wiki-entry')?.addEventListener('click', showCreateWikiModal);
+        
+        // Обработка переключения возможности загрузки файлов
+        document.querySelectorAll('.toggle-upload-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                const entryId = this.closest('.wiki-entry').dataset.entryId;
+                const canUpload = this.dataset.canUpload === 'true';
+                
+                try {
+                    const response = await fetch('/request/toggle/wiki/upload/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            entry_id: entryId,
+                            can_upload: !canUpload
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        location.reload();
+                    }
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                    alert('Не удалось изменить настройки загрузки');
+                }
+            });
+        });
+        
+        // Обработка удаления записи
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                if (confirm('Вы уверены, что хотите удалить эту запись?')) {
+                    const entryId = this.closest('.wiki-entry').dataset.entryId;
+                    
+                    try {
+                        const response = await fetch('/request/delete/wiki/entry/', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                entry_id: entryId
+                            })
+                        });
+                        
+                        if (response.ok) {
+                            location.reload();
+                        }
+                    } catch (error) {
+                        console.error('Ошибка:', error);
+                        alert('Не удалось удалить запись');
+                    }
+                }
+            });
+        });
+    }
+    
+    // Обработка загрузки файлов (для преподавателей и студентов)
+    document.querySelectorAll('.file-input-hidden').forEach(input => {
+        input.addEventListener('change', async function() {
+            const entryId = this.id.split('-').pop();
+            const fileType = this.id.includes('teacher-file') ? 'teacher' : 'student';
+            const files = this.files;
+            
+            if (files.length === 0) return;
+            
+            try {
+                const formData = new FormData();
+                formData.append('entry_id', entryId);
+                formData.append('file_type', fileType);
+                for (let i = 0; i < files.length; i++) {
+                    formData.append('files[]', files[i]);
+                }
+                
+                const response = await fetch(UPLOAD_WIKI_FILE_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    location.reload();
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки файла:', error);
+                alert('Не удалось загрузить файл');
+            }
+        });
+    });
+
+    // Обработчик удаления файлов
+    document.querySelectorAll('.delete-file-btn').forEach(btn => {
+        btn.addEventListener('click', async function(e) {
+            e.stopPropagation();
+            const fileId = this.dataset.fileId;
+            const fileItem = this.closest('.wiki-file-item');
+            
+            if (confirm('Вы уверены, что хотите удалить этот файл?')) {
+                try {
+                    // Добавляем индикатор загрузки
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    this.disabled = true;
+                    
+                    const response = await fetch('/request/delete/wiki/file', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            file_id: fileId
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.status === 'success') {
+                        // Анимация удаления
+                        fileItem.style.opacity = '0';
+                        setTimeout(() => {
+                            fileItem.remove();
+                            
+                            // Обновляем список файлов, если это был последний файл
+                            const filesContainer = fileItem.closest('.student-files');
+                            if (filesContainer && filesContainer.querySelectorAll('.wiki-file-item').length === 0) {
+                                const header = filesContainer.previousElementSibling;
+                                if (header && header.tagName === 'H4') {
+                                    header.remove();
+                                }
+                            }
+                        }, 300);
+                    } else {
+                        alert('Ошибка: ' + (result.message || 'Не удалось удалить файл'));
+                        this.innerHTML = '<i class="fas fa-times"></i>';
+                        this.disabled = false;
+                    }
+                } catch (error) {
+                    console.error('Ошибка при удалении файла:', error);
+                    alert('Ошибка соединения с сервером');
+                    this.innerHTML = '<i class="fas fa-times"></i>';
+                    this.disabled = false;
+                }
+            }
+        });
+    });
+}
+
+function showCreateWikiModal(subjectId) {
+    const modalHtml = `
+        <div class="wiki-modal" id="wiki-create-modal">
+            <div class="wiki-modal-content">
+                <h3>Создать новую запись</h3>
+                <textarea id="wiki-entry-text" placeholder="Первая строка будет заголовком..."></textarea>
+                <div class="wiki-modal-options">
+                    <label>
+                        <input type="checkbox" id="wiki-can-upload">
+                        Разрешить студентам загружать файлы (создать задание)
+                    </label>
+                </div>
+                <div class="wiki-modal-buttons">
+                    <button id="wiki-cancel-create" class="btn cancel-btn">Отмена</button>
+                    <button id="wiki-confirm-create" class="btn confirm-btn" data-subject-id="${subjectId}">Создать</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // Обработчики событий для модального окна
+    document.getElementById('wiki-cancel-create').addEventListener('click', () => {
+        document.getElementById('wiki-create-modal').remove();
+    });
+    
+    document.getElementById('wiki-confirm-create').addEventListener('click', async () => {
+        const text = document.getElementById('wiki-entry-text').value.trim();
+        const canUpload = document.getElementById('wiki-can-upload').checked;
+        const subjectId = document.getElementById('wiki-confirm-create').dataset.subjectId;
+        
+        if (!text) {
+            alert('Текст записи не может быть пустым');
+            return;
+        }
+        
+        try {
+            const response = await fetch(CREATE_WIKI_ENTRY_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    text: text,
+                    can_upload: canUpload,
+                    subject_id: subjectId
+                })
+            });
+            
+            if (response.ok) {
+                location.reload();
+            }
+        } catch (error) {
+            console.error('Ошибка создания записи:', error);
+            alert('Не удалось создать запись');
+        }
+    });
+}
+
+function getAllUserSubjects() {
+    if (!window.userSubjects) return [];
+    
+    return Object.entries(window.userSubjects).map(([name, id]) => ({
+        name,
+        id
+    }));
 }

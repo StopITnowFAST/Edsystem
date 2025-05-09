@@ -15,29 +15,13 @@ class SubjectWikiRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, SubjectWiki::class);
     }
-
-    //    /**
-    //     * @return SubjectWiki[] Returns an array of SubjectWiki objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('s.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?SubjectWiki
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    
+    public function findAllWiki($userId) {        
+        $conn = $this->em->getConnection();
+        $sql = "
+            
+        ";
+        $resultSet = $conn->executeQuery($sql);
+        return  $resultSet->fetchAllAssociative();
+    }
 }

@@ -18,6 +18,12 @@ class File
         $this->em = $em;
     }
 
+    public function handleUploadedFiles($files, int $userId) {
+        foreach ($files as $file) {
+            $this->handleUploadedFile($file, $userId);
+        }
+    }
+
     public function handleUploadedFile(UploadedFile $file, int $userId) {
         // Сохраняем файл на диск
         $fileInfo = $this->saveFileToDisk($file);
