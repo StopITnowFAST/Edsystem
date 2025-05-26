@@ -1331,7 +1331,7 @@
 }
 
 #wiki-entry-text {
-    width: 100%;
+    width: 96%;
     min-height: 200px;
     padding: 12px;
     border-radius: var(--offset-3xs);
@@ -1351,6 +1351,7 @@
     align-items: center;
     gap: 8px;
     cursor: pointer;
+    color: white;
 }
 
 .wiki-modal-buttons {

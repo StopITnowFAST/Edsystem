@@ -15,29 +15,17 @@ class SubjectWikiFileRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, SubjectWikiFile::class);
     }
-
-    //    /**
-    //     * @return SubjectWikiFile[] Returns an array of SubjectWikiFile objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('s.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?SubjectWikiFile
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    
+    public function getStudentFiles($userId, $wikiId) {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
+            SELECT * FROM `subject_wiki_file` swf 
+            JOIN `file` f ON swf.file_id = f.id
+            WHERE swf.file_type = 'student'
+            AND f.created_by = $userId
+            AND swf.wiki_id = $wikiId
+        ";
+        $resultSet = $conn->executeQuery($sql);        
+        return $resultSet->fetchAllAssociative();
+    }
 }

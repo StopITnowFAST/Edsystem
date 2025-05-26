@@ -262,6 +262,7 @@ class UserPageController extends AbstractController
 
         // Получаем все предметы, к которым у пользователя есть доступ
         $subjects = $this->study->getSubjectsForUser($userId);
+        $accountType = $this->study->getUserType($userId);
         
         $data = [];
         
@@ -277,10 +278,14 @@ class UserPageController extends AbstractController
                     'file_type' => 'teacher',
                 ]);
                 
-                $studentFiles = $this->em->getRepository(SubjectWikiFile::class)->findBy([
-                    'wiki_id' => $entry->getId(),
-                    'file_type' => 'student',
-                ]);
+                $studentFiles = $this->em->getRepository(SubjectWikiFile::class)->getStudentFiles($userId, $entry->getId());
+
+                $studentAnswers = ($accountType == 'teacher') 
+                    ? $this->em->getRepository(SubjectWikiFile::class)->findBy([
+                        'wiki_id' => $entry->getId(),
+                        'file_type' => 'student',
+                    ])
+                    : [];
                 
                 $entryData = [
                     'id' => $entry->getId(),
@@ -301,10 +306,22 @@ class UserPageController extends AbstractController
                 }
                 
                 foreach ($studentFiles as $file) {
-                    $fileEntity = $this->em->getRepository(FileEntity::class)->find($file->getFileId());
+                    $fileEntity = $this->em->getRepository(FileEntity::class)->find($file['file_id']);
                     $student = $this->em->getRepository(Student::class)->findOneBy(['user_id' => $fileEntity->getCreatedBy()]);
                     $studentName = $student->getLastName() . ' ' . $student->getFirstName();
                     $entryData['student_files'][] = [
+                        'id' => $fileEntity->getId(),
+                        'name' => $fileEntity->getFileName(),
+                        'url' => '/download/user-file/' . $fileEntity->getRealFileName(),
+                        'student_name' => $studentName,
+                    ];
+                }
+
+                foreach ($studentAnswers as $file) {
+                    $fileEntity = $this->em->getRepository(FileEntity::class)->find($file->getFileId());
+                    $student = $this->em->getRepository(Student::class)->findOneBy(['user_id' => $fileEntity->getCreatedBy()]);
+                    $studentName = $student->getLastName() . ' ' . $student->getFirstName();
+                    $entryData['student_answers'][] = [
                         'id' => $fileEntity->getId(),
                         'name' => $fileEntity->getFileName(),
                         'url' => '/download/user-file/' . $fileEntity->getRealFileName(),

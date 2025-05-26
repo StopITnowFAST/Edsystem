@@ -783,7 +783,6 @@ function renderDay(date, lessons = []) {
 }
 
 function renderLesson(lesson) {
-    console.log(lesson);
     return `
         <div class="lesson-card">
             <div class="lesson-time">
@@ -879,7 +878,6 @@ function formatDateToKey(date) {
 
 
 function getSubjectPage(data, userType) {
-    console.log(data);
     if (!data || data.length == 0) {
         return `
             <div class="wiki-no-data">
@@ -1121,7 +1119,6 @@ function collectGradeChanges(subject, date, type, time) {
     };
     let activeCard = document.querySelector('.subject-cards-container.active');
     activeCard.querySelectorAll('.students-table tbody tr').forEach(row => {
-        console.log('push');
         changes.push({
             studentId: row.dataset.studentId,
             attendance: row.querySelector('.attendance-select').value,
@@ -1154,6 +1151,9 @@ async function saveGradeChanges(changes) {
 // -----------------------------------------------------------------------------
 
 function getWikiPage(wikiData, userType) {
+
+    console.log(wikiData);
+
     // Получаем список всех предметов пользователя (даже без записей)
     const allSubjects = getAllUserSubjects(); // Эта функция должна быть реализована
     
@@ -1233,6 +1233,8 @@ function renderWikiEntry(entry, userType, userId) {
         ? entry.student_files.filter(file => file.student_id == userId)
         : entry.student_files;
 
+    console.log(entry); 
+
     return `
         <div class="wiki-entry" data-entry-id="${entry.id}">
             <div class="wiki-entry-header">
@@ -1274,10 +1276,10 @@ function renderWikiEntry(entry, userType, userId) {
                         </div>
                     ` : ''}
                     
-                    ${userType === 'teacher' && entry.student_files.length > 0 ? `
+                    ${userType === 'teacher' && entry.student_answers.length > 0 ? `
                         <h4>Ответы студентов:</h4>
                         <div class="student-files">
-                            ${entry.student_files.map(file => renderFileItem(file, 'student', 'teacher')).join('')}
+                            ${entry.student_answers.map(file => renderFileItem(file, 'student', 'teacher')).join('')}
                         </div>
                     ` : ''}
                     
@@ -1680,14 +1682,15 @@ function renderStudentProfile(studentData) {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        ${subject.grades.map(grade => `
+                                        ${subject.grades.map(grade => (grade.value) ? `
                                             <tr>
-                                                <td>${new Date(grade.date).toLocaleDateString()}</td>
-                                                <td>${grade.lesson_type}</td>
-                                                <td class="grade-value ${getGradeClass(grade.value)}">${grade.value}</td>
+                                                <td>${grade.date ? new Date(grade.date).toLocaleDateString() : ''}</td>
+                                                <td>${grade.lesson_type || ''}</td>
+                                                <td class="grade-value ${grade.value ? getGradeClass(grade.value) : ''}">
+                                                    ${grade.value || ''}
+                                                </td>
                                             </tr>
-                                        `).join('')}
-                                    </tbody>
+                                        ` : '').join('')}
                                 </table>
                             ` : '<p>Нет оценок по этому предмету</p>'}
                         </div>
