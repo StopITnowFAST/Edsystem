@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Модераторы | {{ app_title }}{% endblock %}
+{% block title %}Панель доступа | {{ app_title }}{% endblock %}
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('/styles/admin_tables.css') }}">
@@ -12,7 +12,7 @@
         {{ include('blocks/breadcrumbs.html.twig') }}
         <div class="admin-table__wrap">
             <div class="admin-table__head">
-                <h1>Модераторы</h1>
+                <h1>Панель доступа</h1>
                 <div class="admin-table__buttons">
                 
                 </div>
@@ -23,7 +23,8 @@
                         <tr>
                             <th>ID</th>
                             <th>Эл. почта</th>
-                            <th>Роль</th>
+                            <th>Модератор</th>
+                            <th>Преподаватель</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -31,11 +32,13 @@
                             <tr>
                                 <td>{{ user.id }}</td>
                                 <td>{{ user.email }}</td>
-                                <td><input type="checkbox" value="{{ user.id }}"
-                                    {% if "ROLE_MODERATOR" in user.roles %}
-                                        checked
-                                    {% endif %} />
+                                <td><input type="checkbox" class="role-checkbox" data-role="ROLE_MODERATOR" value="{{ user.id }}"
+                                        {% if "ROLE_MODERATOR" in user.roles %}checked{% endif %} />
                                     <label>Модератор</label>
+                                </td>
+                                <td><input type="checkbox" class="role-checkbox" data-role="ROLE_TEACHER" value="{{ user.id }}"
+                                        {% if "ROLE_ADMIN" in user.roles %}checked{% endif %} />
+                                    <label>Преподаватель</label>
                                 </td>
                             </tr>
                         {% endfor %}

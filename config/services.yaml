@@ -19,9 +19,9 @@ services:
             $em: '@doctrine.orm.entity_manager'
             $logger: '@logger'
             
-    App\Service\Header:
-        arguments:
-            $security: '@security.helper' # или '@security.token_storage' для Symfony <5.1
+    # App\Service\Header:
+    #     arguments:
+    #         $security: '@security.helper' # или '@security.token_storage' для Symfony <5.1
 
     Symfony\Component\HttpFoundation\Session\SessionInterface: '@session'
     # ИЛИ для Symfony 6.3+:
@@ -29,6 +29,8 @@ services:
     menu_data_provider:
         class: array
         factory: ['@App\Service\Header', 'getHeaderMenu']
+        arguments:
+            - '@=service("security.helper").getUser()'
     # config/services.yaml
     
     # default configuration for services in *this* file

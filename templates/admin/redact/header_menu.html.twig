@@ -54,6 +54,13 @@
                             <input id="link" class="admin-create__input" name="url"
                                 value="{{ (updating_element is not empty) ? updating_element.url : "" }}">
                         </div>
+                        <div class="admin-create__field">
+                            <label for="role">Роль</label>
+                            <select id="role" name="role" class="admin-create__select" required>
+                                <option value="teacher" {{ (updating_element is not empty and updating_element.isForTeacher == 1) ? "selected" : "" }}>Преподаватель</option>
+                                <option value="moderator" {{ (updating_element is not empty and updating_element.isForTeacher == 0) ? "selected" : "" }}>Модератор</option>
+                            </select>
+                        </div>
                     </div>
                     <button class="btn btn-primary" type="sumbit">Сохранить</button>
                 </form>

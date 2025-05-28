@@ -45,11 +45,11 @@ class AdminPagesController extends AbstractController {
     ) {
     }
     
-    // Таблица модераторы
+    // Таблица панель доступа
     #[Route(path: '/admin/moderators/{page}', name: 'admin_moderators')] 
     function adminModerators($page = 1) {
         $breadcrumbs = $this->breadcrumbs->registerBreadcrumbs([
-            'Модераторы' => 'admin_moderators',
+            'Панель доступа' => 'admin_moderators',
         ], $this->router);
 
         $pagination = $this->table->createPagination($page, $this->em->getRepository(User::class));
@@ -368,6 +368,7 @@ class AdminPagesController extends AbstractController {
             $headerItem->setUrl($_POST['url'] ?? NULL);
             $headerItem->setPlaceOrder($_POST['place_order']);
             $headerItem->setStatus($_POST['status']);
+            $headerItem->setForTeacher($_POST['role']);
             $this->em->persist($headerItem);
             $this->em->flush();
             return $this->redirectToRoute('admin_header-menu');

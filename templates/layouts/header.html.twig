@@ -1,5 +1,6 @@
 {% if app.request.attributes.get('_route') != 'app_login' and app.request.attributes.get('_route') != 'app_register' %}
     <header>
+        {{ dump(menu_items) }}
         <div class="container">
             <div class="header__wrap">
                 {% if app.user %}
@@ -7,7 +8,7 @@
                         <img src="{{ asset('logo.svg') }}" alt="KITEDU" class="header__logo">
                         {{ include('blocks/account_widget.html.twig') }}
                     </div>
-                    {% if is_granted('ROLE_MODERATOR') %}
+                    {% if is_granted('ROLE_MODERATOR') or is_granted('ROLE_TEACHER') %}
                         <div class="header__menu">
                             <div class="header__menu-groups">
                                 {# Перебор групп элементов header #}

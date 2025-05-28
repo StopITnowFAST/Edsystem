@@ -27,15 +27,18 @@ class AjaxController extends AbstractController
     #[Route(path: '/request/change/role', name: 'request_change_role')] 
     function changeRole() {    
         $postJsonArray = json_decode(file_get_contents("php://input"), true);
+
         $user = $this->em->getRepository(User::class)->find($postJsonArray['id']);
+        $role = $postJsonArray['role'];
+
         $roles = $user->getRoles();
-        $key = array_search("ROLE_MODERATOR", $roles);        
+        $key = array_search($role, $roles);        
         if ($key !== false) {
             unset($roles[$key]);
             $roles = array_values($roles);
         } 
         else {
-            array_push($roles, "ROLE_MODERATOR");
+            array_push($roles, $role);
         }
         $user->setRoles($roles);
         $this->em->persist($user);
@@ -77,7 +80,6 @@ class AjaxController extends AbstractController
     // Получение расписания для группы 
     #[Route(path: '/request/get/schedule/{groupId}', name: 'get_schedule')] 
     function getSchedule($groupId) {
-
         $schedule = $this->em->getRepository(Schedule::class)->findBy(['schedule_group_id' => $groupId]);
 
         return $this->json([
