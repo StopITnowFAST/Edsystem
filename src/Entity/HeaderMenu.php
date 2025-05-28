@@ -29,6 +29,9 @@ class HeaderMenu
     #[ORM\Column(length: 100)]
     private ?string $name = null;
 
+    #[ORM\Column]
+    private ?bool $isForTeacher = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -90,6 +93,18 @@ class HeaderMenu
     public function setName(string $name): static
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function isForTeacher(): ?bool
+    {
+        return $this->isForTeacher;
+    }
+
+    public function setForTeacher(bool $isForTeacher): static
+    {
+        $this->isForTeacher = $isForTeacher;
 
         return $this;
     }

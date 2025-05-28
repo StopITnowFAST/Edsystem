@@ -1658,3 +1658,156 @@
     font-size: 0.9rem;
     color: var(--color-grey-0);
 }
+
+/* Journal styles */
+.journal-section {
+    padding: 20px;
+    background-color: var(--color-grey-200);
+    border-radius: var(--offset-xxs);
+    color: var(--color-font-bright);
+}
+
+.journal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--color-grey-400);
+}
+
+.journal-header h1 {
+    color: var(--color-main);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.journal-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.journal-subject-container {
+    margin-top: 20px;
+}
+
+.group-tabs-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+}
+
+.group-tab {
+    padding: 8px 15px;
+    background-color: var(--color-grey-300);
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+}
+
+.group-tab:hover {
+    background-color: var(--color-grey-375);
+}
+
+.group-tab.active {
+    background-color: var(--color-main);
+    color: white;
+}
+
+.journal-table-container {
+    overflow-x: auto;
+    background-color: var(--color-grey-300);
+    border-radius: var(--offset-xxs);
+    padding: 15px;
+}
+
+.journal-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.journal-table th, 
+.journal-table td {
+    padding: 12px 15px;
+    text-align: center;
+    border: 1px solid var(--color-grey-400);
+}
+
+.journal-table th {
+    background-color: var(--color-grey-400);
+    color: var(--color-font-bright);
+    font-weight: 500;
+    position: sticky;
+    top: 0;
+}
+
+.journal-table tr:nth-child(even) {
+    background-color: var(--color-grey-375);
+}
+
+.journal-table tr:hover {
+    background-color: var(--color-grey-400);
+}
+
+.grade-cell {
+    font-weight: bold;
+}
+
+.grade-cell.excellent {
+    background-color: rgba(76, 175, 80, 0.2);
+    color: #4CAF50;
+}
+
+.grade-cell.good {
+    background-color: rgba(139, 195, 74, 0.2);
+    color: #8BC34A;
+}
+
+.grade-cell.satisfactory {
+    background-color: rgba(255, 193, 7, 0.2);
+    color: #FFC107;
+}
+
+.grade-cell.unsatisfactory {
+    background-color: rgba(244, 67, 54, 0.2);
+    color: #F44336;
+}
+
+.no-access-message,
+.journal-no-data,
+.no-groups-message,
+.no-students-message {
+    text-align: center;
+    padding: 40px;
+    color: var(--color-grey-0);
+    background: var(--color-grey-300);
+    border-radius: 10px;
+}
+
+.no-access-message i,
+.journal-no-data i,
+.no-groups-message i,
+.no-students-message i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: var(--color-main);
+}
+
+.no-access-message p,
+.journal-no-data p,
+.no-groups-message p,
+.no-students-message p {
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+.excel-button {
+    margin-top: 20px;
+    background-color: var(--color-grey-300);
+    color: white;
+}

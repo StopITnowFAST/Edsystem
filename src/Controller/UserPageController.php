@@ -792,4 +792,81 @@ class UserPageController extends AbstractController
         
         return $subjects;
     }
+
+    #[Route('/request/get/user/journal/{userId}', name: 'get_journal')]
+    public function getJournal($userId) {
+        if ($this->getUser()->getId() != $userId) {
+            return new Response('Permission Error', 403);
+        }
+
+        $accountType = $this->study->getUserType($userId);
+        if ($accountType != 'teacher') {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Доступ только для преподавателей'
+            ], 403);
+        }
+
+        // Получаем все предметы преподавателя
+        $subjects = $this->study->getSubjectsForUser($userId);
+        
+        $journalData = [];
+        
+        foreach ($subjects as $subject) {
+            // Получаем группы для каждого предмета
+            $groups = $this->study->getGroups($subject['id']);
+            
+            $subjectData = [
+                'id' => $subject['id'],
+                'name' => $subject['name'],
+                'groups' => []
+            ];
+            
+            foreach ($groups as $group) {
+                // Получаем студентов группы
+                $students = $this->em->getRepository(Student::class)->findBy(['group_id' => $group['id']]);
+                
+                $groupData = [
+                    'id' => $group['id'],
+                    'code' => $group['code'],
+                    'students' => []
+                ];
+                
+                foreach ($students as $student) {
+                    // Получаем оценки студента по этому предмету
+                    $grades = $this->em->getRepository(Grade::class)->findBy([
+                        'user_id' => $student->getUserId(),
+                        'subject_id' => $subject['id']
+                    ]);
+                    
+                    $studentGrades = [];
+                    foreach ($grades as $grade) {
+                        $studentGrades[] = [
+                            'date' => $grade->getDate(),
+                            'value' => $grade->getGrade(),
+                            'type' => $this->em->getRepository(ScheduleLessonType::class)->find($grade->getType())->getName()
+                        ];
+                    }
+                    
+                    $groupData['students'][] = [
+                        'id' => $student->getId(),
+                        'last_name' => $student->getLastName(),
+                        'first_name' => $student->getFirstName(),
+                        'grades' => $studentGrades
+                    ];
+                }
+                
+                $subjectData['groups'][] = $groupData;
+            }
+            
+            $journalData[] = $subjectData;
+        }
+        
+        return $this->json([
+            'status' => 'success',
+            'data' => [
+                'subjects' => $journalData
+            ]
+        ]);
+    }
 }

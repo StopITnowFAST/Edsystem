@@ -4,6 +4,7 @@ const SUBJECT_SECTION = 'subjects';
 const PROFILE_SECTION = 'profile';
 const TEST_SECTION = 'tests';
 const WIKI_SECTION = 'wiki';
+const JOURNAL_SECTION = 'journal';
 
 const SCHEDULE_SECTION_URL = '/request/get/user/' + SCHEDULE_SECTION + '/';
 const CHAT_SECTION_URL = '/request/get/user/' + CHAT_SECTION + '/';
@@ -17,6 +18,7 @@ const WIKI_SECTION_URL = '/request/get/user/' + WIKI_SECTION + '/';
 const CREATE_WIKI_ENTRY_URL = '/request/create/wiki/entry';
 const UPLOAD_WIKI_FILE_URL = '/request/upload/wiki/file';
 const GET_WIKI_FILES_URL = '/request/get/wiki/files';
+const JOURNAL_SECTION_URL = '/request/get/user/' + JOURNAL_SECTION + '/';
 
 const CONTENT_CONTAINER = document.getElementById('content');
 const POLL_DELAY = 1000;
@@ -86,6 +88,12 @@ async function loadContent(section) {
             json = await getDataFromServer(TEST_SECTION_ULR);
             content = getTestsPage(json.data);
             renderContent(content);   
+            break;
+        case JOURNAL_SECTION:
+            json = await getDataFromServer(JOURNAL_SECTION_URL);
+            content = getJournalPage(json.data, userType);
+            renderContent(content);
+            initJournalPage(userType);
             break;
     } 
 }
@@ -1722,4 +1730,190 @@ function getGradeClass(grade) {
     if (grade >= 3.5) return 'good';
     if (grade >= 2.5) return 'satisfactory';
     return 'unsatisfactory';
+}
+
+
+function getJournalPage(journalData, userType) {
+    if (userType !== 'teacher') {
+        return `
+            <div class="no-access-message">
+                <i class="fas fa-lock"></i>
+                <p>Доступ только для преподавателей</p>
+            </div>
+        `;
+    }
+
+    if (!journalData || !journalData.subjects || journalData.subjects.length === 0) {
+        return `
+            <div class="journal-no-data">
+                <i class="fas fa-book"></i>
+                <p>Нет доступных предметов для просмотра журнала</p>
+            </div>
+        `;
+    }
+
+    // Создаем табы для предметов
+    const subjectTabs = journalData.subjects.map(subject => 
+        `<div class="subject-tab" data-subject-id="${subject.id}">${subject.name}</div>`
+    ).join('');
+
+    // Создаем контейнеры для каждого предмета
+    const subjectContents = journalData.subjects.map(subject => `
+        <div class="journal-subject-container" data-subject-id="${subject.id}" style="display: none;">
+            ${renderJournalSubject(subject)}
+        </div>
+    `).join('');
+
+    return `
+        <div class="journal-section">            
+            <div class="subject-tabs-container">
+                ${subjectTabs}
+            </div>            
+                    
+            ${subjectContents}
+        </div>
+    `;
+}
+
+function renderJournalSubject(subject) {
+    if (!subject.groups || subject.groups.length === 0) {
+        return `
+            <div class="no-groups-message">
+                <i class="fas fa-users-slash"></i>
+                <p>Нет групп для этого предмета</p>
+            </div>
+        `;
+    }
+
+    // Создаем табы для групп
+    const groupTabs = subject.groups.map(group => 
+        `<div class="group-tab" data-group-id="${group.id}">${group.code}</div>`
+    ).join('');
+
+    // Создаем контейнеры для каждой группы
+    const groupContents = subject.groups.map(group => `
+        <div class="journal-group-container" data-group-id="${group.id}" style="display: none;">
+            ${renderJournalGroup(group)}
+        </div>
+    `).join('');
+
+    return `
+        <div class="journal-subject-content">
+            <div class="group-tabs-container">
+                ${groupTabs}
+            </div>
+            
+            <div class="journal-group-content">
+                ${groupContents}
+            </div>
+        </div>
+    `;
+}
+
+function renderJournalGroup(group) {
+    if (!group.students || group.students.length === 0) {
+        return `
+            <div class="no-students-message">
+                <i class="fas fa-user-graduate"></i>
+                <p>Нет студентов в этой группе</p>
+            </div>
+        `;
+    }
+
+    // Собираем все уникальные даты занятий
+    const allDates = [];
+    group.students.forEach(student => {
+        student.grades.forEach(grade => {
+            if (!allDates.includes(grade.date)) {
+                allDates.push(grade.date);
+            }
+        });
+    });
+    allDates.sort();
+
+    // Создаем заголовки таблицы
+    const dateHeaders = allDates.map(date => `
+        <th>${new Date(date).toLocaleDateString()}</th>
+    `).join('');
+
+    // Создаем строки для каждого студента
+    const studentRows = group.students.map(student => `
+        <tr>
+            <td>${student.last_name} ${student.first_name}</td>
+            ${allDates.map(date => {
+                const grade = student.grades.find(g => g.date === date);
+                return `<td class="grade-cell ${grade && grade.value ? getGradeClass(grade.value) : ''}">
+                    ${grade && grade.value ? grade.value : '-'}
+                </td>`;
+            }).join('')}
+        </tr>
+    `).join('');
+
+    return `
+        <div class="journal-table-container">
+            <table class="journal-table">
+                <thead>
+                    <tr>
+                        <th>Студент</th>
+                        ${dateHeaders}
+                    </tr>
+                </thead>
+                <tbody>
+                    ${studentRows}
+                </tbody>
+            </table>
+        </div>
+    `;
+}
+
+function initJournalPage(userType) {
+    if (userType !== 'teacher') return;
+
+    // Обработка переключения между предметами
+    const subjectTabs = document.querySelectorAll('.subject-tab');
+    if (subjectTabs.length > 0) {
+        subjectTabs[0].classList.add('active');
+        const firstSubjectId = subjectTabs[0].dataset.subjectId;
+        document.querySelector(`.journal-subject-container[data-subject-id="${firstSubjectId}"]`).style.display = 'block';
+        
+        subjectTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                subjectTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                const subjectId = tab.dataset.subjectId;
+                document.querySelectorAll('.journal-subject-container').forEach(container => {
+                    container.style.display = 'none';
+                });
+                document.querySelector(`.journal-subject-container[data-subject-id="${subjectId}"]`).style.display = 'block';
+            });
+        });
+    }
+
+    // Обработка переключения между группами
+    document.querySelectorAll('.group-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            const container = this.closest('.group-tabs-container');
+            container.querySelectorAll('.group-tab').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            
+            const groupId = this.dataset.groupId;
+            const contentContainer = this.closest('.journal-subject-content').querySelector('.journal-group-content');
+            contentContainer.querySelectorAll('.journal-group-container').forEach(container => {
+                container.style.display = 'none';
+            });
+            contentContainer.querySelector(`.journal-group-container[data-group-id="${groupId}"]`).style.display = 'block';
+        });
+    });
+
+    // Первая группа в первом предмете должна быть активной
+    const firstGroupTab = document.querySelector('.group-tab');
+    if (firstGroupTab) {
+        firstGroupTab.classList.add('active');
+        const firstGroupId = firstGroupTab.dataset.groupId;
+        document.querySelector(`.journal-group-container[data-group-id="${firstGroupId}"]`).style.display = 'block';
+    }
+
+    // Обработка экспорта в Excel
+    document.getElementById('export-journal-btn')?.addEventListener('click', exportJournalToExcel);
 }
